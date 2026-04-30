@@ -59,6 +59,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
           border: `1px solid ${searchFocused ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)'}`,
           background: searchFocused ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.03)',
           padding: '8px 14px',
+          borderRadius: 12,
           minWidth: 220,
           transition: 'all 0.2s',
         }}>
@@ -90,14 +91,16 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
               key={t}
               onClick={() => setTypeFilter(t)}
               style={{
-                padding: '7px 12px',
+                padding: '7px 14px',
                 border: `1px solid ${typeFilter === t ? 'rgba(255,40,0,0.5)' : 'rgba(255,255,255,0.08)'}`,
                 background: typeFilter === t ? 'rgba(255,40,0,0.12)' : 'transparent',
-                color: typeFilter === t ? '#FF2800' : 'rgba(255,255,255,0.4)',
+                color: typeFilter === t ? '#FF2800' : 'rgba(255,255,255,0.55)',
                 fontFamily: 'var(--font-barlow-cond)',
                 fontWeight: 700,
                 fontSize: 11,
                 letterSpacing: '0.08em',
+                borderRadius: 99,
+                cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
             >
@@ -113,14 +116,16 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
               key={d}
               onClick={() => setDriveFilter(d)}
               style={{
-                padding: '7px 10px',
+                padding: '7px 12px',
                 border: `1px solid ${driveFilter === d ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
                 background: driveFilter === d ? 'rgba(255,255,255,0.07)' : 'transparent',
-                color: driveFilter === d ? 'rgba(255,255,255,0.85)' : 'rgba(255,255,255,0.3)',
+                color: driveFilter === d ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
                 fontFamily: 'var(--font-barlow-cond)',
                 fontWeight: 600,
                 fontSize: 11,
                 letterSpacing: '0.06em',
+                borderRadius: 99,
+                cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
             >
@@ -136,14 +141,16 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
               key={s.label}
               onClick={() => setSortIdx(i)}
               style={{
-                padding: '7px 12px',
+                padding: '7px 14px',
                 border: `1px solid ${sortIdx === i ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)'}`,
                 background: sortIdx === i ? 'rgba(255,255,255,0.06)' : 'transparent',
-                color: sortIdx === i ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)',
+                color: sortIdx === i ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)',
                 fontFamily: 'var(--font-barlow-cond)',
                 fontWeight: 600,
                 fontSize: 11,
                 letterSpacing: '0.06em',
+                borderRadius: 99,
+                cursor: 'pointer',
                 transition: 'all 0.15s',
               }}
             >
@@ -183,8 +190,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 1,
-          border: '1px solid rgba(255,255,255,0.07)',
+          gap: 16,
         }}>
           {filtered.map(deal => (
             <DealCard key={deal.id} deal={deal} />

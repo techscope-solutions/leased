@@ -3,8 +3,8 @@ import Ticker from '@/components/Ticker';
 import HeroSlideshow from '@/components/HeroSlideshow';
 import HeroCTA from '@/components/HeroCTA';
 import HowItWorks from '@/components/HowItWorks';
-import { BudgetAndLane } from '@/components/HomepageInteractive';
-import { DEALS, DEALS_BY_CATEGORY, STATS, TICKER_DEALS } from '@/lib/data';
+import Testimonials from '@/components/Testimonials';
+import { DEALS_BY_CATEGORY, STATS, TICKER_DEALS } from '@/lib/data';
 
 export default function Home() {
   const heroDeals = [
@@ -105,9 +105,9 @@ export default function Home() {
         <HowItWorks />
       </div>
 
-      {/* ── Budget + Lane ── */}
+      {/* ── Testimonials ── */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <BudgetAndLane />
+        <Testimonials />
       </div>
 
       {/* ── Footer ── */}

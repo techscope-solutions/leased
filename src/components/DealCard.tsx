@@ -26,17 +26,23 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#0e0e0e',
-        border: `1px solid ${hovered ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.07)'}`,
+        background: 'rgba(12,12,12,0.95)',
+        border: `1px solid ${hovered ? 'rgba(255,255,255,0.16)' : 'rgba(255,255,255,0.08)'}`,
+        borderRadius: 20,
         cursor: 'pointer',
-        transition: 'border-color 0.2s, transform 0.25s cubic-bezier(0.23,1,0.32,1)',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
+        transition: 'border-color 0.2s, transform 0.25s cubic-bezier(0.23,1,0.32,1), box-shadow 0.25s',
+        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
+        boxShadow: hovered
+          ? '0 20px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)'
+          : '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)',
         overflow: 'hidden',
         position: 'relative',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
       }}
     >
       {/* Car image */}
-      <div style={{ height: 180, position: 'relative', overflow: 'hidden' }}>
+      <div style={{ height: 180, position: 'relative', overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
         <div style={{
           position: 'absolute',
           inset: 0,
@@ -51,7 +57,8 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
           {deal.zeroDeal && (
             <div style={{
               background: '#FF2800',
-              padding: '3px 8px',
+              padding: '4px 10px',
+              borderRadius: 99,
               fontFamily: 'var(--font-barlow-cond)',
               fontWeight: 800,
               fontSize: 10,
@@ -60,20 +67,22 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
               display: 'flex',
               alignItems: 'center',
               gap: 4,
+              boxShadow: '0 2px 12px rgba(255,40,0,0.4)',
             }}>
-              <span style={{ fontSize: 8 }}>◆</span> ZERO DOWN
+              <span style={{ fontSize: 7 }}>◆</span> ZERO DOWN
             </div>
           )}
           {deal.slotsLeft !== null && (
             <div style={{
-              background: 'rgba(0,0,0,0.7)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              padding: '3px 8px',
+              background: 'rgba(0,0,0,0.75)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              padding: '4px 10px',
+              borderRadius: 99,
               fontFamily: 'var(--font-barlow-cond)',
               fontWeight: 700,
               fontSize: 10,
               letterSpacing: '0.08em',
-              color: 'rgba(255,255,255,0.8)',
+              color: 'rgba(255,255,255,0.9)',
               backdropFilter: 'blur(8px)',
             }}>
               {deal.slotsLeft} LEFT
@@ -87,13 +96,14 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
           bottom: 12,
           left: 12,
           background: 'rgba(0,0,0,0.75)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          padding: '3px 8px',
+          border: '1px solid rgba(255,255,255,0.14)',
+          padding: '4px 10px',
+          borderRadius: 8,
           fontFamily: 'var(--font-barlow-cond)',
           fontWeight: 700,
           fontSize: 10,
           letterSpacing: '0.1em',
-          color: 'rgba(255,255,255,0.7)',
+          color: 'rgba(255,255,255,0.85)',
           backdropFilter: 'blur(8px)',
         }}>
           {deal.type}
@@ -104,12 +114,12 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
 
         {/* Make / Model */}
-        <div style={{ padding: '12px 14px 8px' }}>
+        <div style={{ padding: '14px 16px 8px' }}>
           <div style={{
             fontFamily: 'var(--font-barlow)',
             fontWeight: 400,
             fontSize: 11,
-            color: 'rgba(255,255,255,0.35)',
+            color: 'rgba(255,255,255,0.55)',
             letterSpacing: '0.06em',
             marginBottom: 2,
           }}>
@@ -129,7 +139,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
             fontFamily: 'var(--font-barlow-cond)',
             fontWeight: 500,
             fontSize: 13,
-            color: 'rgba(255,255,255,0.5)',
+            color: 'rgba(255,255,255,0.65)',
             letterSpacing: '0.02em',
             marginTop: 1,
           }}>
@@ -139,11 +149,11 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
 
         {/* Price row */}
         <div style={{
-          padding: '4px 14px 10px',
+          padding: '4px 16px 12px',
           display: 'flex',
           alignItems: 'flex-end',
           justifyContent: 'space-between',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 3 }}>
             <span style={{
@@ -160,7 +170,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
               fontFamily: 'var(--font-barlow-cond)',
               fontWeight: 600,
               fontSize: 12,
-              color: 'rgba(255,255,255,0.4)',
+              color: 'rgba(255,255,255,0.55)',
               marginBottom: 4,
             }}>
               /MO
@@ -172,7 +182,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
               fontWeight: 500,
               fontSize: 9,
               letterSpacing: '0.1em',
-              color: 'rgba(255,255,255,0.3)',
+              color: 'rgba(255,255,255,0.5)',
               marginBottom: 2,
             }}>
               DUE AT SIGNING
@@ -181,7 +191,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
               fontFamily: 'var(--font-barlow-cond)',
               fontWeight: 700,
               fontSize: 13,
-              color: 'rgba(255,255,255,0.7)',
+              color: 'rgba(255,255,255,0.85)',
             }}>
               ${deal.dueAtSigning === 0 ? '0' : deal.dueAtSigning.toLocaleString()} DAS
             </div>
@@ -192,7 +202,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
         <div style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}>
           {[
             { label: 'TERM', value: `${deal.term}MO` },
@@ -202,8 +212,8 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
             <div
               key={item.label}
               style={{
-                padding: '8px 10px',
-                borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                padding: '10px 12px',
+                borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.07)' : 'none',
               }}
             >
               <div style={{
@@ -211,7 +221,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
                 fontWeight: 500,
                 fontSize: 9,
                 letterSpacing: '0.1em',
-                color: 'rgba(255,255,255,0.25)',
+                color: 'rgba(255,255,255,0.5)',
                 marginBottom: 2,
               }}>
                 {item.label}
@@ -220,7 +230,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
                 fontFamily: 'var(--font-barlow-cond)',
                 fontWeight: 700,
                 fontSize: 12,
-                color: 'rgba(255,255,255,0.75)',
+                color: 'rgba(255,255,255,0.85)',
                 letterSpacing: '0.02em',
               }}>
                 {item.value}
@@ -234,9 +244,10 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '8px 12px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          padding: '10px 14px',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
           background: isUrgent ? 'rgba(255,40,0,0.04)' : 'transparent',
+          borderRadius: isUrgent ? 0 : 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{
@@ -244,7 +255,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
               fontWeight: 600,
               fontSize: 9,
               letterSpacing: '0.1em',
-              color: 'rgba(255,255,255,0.25)',
+              color: 'rgba(255,255,255,0.5)',
             }}>
               EXPIRES
             </span>
@@ -256,11 +267,12 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
             display: 'flex',
             alignItems: 'center',
             gap: 5,
-            padding: '3px 8px',
+            padding: '4px 10px',
+            borderRadius: 99,
             background: TIER_BG[deal.tier],
-            border: `1px solid ${TIER_COLORS[deal.tier]}40`,
+            border: `1px solid ${TIER_COLORS[deal.tier]}50`,
           }}>
-            <span style={{ fontSize: 8, color: TIER_COLORS[deal.tier] }}>◈◈</span>
+            <span style={{ fontSize: 7, color: TIER_COLORS[deal.tier] }}>◈◈</span>
             <span style={{
               fontFamily: 'var(--font-barlow-cond)',
               fontWeight: 700,
@@ -278,14 +290,14 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '7px 12px',
+          padding: '8px 14px',
         }}>
           <span style={{
             fontFamily: 'var(--font-barlow-cond)',
             fontWeight: 500,
             fontSize: 10,
             letterSpacing: '0.06em',
-            color: 'rgba(255,255,255,0.25)',
+            color: 'rgba(255,255,255,0.45)',
           }}>
             DROP / {deal.dropId}
           </span>
@@ -294,7 +306,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
             fontWeight: 500,
             fontSize: 10,
             letterSpacing: '0.06em',
-            color: 'rgba(255,255,255,0.25)',
+            color: 'rgba(255,255,255,0.45)',
           }}>
             {deal.state} · {deal.city}
           </span>

@@ -93,8 +93,8 @@ export default function HowItWorks() {
             <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.35)' }}>THE PROCESS</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(40px, 5vw, 68px)', letterSpacing: '-0.025em', lineHeight: 0.9, color: '#fff' }}>
-              HOW IT<br/><span style={{ color: '#FF2800' }}>WORKS.</span>
+            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(40px, 5vw, 68px)', letterSpacing: '-0.025em', lineHeight: 0.9 }}>
+              <span style={{ color: '#fff' }}>HOW IT </span><span style={{ color: '#FF2800' }}>WORKS.</span>
             </div>
             <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 14, lineHeight: 1.7, color: 'rgba(255,255,255,0.35)', maxWidth: 340 }}>
               Six steps from live drop to keys in hand.<br/>No hidden fees, no data games.
@@ -137,29 +137,30 @@ function StepCard({ step }: { step: typeof STEPS[number] }) {
         {step.n}
       </div>
 
-      {/* Animated icon */}
-      <div style={{ marginBottom: 20, height: 52, display: 'flex', alignItems: 'center' }}>
+      {/* Animated icon — centered */}
+      <div style={{ marginBottom: 24, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <StepIcon icon={step.icon} accent={step.accent} />
       </div>
 
-      {/* Step number label */}
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.16em', color: step.trust ? 'rgba(255,40,0,0.7)' : 'rgba(255,255,255,0.22)', marginBottom: 8 }}>
+      {/* Step number label — centered */}
+      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.16em', color: step.trust ? 'rgba(255,40,0,0.7)' : 'rgba(255,255,255,0.38)', marginBottom: 8, textAlign: 'center' }}>
         STEP {step.n}
       </div>
 
-      {/* Title */}
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 18, letterSpacing: '0.01em', color: '#fff', lineHeight: 1.2, marginBottom: 10, textTransform: 'uppercase' }}>
+      {/* Title — centered */}
+      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 18, letterSpacing: '0.01em', color: '#fff', lineHeight: 1.2, marginBottom: 10, textTransform: 'uppercase', textAlign: 'center' }}>
         {step.title}
       </div>
 
-      {/* Body */}
-      <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.42)', margin: 0 }}>
+      {/* Body — centered */}
+      <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.58)', margin: 0, textAlign: 'center' }}>
         {step.body}
       </p>
 
       {/* Trust badge on step 6 */}
       {step.trust && (
-        <div style={{ marginTop: 20, display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.28)', borderRadius: 99, padding: '5px 14px' }}>
+        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.28)', borderRadius: 99, padding: '5px 14px' }}>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
             <path d="M5 1 L9 3 L9 6 C9 8 7 9.5 5 9.5 C3 9.5 1 8 1 6 L1 3 Z" stroke="#FF2800" strokeWidth="1" fill="none"/>
             <path d="M3.5 5 L4.5 6 L6.5 4" stroke="#FF2800" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -167,6 +168,7 @@ function StepCard({ step }: { step: typeof STEPS[number] }) {
           <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', color: '#FF2800' }}>
             CREDIT DATA NEVER RETAINED
           </span>
+        </div>
         </div>
       )}
     </div>

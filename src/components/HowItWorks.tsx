@@ -137,30 +137,29 @@ function StepCard({ step }: { step: typeof STEPS[number] }) {
         {step.n}
       </div>
 
-      {/* Animated icon — centered */}
-      <div style={{ marginBottom: 24, height: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <StepIcon icon={step.icon} accent={step.accent} />
+      {/* Icon + title on same row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
+        <div style={{ flexShrink: 0, width: 52, height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <StepIcon icon={step.icon} accent={step.accent} />
+        </div>
+        <div>
+          <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.16em', color: step.trust ? 'rgba(255,40,0,0.7)' : 'rgba(255,255,255,0.38)', marginBottom: 4 }}>
+            STEP {step.n}
+          </div>
+          <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 18, letterSpacing: '0.01em', color: '#fff', lineHeight: 1.15, textTransform: 'uppercase' }}>
+            {step.title}
+          </div>
+        </div>
       </div>
 
-      {/* Step number label — centered */}
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.16em', color: step.trust ? 'rgba(255,40,0,0.7)' : 'rgba(255,255,255,0.38)', marginBottom: 8, textAlign: 'center' }}>
-        STEP {step.n}
-      </div>
-
-      {/* Title — centered */}
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 18, letterSpacing: '0.01em', color: '#fff', lineHeight: 1.2, marginBottom: 10, textTransform: 'uppercase', textAlign: 'center' }}>
-        {step.title}
-      </div>
-
-      {/* Body — centered */}
-      <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 13, lineHeight: 1.75, color: 'rgba(255,255,255,0.58)', margin: 0, textAlign: 'center' }}>
+      {/* Body */}
+      <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 13, lineHeight: 1.8, color: 'rgba(255,255,255,0.58)', margin: 0 }}>
         {step.body}
       </p>
 
       {/* Trust badge on step 6 */}
       {step.trust && (
-        <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.28)', borderRadius: 99, padding: '5px 14px' }}>
+        <div style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.28)', borderRadius: 99, padding: '5px 14px' }}>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
             <path d="M5 1 L9 3 L9 6 C9 8 7 9.5 5 9.5 C3 9.5 1 8 1 6 L1 3 Z" stroke="#FF2800" strokeWidth="1" fill="none"/>
             <path d="M3.5 5 L4.5 6 L6.5 4" stroke="#FF2800" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -168,7 +167,6 @@ function StepCard({ step }: { step: typeof STEPS[number] }) {
           <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', color: '#FF2800' }}>
             CREDIT DATA NEVER RETAINED
           </span>
-        </div>
         </div>
       )}
     </div>

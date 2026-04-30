@@ -140,7 +140,7 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* Right: live count + light mode toggle + sign in */}
+      {/* Right: live count + sign in */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
           <span
@@ -166,31 +166,6 @@ export default function Nav() {
             {liveCount ?? BASE} LIVE
           </span>
         </div>
-
-        <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
-
-        <button style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          background: 'transparent',
-          border: 'none',
-          color: 'rgba(255,255,255,0.4)',
-          fontFamily: 'var(--font-barlow-cond)',
-          fontWeight: 600,
-          fontSize: 12,
-          letterSpacing: '0.08em',
-          padding: 0,
-        }}>
-          <span style={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            border: '1px solid rgba(255,255,255,0.35)',
-            display: 'inline-block',
-          }} />
-          LIGHT
-        </button>
 
         <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
 

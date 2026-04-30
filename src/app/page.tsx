@@ -1,13 +1,12 @@
 import Nav from '@/components/Nav';
 import Ticker from '@/components/Ticker';
 import HeroSlideshow from '@/components/HeroSlideshow';
-import HomepageDeals from '@/components/HomepageDeals';
+import HeroCTA from '@/components/HeroCTA';
 import HowItWorks from '@/components/HowItWorks';
 import { BudgetAndLane } from '@/components/HomepageInteractive';
 import { DEALS, DEALS_BY_CATEGORY, STATS, TICKER_DEALS } from '@/lib/data';
 
 export default function Home() {
-  // One representative deal per category for the hero slideshow
   const heroDeals = [
     DEALS_BY_CATEGORY.Daily[0],
     DEALS_BY_CATEGORY.Luxury[0],
@@ -20,128 +19,91 @@ export default function Home() {
       <Ticker deals={TICKER_DEALS} />
 
       {/* ── Hero ── */}
-      <main style={{
-        maxWidth: 1320,
-        margin: '0 auto',
-        padding: '72px 48px 80px',
+      <section style={{
+        position: 'relative',
+        minHeight: 'calc(100vh - 86px)',
         display: 'flex',
         alignItems: 'center',
-        gap: 64,
+        overflow: 'hidden',
       }}>
+        {/* Bottom gradient — hero fades into the page */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: 160,
+          background: 'linear-gradient(to top, #070707, transparent)',
+          zIndex: 10, pointerEvents: 'none',
+        }} />
 
-        {/* Left — headline + stats */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Inner layout */}
+        <div style={{
+          maxWidth: 1320,
+          width: '100%',
+          margin: '0 auto',
+          padding: '0 48px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 0,
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 5,
+        }}>
 
-          {/* Live pill */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'rgba(255,255,255,0.05)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255,255,255,0.09)',
-            borderRadius: 99,
-            padding: '6px 14px',
-            marginBottom: 32,
-          }}>
-            <span className="pulse-dot" style={{
-              width: 6, height: 6, borderRadius: '50%',
-              background: '#FF2800', display: 'inline-block', flexShrink: 0,
-            }} />
-            <span style={{
-              fontFamily: 'var(--font-barlow-cond)', fontWeight: 700,
-              fontSize: 11, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)',
+          {/* Left — text, overlaid above the fan */}
+          <div style={{ paddingRight: 48, position: 'relative', zIndex: 6 }}>
+            {/* Live pill */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'rgba(255,255,255,0.05)',
+              backdropFilter: 'blur(20px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(160%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+              borderRadius: 99, padding: '6px 16px', marginBottom: 36,
             }}>
-              {STATS.liveDrops} LIVE DROPS
-            </span>
+              <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
+              <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>
+                {STATS.liveDrops} LIVE DROPS
+              </span>
+            </div>
+
+            {/* 2-line headline */}
+            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.025em', marginBottom: 28 }}>
+              <div style={{ fontSize: 'clamp(60px, 7.5vw, 108px)', color: '#fff' }}>
+                GET YOUR
+              </div>
+              <div style={{
+                fontSize: 'clamp(60px, 7.5vw, 108px)',
+                background: 'linear-gradient(135deg, #FF2800 20%, #cc1f00 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                DREAM LEASE.
+              </div>
+            </h1>
+
+            {/* Tagline */}
+            <p style={{
+              fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 15,
+              lineHeight: 1.7, color: 'rgba(255,255,255,0.35)',
+              maxWidth: 380, marginBottom: 44, letterSpacing: '0.01em',
+            }}>
+              Vetted brokers. Live countdowns.<br/>Strike before the timer hits zero.
+            </p>
+
+            {/* CTA — sits in front of text visually (highest z) */}
+            <HeroCTA />
           </div>
 
-          {/* 2-line headline */}
-          <h1 style={{
-            fontFamily: 'var(--font-display)',
-            fontWeight: 900,
-            lineHeight: 0.88,
-            letterSpacing: '-0.025em',
-            marginBottom: 28,
-          }}>
-            <div style={{ fontSize: 'clamp(68px, 8.5vw, 118px)', color: '#fff' }}>
-              GET YOUR
-            </div>
-            <div style={{
-              fontSize: 'clamp(68px, 8.5vw, 118px)',
-              color: 'transparent',
-              WebkitTextStroke: '2px #FF2800',
-              // Solid red fill with stroke
-              background: 'linear-gradient(135deg, #FF2800 0%, #cc1f00 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
-              DREAM LEASE.
-            </div>
-          </h1>
-
-          {/* Tagline */}
-          <p style={{
-            fontFamily: 'var(--font-barlow)',
-            fontWeight: 300,
-            fontSize: 16,
-            lineHeight: 1.65,
-            color: 'rgba(255,255,255,0.38)',
-            maxWidth: 400,
-            marginBottom: 48,
-            letterSpacing: '0.01em',
-          }}>
-            Vetted brokers. Live countdowns.
-            Strike before the timer hits zero.
-          </p>
-
-          {/* Glass stat pills */}
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-            {[
-              { value: `${STATS.liveDrops}`, label: 'Live Drops' },
-              { value: `${STATS.zeroDown}`, label: 'Zero Down' },
-              { value: `$${STATS.startingFrom}/mo`, label: 'Starting From', red: true },
-            ].map(({ value, label, red }) => (
-              <div key={label} style={{
-                background: 'rgba(255,255,255,0.045)',
-                backdropFilter: 'blur(24px) saturate(160%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-                border: '1px solid rgba(255,255,255,0.09)',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07)',
-                borderRadius: 14,
-                padding: '14px 22px',
-              }}>
-                <div style={{
-                  fontFamily: 'var(--font-display)', fontWeight: 900,
-                  fontSize: 28, letterSpacing: '-0.03em', lineHeight: 1,
-                  color: red ? '#FF2800' : '#fff',
-                  marginBottom: 4,
-                }}>
-                  {value}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-barlow)', fontWeight: 400,
-                  fontSize: 11, letterSpacing: '0.04em',
-                  color: 'rgba(255,255,255,0.3)',
-                }}>
-                  {label}
-                </div>
-              </div>
-            ))}
+          {/* Right — fanned glass slideshow */}
+          <div style={{ position: 'relative', height: 560, zIndex: 4 }}>
+            <HeroSlideshow deals={heroDeals} />
           </div>
         </div>
-
-        {/* Right — glass slideshow */}
-        <HeroSlideshow deals={heroDeals} />
-      </main>
-
-      {/* ── Live Deal Categories ── */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 56 }}>
-        <HomepageDeals dealsByCategory={DEALS_BY_CATEGORY} />
-      </div>
+      </section>
 
       {/* ── How It Works ── */}
-      <HowItWorks />
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <HowItWorks />
+      </div>
 
       {/* ── Budget + Lane ── */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>

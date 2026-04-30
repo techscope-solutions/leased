@@ -42,8 +42,8 @@ const STEPS = [
     n: '06',
     title: 'Keys in Hand — $50',
     body: 'Approved? LEASED charges a flat $50 to coordinate delivery or pickup. We never retain your credit data.',
-    gradient: 'linear-gradient(135deg, #200808 0%, #300a0a 100%)',
-    accentColor: '#FF2800',
+    gradient: 'linear-gradient(135deg, #080f1e 0%, #0d1a30 100%)',
+    accentColor: '#4a7fd4',
     trust: true,
   },
 ];
@@ -55,7 +55,7 @@ export default function HowItWorks() {
       {/* Centered title */}
       <div style={{ textAlign: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800' }} />
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4a7fd4' }} />
           <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.35)' }}>
             THE PROCESS
           </span>
@@ -143,7 +143,7 @@ function StepCard({ step }: { step: typeof STEPS[number] }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <span style={{
           fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10,
-          letterSpacing: '0.16em', color: step.trust ? 'rgba(255,40,0,0.7)' : 'rgba(255,255,255,0.35)',
+          letterSpacing: '0.16em', color: step.trust ? 'rgba(74,127,212,0.85)' : 'rgba(255,255,255,0.35)',
         }}>
           STEP {step.n}
         </span>
@@ -166,12 +166,12 @@ function StepCard({ step }: { step: typeof STEPS[number] }) {
 
       {/* Trust badge on step 6 */}
       {step.trust && (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.28)', borderRadius: 99, padding: '5px 14px', alignSelf: 'flex-start' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'rgba(74,127,212,0.08)', border: '1px solid rgba(74,127,212,0.3)', borderRadius: 99, padding: '5px 14px', alignSelf: 'flex-start' }}>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M5 1 L9 3 L9 6 C9 8 7 9.5 5 9.5 C3 9.5 1 8 1 6 L1 3 Z" stroke="#FF2800" strokeWidth="1" fill="none"/>
-            <path d="M3.5 5 L4.5 6 L6.5 4" stroke="#FF2800" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M5 1 L9 3 L9 6 C9 8 7 9.5 5 9.5 C3 9.5 1 8 1 6 L1 3 Z" stroke="#4a7fd4" strokeWidth="1" fill="none"/>
+            <path d="M3.5 5 L4.5 6 L6.5 4" stroke="#4a7fd4" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', color: '#FF2800' }}>
+          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', color: '#4a7fd4' }}>
             CREDIT DATA NEVER RETAINED
           </span>
         </div>

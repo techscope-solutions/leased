@@ -136,7 +136,7 @@ function StarRow() {
     <div style={{ display: 'flex', gap: 4 }}>
       {Array.from({ length: 5 }).map((_, i) => (
         <svg key={i} width="14" height="14" viewBox="0 0 12 12" fill="none">
-          <path d="M6 1 L7.2 4.2 L10.6 4.4 L8 6.8 L8.9 10.2 L6 8.4 L3.1 10.2 L4 6.8 L1.4 4.4 L4.8 4.2 Z" fill="#FF2800"/>
+          <path d="M6 1 L7.2 4.2 L10.6 4.4 L8 6.8 L8.9 10.2 L6 8.4 L3.1 10.2 L4 6.8 L1.4 4.4 L4.8 4.2 Z" fill="#c8922a"/>
         </svg>
       ))}
     </div>
@@ -186,7 +186,7 @@ export default function Testimonials() {
         {/* Header */}
         <div style={{ marginBottom: 52 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800' }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#4a7fd4' }} />
             <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.35)' }}>
               REAL DRIVERS
             </span>

@@ -28,11 +28,25 @@ function loadCount(): number {
 }
 
 function step(c: number): number {
-  // Bias toward center so the number never drifts to the rails for long.
-  const mid = (MIN + MAX) / 2;
-  const upBias = c < mid ? 0.58 : 0.42;
-  const delta = Math.random() < upBias ? 1 : -1;
-  return Math.max(MIN, Math.min(MAX, c + delta));
+  const r = Math.random();
+  let delta: number;
+  if (r < 0.04) {
+    delta = -3; // occasional bigger drop (someone left)
+  } else if (r < 0.10) {
+    delta = -2;
+  } else if (r < 0.42) {
+    delta = -1;
+  } else if (r < 0.74) {
+    delta = 1;
+  } else if (r < 0.93) {
+    delta = 2;
+  } else {
+    delta = 3; // occasional bigger jump (group arrived)
+  }
+  // Soft wall: nudge back toward range if drifting to the edges
+  if (c + delta > MAX) delta = -1;
+  if (c + delta < MIN) delta = 1;
+  return c + delta;
 }
 
 function saveCount(count: number) {

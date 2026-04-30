@@ -8,7 +8,7 @@ export default function Home() {
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative', zIndex: 1 }}>
-      <Nav liveCount={STATS.liveDrops} />
+      <Nav />
       <Ticker deals={TICKER_DEALS} />
 
       {/* Hero */}

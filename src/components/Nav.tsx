@@ -2,9 +2,71 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
 
-export default function Nav({ liveCount = 12 }: { liveCount?: number }) {
+const MIN = 28;
+const MAX = 64;
+const BASE = 41;
+const STORAGE_KEY = 'leased_live_v1';
+
+function loadCount(): number {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const { count, ts } = JSON.parse(raw);
+      // Replay the random walk for however many seconds elapsed while away.
+      // Cap replay at 90s so a long absence doesn't cause a huge jump.
+      const elapsed = Math.min(Math.floor((Date.now() - ts) / 1000), 90);
+      let c = Math.max(MIN, Math.min(MAX, count));
+      for (let i = 0; i < elapsed; i++) {
+        c = step(c);
+      }
+      return c;
+    }
+  } catch { /* ignore */ }
+  return BASE;
+}
+
+function step(c: number): number {
+  // Bias toward center so the number never drifts to the rails for long.
+  const mid = (MIN + MAX) / 2;
+  const upBias = c < mid ? 0.58 : 0.42;
+  const delta = Math.random() < upBias ? 1 : -1;
+  return Math.max(MIN, Math.min(MAX, c + delta));
+}
+
+function saveCount(count: number) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ count, ts: Date.now() }));
+  } catch { /* ignore */ }
+}
+
+function useLiveCount() {
+  const [count, setCount] = useState<number | null>(null);
+  const countRef = useRef(BASE);
+
+  useEffect(() => {
+    // Hydrate from storage on mount (client only).
+    const initial = loadCount();
+    countRef.current = initial;
+    setCount(initial);
+    saveCount(initial);
+
+    const id = setInterval(() => {
+      countRef.current = step(countRef.current);
+      setCount(countRef.current);
+      saveCount(countRef.current);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, []);
+
+  return count;
+}
+
+export default function Nav() {
   const path = usePathname();
+  const liveCount = useLiveCount();
 
   return (
     <nav style={{
@@ -83,8 +145,11 @@ export default function Nav({ liveCount = 12 }: { liveCount?: number }) {
             fontSize: 12,
             letterSpacing: '0.1em',
             color: 'rgba(255,255,255,0.7)',
+            fontVariantNumeric: 'tabular-nums',
+            minWidth: 28,
+            display: 'inline-block',
           }}>
-            {liveCount} LIVE
+            {liveCount ?? BASE} LIVE
           </span>
         </div>
 

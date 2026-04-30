@@ -118,8 +118,9 @@ export default function Nav() {
 
         <div style={{ display: 'flex', gap: 24 }}>
           {[
-            { label: 'FEED', href: '/browse' },
-            { label: 'POST', href: '/post' },
+            { label: 'MARKETPLACE', href: '/browse' },
+            { label: 'BROKERS', href: '/brokers' },
+            { label: 'DEALERSHIPS', href: '/dealerships' },
           ].map(({ label, href }) => (
             <Link
               key={label}
@@ -170,17 +171,18 @@ export default function Nav() {
         <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
 
         <button style={{
-          padding: '6px 16px',
+          padding: '6px 18px',
           border: '1px solid rgba(255,255,255,0.2)',
-          borderRadius: 3,
+          borderRadius: 8,
           background: 'transparent',
           color: '#fff',
           fontFamily: 'var(--font-barlow-cond)',
           fontWeight: 700,
           fontSize: 12,
           letterSpacing: '0.1em',
+          cursor: 'pointer',
         }}>
-          SIGN IN
+          LOG IN
         </button>
       </div>
     </nav>

@@ -33,23 +33,22 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
   }, [deals, typeFilter, driveFilter, search, sortIdx]);
 
   return (
-    <div style={{ maxWidth: 1400, margin: '0 auto', padding: '0 32px 80px' }}>
+    <div className="r-browse-outer">
 
       {/* Filter bar */}
-      <div style={{
-        position: 'sticky',
-        top: 52,
-        zIndex: 90,
-        background: 'rgba(8,8,8,0.9)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        padding: '12px 0',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
-        flexWrap: 'wrap',
-      }}>
+      <div
+        className="r-filter-bar"
+        style={{
+          position: 'sticky',
+          top: 52,
+          zIndex: 90,
+          background: 'rgba(8,8,8,0.9)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
+          padding: '12px 0',
+        }}
+      >
 
         {/* Search */}
         <div style={{
@@ -85,7 +84,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
         </div>
 
         {/* Type filters */}
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div className="r-filter-chips">
           {TYPES.map(t => (
             <button
               key={t}
@@ -110,7 +109,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
         </div>
 
         {/* Drive filters */}
-        <div style={{ display: 'flex', gap: 4 }}>
+        <div className="r-filter-chips">
           {DRIVES.map(d => (
             <button
               key={d}
@@ -135,7 +134,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
         </div>
 
         {/* Sort */}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+        <div className="r-filter-sort">
           {SORTS.map((s, i) => (
             <button
               key={s.label}
@@ -187,11 +186,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
           NO DROPS MATCH YOUR FILTERS
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 16,
-        }}>
+        <div className="r-deals-grid">
           {filtered.map(deal => (
             <DealCard key={deal.id} deal={deal} />
           ))}

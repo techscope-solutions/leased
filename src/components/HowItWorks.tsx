@@ -50,7 +50,7 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section style={{ padding: '80px 48px 88px', maxWidth: 1320, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 56 }}>
+    <section className="r-how-section" style={{ maxWidth: 1320, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
       {/* Centered title */}
       <div style={{ textAlign: 'center' }}>
@@ -69,7 +69,7 @@ export default function HowItWorks() {
       </div>
 
       {/* 3-column step grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 32, width: '100%' }}>
+      <div className="r-steps-grid">
         {STEPS.map(step => (
           <StepCard key={step.n} step={step} />
         ))}

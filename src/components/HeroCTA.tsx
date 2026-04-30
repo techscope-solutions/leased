@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function HeroCTA() {
   return (
-    <div style={{ display: 'flex', gap: 12, position: 'relative', zIndex: 8 }}>
+    <div className="r-cta-row" style={{ position: 'relative', zIndex: 8 }}>
       <Link href="/browse" style={{ textDecoration: 'none' }}>
         <button
           style={{

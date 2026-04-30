@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CarDeal, DealCategory } from '@/lib/types';
 import CountdownTimer from './CountdownTimer';
+import { useIsMobile } from '@/hooks/useIsMobile';
 
 const CAT: Record<DealCategory, { pill: string; pillBg: string; pillBorder: string; glow: string }> = {
   Daily:    { pill: 'rgba(255,255,255,0.75)', pillBg: 'rgba(255,255,255,0.08)', pillBorder: 'rgba(255,255,255,0.18)', glow: 'rgba(255,255,255,0.04)' },
@@ -15,6 +16,7 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
   const [idx, setIdx] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
+  const isMobile = useIsMobile();
 
   const goTo = useCallback((next: number) => {
     if (animating || next === idx) return;
@@ -29,10 +31,12 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
     return () => clearInterval(id);
   }, [idx, goTo]);
 
+  const frontWidth = isMobile ? '88%' : 340;
+
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      {/* Fanned background cards — the other 2 */}
-      {deals.map((deal, i) => {
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: isMobile ? 'hidden' : 'visible' }}>
+      {/* Fanned background cards — desktop only */}
+      {!isMobile && deals.map((deal, i) => {
         if (i === idx) return null;
         const isLeft = (i < idx) || (idx === 2 && i === 0);
         const offset = isLeft ? -1 : 1;
@@ -70,7 +74,7 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
         position: 'absolute',
         top: '50%',
         left: '50%',
-        width: 340,
+        width: frontWidth,
         transform: 'translate(-50%, -50%) scale(1)',
         transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
         zIndex: 3,

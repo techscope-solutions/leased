@@ -174,8 +174,7 @@ export default function Testimonials() {
         @keyframes slide-out-left  { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(-48px); } }
       `}</style>
 
-      <section style={{
-        padding: '72px 48px 88px',
+      <section className="r-testimonials-section" style={{
         maxWidth: 1320,
         margin: '0 auto',
         display: 'flex',
@@ -207,6 +206,7 @@ export default function Testimonials() {
           {/* Main card */}
           <div
             key={active}
+            className="r-testimonial-card"
             style={{
               flex: 1,
               borderRadius: 28,
@@ -215,31 +215,27 @@ export default function Testimonials() {
               WebkitBackdropFilter: 'blur(40px) saturate(160%)',
               border: '1px solid rgba(255,255,255,0.08)',
               boxShadow: '0 12px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.07)',
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              overflow: 'hidden',
               animation: animating
                 ? (dir > 0 ? 'slide-out-left 0.38s ease forwards' : 'slide-out-right 0.38s ease forwards')
                 : (dir > 0 ? 'slide-in-right 0.38s ease forwards' : 'slide-in-left 0.38s ease forwards'),
             }}
           >
             {/* Left — quote side */}
-            <div style={{
-              padding: '48px 48px 48px 52px',
+            <div className="r-testimonial-left" style={{
+              padding: '40px 40px 40px 44px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
-              borderRight: '1px solid rgba(255,255,255,0.06)',
             }}>
               <div>
                 <StarRow />
                 <p style={{
                   fontFamily: 'var(--font-barlow)',
                   fontWeight: 300,
-                  fontSize: 20,
+                  fontSize: 'clamp(15px, 2.5vw, 20px)',
                   lineHeight: 1.65,
                   color: 'rgba(255,255,255,0.85)',
-                  margin: '28px 0 0',
+                  margin: '24px 0 0',
                   letterSpacing: '-0.01em',
                 }}>
                   &ldquo;{t.quote}&rdquo;
@@ -266,7 +262,7 @@ export default function Testimonials() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 24,
-              padding: '48px',
+              padding: '40px 32px',
               background: `radial-gradient(ellipse at 50% 60%, ${t.carColor} 0%, rgba(8,8,8,0.6) 65%)`,
               position: 'relative',
               overflow: 'hidden',
@@ -292,7 +288,7 @@ export default function Testimonials() {
           </div>
 
           {/* Bottom row: dots + CTA */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div className="r-testimonial-bottom">
 
             {/* Dots */}
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -315,10 +311,11 @@ export default function Testimonials() {
             </div>
 
             {/* CTA */}
-            <Link href="/browse" style={{ textDecoration: 'none' }}>
+            <Link href="/browse" style={{ textDecoration: 'none', width: '100%' }}>
               <button
                 style={{
                   padding: '14px 36px',
+                  width: '100%',
                   borderRadius: 14,
                   background: 'rgba(255,40,0,0.9)',
                   border: '1px solid rgba(255,80,40,0.45)',

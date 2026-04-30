@@ -19,14 +19,8 @@ export default function Home() {
       <Ticker deals={TICKER_DEALS} />
 
       {/* ── Hero ── */}
-      <section style={{
-        position: 'relative',
-        minHeight: 'calc(100vh - 86px)',
-        display: 'flex',
-        alignItems: 'center',
-        overflow: 'hidden',
-      }}>
-        {/* Bottom gradient — hero fades into the page */}
+      <section className="r-hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Bottom gradient */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: 160,
           background: 'linear-gradient(to top, #070707, transparent)',
@@ -34,21 +28,10 @@ export default function Home() {
         }} />
 
         {/* Inner layout */}
-        <div style={{
-          maxWidth: 1320,
-          width: '100%',
-          margin: '0 auto',
-          padding: '0 48px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 0,
-          alignItems: 'center',
-          position: 'relative',
-          zIndex: 5,
-        }}>
+        <div className="r-hero-inner" style={{ maxWidth: 1320, width: '100%', margin: '0 auto', position: 'relative', zIndex: 5 }}>
 
-          {/* Left — text, overlaid above the fan */}
-          <div style={{ paddingRight: 48, position: 'relative', zIndex: 6 }}>
+          {/* Left */}
+          <div className="r-hero-left" style={{ position: 'relative', zIndex: 6 }}>
             {/* Live pill */}
             <div style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -57,7 +40,7 @@ export default function Home() {
               WebkitBackdropFilter: 'blur(20px) saturate(160%)',
               border: '1px solid rgba(255,255,255,0.08)',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-              borderRadius: 99, padding: '6px 16px', marginBottom: 36,
+              borderRadius: 99, padding: '6px 16px', marginBottom: 28,
             }}>
               <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
               <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>
@@ -66,12 +49,12 @@ export default function Home() {
             </div>
 
             {/* 2-line headline */}
-            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.025em', marginBottom: 28 }}>
-              <div style={{ fontSize: 'clamp(60px, 7.5vw, 108px)', color: '#fff' }}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.025em', marginBottom: 24 }}>
+              <div style={{ fontSize: 'clamp(44px, 7.5vw, 108px)', color: '#fff' }}>
                 GET YOUR
               </div>
               <div style={{
-                fontSize: 'clamp(60px, 7.5vw, 108px)',
+                fontSize: 'clamp(44px, 7.5vw, 108px)',
                 background: 'linear-gradient(135deg, #FF2800 20%, #cc1f00 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -83,18 +66,17 @@ export default function Home() {
             {/* Tagline */}
             <p style={{
               fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 15,
-              lineHeight: 1.7, color: 'rgba(255,255,255,0.35)',
-              maxWidth: 380, marginBottom: 44, letterSpacing: '0.01em',
+              lineHeight: 1.7, color: 'rgba(255,255,255,0.5)',
+              maxWidth: 380, marginBottom: 36, letterSpacing: '0.01em',
             }}>
               Vetted brokers. Live countdowns.<br/>Strike before the timer hits zero.
             </p>
 
-            {/* CTA — sits in front of text visually (highest z) */}
             <HeroCTA />
           </div>
 
           {/* Right — fanned glass slideshow */}
-          <div style={{ position: 'relative', height: 560, zIndex: 4 }}>
+          <div className="r-hero-slideshow">
             <HeroSlideshow deals={heroDeals} />
           </div>
         </div>
@@ -111,8 +93,8 @@ export default function Home() {
       </div>
 
       {/* ── Footer ── */}
-      <footer style={{
-        textAlign: 'center', padding: '24px 40px',
+      <footer className="r-footer" style={{
+        textAlign: 'center',
         borderTop: '1px solid rgba(255,255,255,0.05)',
         fontFamily: 'var(--font-barlow)', fontWeight: 300,
         fontSize: 11, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.18)',

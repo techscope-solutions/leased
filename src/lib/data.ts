@@ -1,6 +1,5 @@
 import { CarDeal } from './types';
 
-const now = () => new Date();
 const addHours = (h: number) => new Date(Date.now() + h * 3600 * 1000);
 const addMinutes = (m: number) => new Date(Date.now() + m * 60 * 1000);
 
@@ -27,6 +26,7 @@ export const DEALS: CarDeal[] = [
     zeroDeal: false,
     featured: true,
     carType: 'Sedan',
+    category: 'Supercar',
     accent: '#161616',
     stripe: 'linear-gradient(135deg, #161616 0%, #1e1e1e 100%)',
   },
@@ -51,6 +51,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 1,
     zeroDeal: true,
     carType: 'Sedan',
+    category: 'Luxury',
     accent: '#1a1a2e',
     stripe: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
   },
@@ -75,6 +76,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 1,
     zeroDeal: false,
     carType: 'SUV',
+    category: 'Supercar',
     accent: '#1c1c1c',
     stripe: 'linear-gradient(135deg, #1c1c1c 0%, #2a1a0e 100%)',
   },
@@ -99,6 +101,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 2,
     zeroDeal: false,
     carType: 'EV',
+    category: 'Daily',
     accent: '#111827',
     stripe: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
   },
@@ -123,6 +126,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: null,
     zeroDeal: false,
     carType: 'EV',
+    category: 'Daily',
     accent: '#0d1a2e',
     stripe: 'linear-gradient(135deg, #0d1a2e 0%, #0a1520 100%)',
   },
@@ -147,6 +151,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: null,
     zeroDeal: true,
     carType: 'EV',
+    category: 'Supercar',
     accent: '#0a0e1a',
     stripe: 'linear-gradient(135deg, #0a0e1a 0%, #1a2030 100%)',
   },
@@ -171,6 +176,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 1,
     zeroDeal: false,
     carType: 'SUV',
+    category: 'Supercar',
     accent: '#0d0a0a',
     stripe: 'linear-gradient(135deg, #0d0a0a 0%, #1a1010 100%)',
   },
@@ -195,6 +201,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: null,
     zeroDeal: true,
     carType: 'Truck',
+    category: 'Daily',
     accent: '#0a1018',
     stripe: 'linear-gradient(135deg, #0a1018 0%, #0d1520 100%)',
   },
@@ -219,6 +226,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 4,
     zeroDeal: true,
     carType: 'Truck',
+    category: 'Daily',
     accent: '#1a1200',
     stripe: 'linear-gradient(135deg, #1a1200 0%, #251a00 100%)',
   },
@@ -243,6 +251,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 3,
     zeroDeal: false,
     carType: 'SUV',
+    category: 'Luxury',
     accent: '#0a0f1e',
     stripe: 'linear-gradient(135deg, #0a0f1e 0%, #0e1830 100%)',
   },
@@ -267,6 +276,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 5,
     zeroDeal: false,
     carType: 'SUV',
+    category: 'Luxury',
     accent: '#1a1a1a',
     stripe: 'linear-gradient(135deg, #1a1a1a 0%, #252525 100%)',
   },
@@ -291,6 +301,7 @@ export const DEALS: CarDeal[] = [
     slotsLeft: 2,
     zeroDeal: false,
     carType: 'SUV',
+    category: 'Luxury',
     accent: '#1a0505',
     stripe: 'linear-gradient(135deg, #1a0505 0%, #2a0a0a 100%)',
   },
@@ -302,4 +313,10 @@ export const STATS = {
   liveDrops: DEALS.length,
   zeroDown: DEALS.filter(d => d.zeroDeal).length,
   startingFrom: Math.min(...DEALS.map(d => d.monthly)),
+};
+
+export const DEALS_BY_CATEGORY = {
+  Daily: DEALS.filter(d => d.category === 'Daily'),
+  Luxury: DEALS.filter(d => d.category === 'Luxury'),
+  Supercar: DEALS.filter(d => d.category === 'Supercar'),
 };

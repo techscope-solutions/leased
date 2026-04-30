@@ -1,6 +1,7 @@
 export type DriveTrain = 'AWD' | 'RWD' | 'FWD' | '4WD';
 export type DealTier = 'GOLD' | 'PLATINUM' | 'VERIFIED';
 export type DealType = 'LEASE' | 'FINANCE';
+export type DealCategory = 'Daily' | 'Luxury' | 'Supercar';
 
 export interface CarDeal {
   id: string;
@@ -25,6 +26,7 @@ export interface CarDeal {
   featured?: boolean;
   color?: string;
   carType: 'Sedan' | 'SUV' | 'Coupe' | 'Truck' | 'EV';
+  category: DealCategory;
   stripe: string;
   accent: string;
 }

@@ -179,7 +179,6 @@ export default function Testimonials() {
         margin: '0 auto',
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '80vh',
       }}>
 
         {/* Header */}

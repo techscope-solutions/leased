@@ -19,7 +19,7 @@ export default function Home() {
       <Ticker deals={TICKER_DEALS} />
 
       {/* ── Hero ── */}
-      <section className="r-hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
+      <section className="r-hero-section" style={{ position: 'relative' }}>
         {/* Bottom gradient */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, height: 160,

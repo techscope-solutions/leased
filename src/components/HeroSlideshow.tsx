@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { CarDeal, DealCategory } from '@/lib/types';
 import CountdownTimer from './CountdownTimer';
-import { useIsMobile } from '@/hooks/useIsMobile';
 
 const CAT: Record<DealCategory, { pill: string; pillBg: string; pillBorder: string; glow: string }> = {
   Daily:    { pill: 'rgba(255,255,255,0.75)', pillBg: 'rgba(255,255,255,0.08)', pillBorder: 'rgba(255,255,255,0.18)', glow: 'rgba(255,255,255,0.04)' },
@@ -12,11 +11,19 @@ const CAT: Record<DealCategory, { pill: string; pillBg: string; pillBorder: stri
   Supercar: { pill: '#d4aa50',               pillBg: 'rgba(212,170,80,0.1)',    pillBorder: 'rgba(212,170,80,0.28)',  glow: 'rgba(212,170,80,0.06)' },
 };
 
+const FRONT_CARD_STYLE = {
+  borderRadius: 24,
+  overflow: 'hidden' as const,
+  background: 'rgba(255,255,255,0.055)',
+  backdropFilter: 'blur(40px) saturate(180%)',
+  WebkitBackdropFilter: 'blur(40px) saturate(180%)',
+  border: '1px solid rgba(255,255,255,0.13)',
+} as const;
+
 export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
   const [idx, setIdx] = useState(0);
   const [prev, setPrev] = useState<number | null>(null);
   const [animating, setAnimating] = useState(false);
-  const isMobile = useIsMobile();
 
   const goTo = useCallback((next: number) => {
     if (animating || next === idx) return;
@@ -31,95 +38,93 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
     return () => clearInterval(id);
   }, [idx, goTo]);
 
-  const frontWidth = isMobile ? '88%' : 340;
-
-  return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: isMobile ? 'hidden' : 'visible' }}>
-      {/* Fanned background cards — desktop only */}
-      {!isMobile && deals.map((deal, i) => {
-        if (i === idx) return null;
-        const isLeft = (i < idx) || (idx === 2 && i === 0);
-        const offset = isLeft ? -1 : 1;
+  const dots = (
+    <div style={{ display: 'flex', gap: 8 }}>
+      {deals.map((d, i) => {
+        const c = CAT[d.category];
         return (
-          <div
-            key={deal.id}
+          <button
+            key={i}
             onClick={() => goTo(i)}
             style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              width: 320,
-              cursor: 'pointer',
-              borderRadius: 24,
-              overflow: 'hidden',
-              background: 'rgba(255,255,255,0.03)',
-              backdropFilter: 'blur(20px) saturate(140%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(140%)',
-              border: '1px solid rgba(255,255,255,0.07)',
-              boxShadow: '0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
-              transform: `translate(-50%, -50%) translateX(${offset * 200}px) rotate(${offset * 10}deg) scale(0.78)`,
-              transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
-              zIndex: 1,
-              opacity: 0.55,
-              pointerEvents: animating ? 'none' : 'auto',
+              width: i === idx ? 24 : 7, height: 7, borderRadius: 4,
+              background: i === idx ? c.pill : 'rgba(255,255,255,0.15)',
+              border: 'none', cursor: 'pointer', padding: 0,
+              transition: 'all 0.4s cubic-bezier(0.23,1,0.32,1)',
             }}
-          >
-            <BackCard deal={deal} />
-          </div>
+          />
         );
       })}
+    </div>
+  );
 
-      {/* Active front card */}
-      <div style={{
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        width: frontWidth,
-        transform: 'translate(-50%, -50%) scale(1)',
-        transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
-        zIndex: 3,
-        borderRadius: 24,
-        overflow: 'hidden',
-        background: 'rgba(255,255,255,0.055)',
-        backdropFilter: 'blur(40px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(40px) saturate(180%)',
-        border: '1px solid rgba(255,255,255,0.13)',
-        boxShadow: `0 40px 80px rgba(0,0,0,0.7), 0 0 60px ${CAT[deals[idx].category].glow}, inset 0 1px 0 rgba(255,255,255,0.15)`,
-      }}>
-        <FrontCard deal={deals[idx]} animating={animating} />
-      </div>
+  const glow = CAT[deals[idx].category].glow;
 
-      {/* Dot indicators */}
-      <div style={{
-        position: 'absolute',
-        bottom: -36,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        gap: 8,
-        zIndex: 10,
-      }}>
-        {deals.map((d, i) => {
-          const c = CAT[d.category];
+  return (
+    <>
+      {/* ── Desktop: fanned cards + absolute front card ── */}
+      <div className="r-slideshow-desktop">
+        {/* Back cards */}
+        {deals.map((deal, i) => {
+          if (i === idx) return null;
+          const isLeft = (i < idx) || (idx === 2 && i === 0);
+          const offset = isLeft ? -1 : 1;
           return (
-            <button
-              key={i}
+            <div
+              key={deal.id}
               onClick={() => goTo(i)}
               style={{
-                width: i === idx ? 24 : 7,
-                height: 7,
-                borderRadius: 4,
-                background: i === idx ? c.pill : 'rgba(255,255,255,0.15)',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                transition: 'all 0.4s cubic-bezier(0.23,1,0.32,1)',
+                position: 'absolute', top: '50%', left: '50%', width: 320,
+                cursor: 'pointer', borderRadius: 24, overflow: 'hidden',
+                background: 'rgba(255,255,255,0.03)',
+                backdropFilter: 'blur(20px) saturate(140%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(140%)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06)',
+                transform: `translate(-50%, -50%) translateX(${offset * 200}px) rotate(${offset * 10}deg) scale(0.78)`,
+                transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+                zIndex: 1, opacity: 0.55,
+                pointerEvents: animating ? 'none' : 'auto',
               }}
-            />
+            >
+              <BackCard deal={deal} />
+            </div>
           );
         })}
+
+        {/* Front card */}
+        <div style={{
+          position: 'absolute', top: '50%', left: '50%', width: 340,
+          transform: 'translate(-50%, -50%) scale(1)',
+          transition: 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)',
+          zIndex: 3,
+          boxShadow: `0 40px 80px rgba(0,0,0,0.7), 0 0 60px ${glow}, inset 0 1px 0 rgba(255,255,255,0.15)`,
+          ...FRONT_CARD_STYLE,
+        }}>
+          <FrontCard deal={deals[idx]} animating={animating} />
+        </div>
+
+        {/* Dots */}
+        <div style={{ position: 'absolute', bottom: -36, left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+          {dots}
+        </div>
       </div>
-    </div>
+
+      {/* ── Mobile: single card in normal flow ── */}
+      <div className="r-slideshow-mobile">
+        <div style={{
+          width: '92%', maxWidth: 380, margin: '0 auto',
+          boxShadow: `0 24px 60px rgba(0,0,0,0.6), 0 0 40px ${glow}, inset 0 1px 0 rgba(255,255,255,0.15)`,
+          ...FRONT_CARD_STYLE,
+        }}>
+          <FrontCard deal={deals[idx]} animating={animating} />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+          {dots}
+        </div>
+      </div>
+
+    </>
   );
 }
 

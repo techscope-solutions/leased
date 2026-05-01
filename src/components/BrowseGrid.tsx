@@ -60,6 +60,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
           padding: '8px 14px',
           borderRadius: 12,
           minWidth: 220,
+          flex: 1,
           transition: 'all 0.2s',
         }}>
           <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
@@ -78,7 +79,8 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
               color: 'rgba(255,255,255,0.8)',
               fontFamily: 'var(--font-barlow)',
               fontSize: 12,
-              width: 160,
+              flex: 1,
+              minWidth: 0,
             }}
           />
         </div>

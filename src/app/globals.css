@@ -122,7 +122,7 @@ button { cursor: pointer; font-family: var(--font-cond); }
 .r-mobile-menu.open { display: flex; }
 
 /* Hero */
-.r-hero-section { min-height: calc(100vh - 86px); display: flex; align-items: center; }
+.r-hero-section { min-height: calc(100vh - 86px); display: flex; align-items: center; overflow: hidden; }
 .r-hero-inner {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -133,6 +133,10 @@ button { cursor: pointer; font-family: var(--font-cond); }
 .r-hero-left  { padding-right: 48px; }
 .r-hero-slideshow { position: relative; height: 560px; z-index: 4; }
 .r-cta-row    { display: flex; gap: 12px; }
+
+/* Slideshow layout toggle */
+.r-slideshow-desktop { display: block; position: relative; width: 100%; height: 100%; }
+.r-slideshow-mobile  { display: none; }
 
 /* How It Works */
 .r-how-section {
@@ -147,7 +151,7 @@ button { cursor: pointer; font-family: var(--font-cond); }
 }
 
 /* Testimonials */
-.r-testimonials-section { padding: 72px 48px 88px; }
+.r-testimonials-section { padding: 72px 48px 88px; min-height: 80vh; }
 .r-testimonial-card {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -192,18 +196,20 @@ button { cursor: pointer; font-family: var(--font-cond); }
   .r-hamburger  { display: flex; }
 
   /* Hero */
-  .r-hero-section   { min-height: auto; align-items: flex-start; padding-top: 0; }
-  .r-hero-inner     { grid-template-columns: 1fr; padding: 36px 20px 40px; gap: 36px; }
-  .r-hero-left      { padding-right: 0; }
-  .r-hero-slideshow { height: 300px; }
-  .r-cta-row        { flex-direction: column; }
+  .r-hero-section        { min-height: auto; align-items: flex-start; overflow: visible; }
+  .r-hero-inner          { grid-template-columns: 1fr; padding: 36px 20px 40px; gap: 32px; }
+  .r-hero-left           { padding-right: 0; }
+  .r-hero-slideshow      { height: auto; }
+  .r-cta-row             { flex-direction: column; }
+  .r-slideshow-desktop   { display: none; }
+  .r-slideshow-mobile    { display: block; }
 
   /* How It Works */
   .r-how-section  { padding: 48px 20px 56px; gap: 36px; }
   .r-steps-grid   { grid-template-columns: 1fr; gap: 16px; }
 
   /* Testimonials */
-  .r-testimonials-section { padding: 48px 20px 56px; }
+  .r-testimonials-section { padding: 48px 20px 56px; min-height: 0; }
   .r-testimonial-card     { grid-template-columns: 1fr; }
   .r-testimonial-left     { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
   .r-testimonial-bottom   { flex-direction: column; align-items: stretch; gap: 14px; }

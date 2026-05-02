@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { CarDeal, DealCategory } from '@/lib/types';
 import CountdownTimer from './CountdownTimer';
@@ -33,13 +33,23 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
     setTimeout(() => { setPrev(null); setAnimating(false); }, 600);
   }, [idx, animating]);
 
+  const touchX = useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 40) return;
+    goTo(dx < 0 ? (idx + 1) % deals.length : (idx - 1 + deals.length) % deals.length);
+  };
+
   useEffect(() => {
     const id = setInterval(() => goTo((idx + 1) % 3), 5000);
     return () => clearInterval(id);
   }, [idx, goTo]);
 
   const dots = (
-    <div style={{ display: 'flex', gap: 8 }}>
+    <div style={{ display: 'flex', gap: 4 }}>
       {deals.map((d, i) => {
         const c = CAT[d.category];
         return (
@@ -47,12 +57,17 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
             key={i}
             onClick={() => goTo(i)}
             style={{
+              padding: '12px 6px', background: 'transparent', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <span style={{
+              display: 'block',
               width: i === idx ? 24 : 7, height: 7, borderRadius: 4,
               background: i === idx ? c.pill : 'rgba(255,255,255,0.15)',
-              border: 'none', cursor: 'pointer', padding: 0,
               transition: 'all 0.4s cubic-bezier(0.23,1,0.32,1)',
-            }}
-          />
+            }} />
+          </button>
         );
       })}
     </div>
@@ -111,7 +126,7 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
       </div>
 
       {/* ── Mobile: single card in normal flow ── */}
-      <div className="r-slideshow-mobile">
+      <div className="r-slideshow-mobile" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <div style={{
           width: '92%', maxWidth: 380, margin: '0 auto',
           boxShadow: `0 24px 60px rgba(0,0,0,0.6), 0 0 40px ${glow}, inset 0 1px 0 rgba(255,255,255,0.15)`,

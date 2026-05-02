@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 const TESTIMONIALS = [
@@ -158,6 +158,19 @@ export default function Testimonials() {
     }, 380);
   };
 
+  const touchX = useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => { touchX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 40) return;
+    const next = dx < 0
+      ? (active + 1) % TESTIMONIALS.length
+      : (active - 1 + TESTIMONIALS.length) % TESTIMONIALS.length;
+    goTo(next);
+  };
+
   useEffect(() => {
     const id = setInterval(() => goTo((active + 1) % TESTIMONIALS.length), 6000);
     return () => clearInterval(id);
@@ -206,6 +219,8 @@ export default function Testimonials() {
           <div
             key={active}
             className="r-testimonial-card"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             style={{
               flex: 1,
               borderRadius: 28,
@@ -290,22 +305,24 @@ export default function Testimonials() {
           <div className="r-testimonial-bottom">
 
             {/* Dots */}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               {TESTIMONIALS.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
                   style={{
-                    width: i === active ? 28 : 8,
-                    height: 8,
-                    borderRadius: 99,
-                    background: i === active ? '#FF2800' : 'rgba(255,255,255,0.18)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    transition: 'all 0.3s cubic-bezier(0.23,1,0.32,1)',
+                    padding: '12px 6px', background: 'transparent',
+                    border: 'none', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center',
                   }}
-                />
+                >
+                  <span style={{
+                    display: 'block',
+                    width: i === active ? 28 : 8, height: 8, borderRadius: 99,
+                    background: i === active ? '#FF2800' : 'rgba(255,255,255,0.18)',
+                    transition: 'all 0.3s cubic-bezier(0.23,1,0.32,1)',
+                  }} />
+                </button>
               ))}
             </div>
 

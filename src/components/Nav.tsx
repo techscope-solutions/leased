@@ -63,13 +63,51 @@ const NAV_LINKS = [
   { label: 'DEALERSHIPS', href: '/dealerships' },
 ];
 
+const BOTTOM_TABS = [
+  {
+    label: 'HOME', href: '/',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M3 9L10 3L17 9V17H13V12H7V17H3V9Z" fill="currentColor"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'MARKET', href: '/browse',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
+        <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
+        <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
+        <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'BROKERS', href: '/brokers',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="6" r="3.5" fill="currentColor"/>
+        <path d="M3 18C3 14.5 6.1 11.5 10 11.5C13.9 11.5 17 14.5 17 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    ),
+  },
+  {
+    label: 'DEALERS', href: '/dealerships',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <rect x="2" y="7" width="16" height="11" rx="1" fill="currentColor" opacity="0.7"/>
+        <rect x="1" y="5" width="18" height="4" rx="1" fill="currentColor"/>
+        <rect x="7" y="12" width="3" height="6" fill="#080808"/>
+        <rect x="10" y="12" width="3" height="6" fill="#080808"/>
+      </svg>
+    ),
+  },
+];
+
 export default function Nav() {
   const path = usePathname();
   const liveCount = useLiveCount();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  // Close menu on route change
-  useEffect(() => { setMenuOpen(false); }, [path]);
 
   const linkStyle = (href: string) => ({
     fontFamily: 'var(--font-barlow-cond)',
@@ -82,92 +120,105 @@ export default function Nav() {
   });
 
   return (
-    <nav style={{
-      position: 'sticky', top: 0, zIndex: 100, height: 52,
-      borderBottom: '1px solid rgba(255,255,255,0.07)',
-      background: 'rgba(8,8,8,0.9)',
-      backdropFilter: 'blur(24px)',
-      WebkitBackdropFilter: 'blur(24px)',
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 24px',
-    }}>
+    <>
+      <nav style={{
+        position: 'sticky', top: 0, zIndex: 100, height: 52,
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        background: 'rgba(8,8,8,0.9)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px',
+      }}>
 
-      {/* Left: logo + desktop links */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 1 }}>
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#fff' }}>LEASE</span>
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#FF2800' }}>D</span>
-        </Link>
-
-        {/* Desktop nav links */}
-        <div className="r-nav-links">
-          {NAV_LINKS.map(({ label, href }) => (
-            <Link key={label} href={href} style={linkStyle(href)}>{label}</Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Right: live count + log in + hamburger */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.7)', fontVariantNumeric: 'tabular-nums', minWidth: 28, display: 'inline-block' }}>
-            {liveCount ?? BASE} LIVE
-          </span>
-        </div>
-
-        <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
-
-        {/* Desktop LOG IN */}
-        <button
-          className="r-nav-links"
-          style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}
-        >
-          LOG IN
-        </button>
-
-        {/* Mobile hamburger */}
-        <button
-          className="r-hamburger"
-          onClick={() => setMenuOpen(o => !o)}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-        >
-          {menuOpen ? (
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M2 2 L16 16" stroke="rgba(255,255,255,0.85)" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M16 2 L2 16" stroke="rgba(255,255,255,0.85)" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          ) : (
-            <svg width="20" height="14" viewBox="0 0 20 14" fill="none">
-              <rect y="0" width="20" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
-              <rect y="6" width="20" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
-              <rect y="12" width="20" height="2" rx="1" fill="rgba(255,255,255,0.85)"/>
-            </svg>
-          )}
-        </button>
-      </div>
-
-      {/* Mobile menu dropdown */}
-      <div className={`r-mobile-menu${menuOpen ? ' open' : ''}`}>
-        {NAV_LINKS.map(({ label, href }) => (
-          <Link
-            key={label}
-            href={href}
-            style={{
-              ...linkStyle(href),
-              padding: '14px 4px',
-              fontSize: 15,
-              letterSpacing: '0.1em',
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-            }}
-          >
-            {label}
+        {/* Left: logo + desktop links */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 1 }}>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#fff' }}>LEASE</span>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#FF2800' }}>D</span>
           </Link>
-        ))}
-        <button style={{ marginTop: 16, padding: '12px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 13, letterSpacing: '0.1em', cursor: 'pointer', width: '100%' }}>
-          LOG IN
+
+          <div className="r-nav-links">
+            {NAV_LINKS.map(({ label, href }) => (
+              <Link key={label} href={href} style={linkStyle(href)}>{label}</Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: live count + log in */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+            <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.7)', fontVariantNumeric: 'tabular-nums', minWidth: 28, display: 'inline-block' }}>
+              {liveCount ?? BASE} LIVE
+            </span>
+          </div>
+
+          <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+
+          <button
+            className="r-nav-links"
+            style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}
+          >
+            LOG IN
+          </button>
+        </div>
+      </nav>
+
+      {/* Bottom tab bar — mobile only */}
+      <div className="r-bottom-nav">
+        {BOTTOM_TABS.map(({ label, href, icon }) => {
+          const active = path === href;
+          return (
+            <Link
+              key={href}
+              href={href}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                textDecoration: 'none',
+                color: active ? (href === '/browse' ? '#FF2800' : '#fff') : 'rgba(255,255,255,0.35)',
+                transition: 'color 0.2s',
+                borderTop: active ? `2px solid ${href === '/browse' ? '#FF2800' : 'rgba(255,255,255,0.5)'}` : '2px solid transparent',
+              }}
+            >
+              {icon}
+              <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+        <button
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            background: 'transparent',
+            border: 'none',
+            borderTop: '2px solid transparent',
+            color: 'rgba(255,255,255,0.35)',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="8.5" cy="8.5" r="4" stroke="currentColor" strokeWidth="1.8"/>
+            <path d="M11.5 11.5L17 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            <path d="M15 14.5V17H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>
+            LOG IN
+          </span>
         </button>
       </div>
-    </nav>
+    </>
   );
 }

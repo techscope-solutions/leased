@@ -42,7 +42,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
       }}
     >
       {/* Car image */}
-      <div style={{ height: 180, position: 'relative', overflow: 'hidden', borderRadius: '20px 20px 0 0' }}>
+      <div className="r-deal-card-img">
         <div style={{
           position: 'absolute',
           inset: 0,

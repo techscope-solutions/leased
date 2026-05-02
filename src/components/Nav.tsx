@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 const MIN = 28, MAX = 64, BASE = 41;
 const STORAGE_KEY = 'leased_live_v1';
@@ -107,7 +108,24 @@ const BOTTOM_TABS = [
 
 export default function Nav() {
   const path = usePathname();
+  const router = useRouter();
   const liveCount = useLiveCount();
+  const [user, setUser] = useState<{ email?: string } | null>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+  };
 
   const linkStyle = (href: string) => ({
     fontFamily: 'var(--font-barlow-cond)',
@@ -156,12 +174,21 @@ export default function Nav() {
 
           <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
 
-          <button
-            className="r-nav-links"
-            style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}
-          >
-            LOG IN
-          </button>
+          {user ? (
+            <button
+              className="r-nav-links"
+              onClick={signOut}
+              style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, background: 'transparent', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}
+            >
+              SIGN OUT
+            </button>
+          ) : (
+            <Link href="/login" className="r-nav-links" style={{ textDecoration: 'none' }}>
+              <button style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}>
+                LOG IN
+              </button>
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -193,31 +220,27 @@ export default function Nav() {
             </Link>
           );
         })}
-        <button
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 4,
-            background: 'transparent',
-            border: 'none',
-            borderTop: '2px solid transparent',
-            color: 'rgba(255,255,255,0.35)',
-            cursor: 'pointer',
-            padding: 0,
-          }}
-        >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <circle cx="8.5" cy="8.5" r="4" stroke="currentColor" strokeWidth="1.8"/>
-            <path d="M11.5 11.5L17 17" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            <path d="M15 14.5V17H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>
-            LOG IN
-          </span>
-        </button>
+        {user ? (
+          <button
+            onClick={signOut}
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, background: 'transparent', border: 'none', borderTop: '2px solid transparent', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', padding: 0 }}
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M12 3H16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <path d="M8 13l-4-4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M4 9h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>SIGN OUT</span>
+          </button>
+        ) : (
+          <Link href="/login" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, textDecoration: 'none', color: 'rgba(255,255,255,0.35)', borderTop: '2px solid transparent' }}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="7" r="3.5" fill="currentColor"/>
+              <path d="M3 18C3 14.5 6.1 11.5 10 11.5C13.9 11.5 17 14.5 17 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>LOG IN</span>
+          </Link>
+        )}
       </div>
     </>
   );

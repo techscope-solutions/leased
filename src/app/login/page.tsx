@@ -1,0 +1,211 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+
+export default function LoginPage() {
+  const [loading, setLoading] = useState<'google' | 'apple' | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
+
+  const signIn = async (provider: 'google' | 'apple') => {
+    setLoading(provider);
+    setError(null);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setError('Something went wrong. Please try again.');
+      setLoading(null);
+    }
+  };
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px 20px',
+      position: 'relative',
+      zIndex: 2,
+    }}>
+
+      {/* Back to home */}
+      <Link href="/" style={{
+        position: 'absolute', top: 24, left: 24,
+        display: 'flex', alignItems: 'center', gap: 8,
+        fontFamily: 'var(--font-barlow-cond)', fontWeight: 600,
+        fontSize: 12, letterSpacing: '0.08em',
+        color: 'rgba(255,255,255,0.4)', textDecoration: 'none',
+        transition: 'color 0.2s',
+      }}>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M9 2L4 7L9 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+        LEASED
+      </Link>
+
+      <div style={{ width: '100%', maxWidth: 400 }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'baseline', gap: 1, marginBottom: 16 }}>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 32, color: '#fff' }}>LEASE</span>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 32, color: '#FF2800' }}>D</span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(28px, 6vw, 40px)', lineHeight: 0.95, letterSpacing: '-0.02em', marginBottom: 12 }}>
+            <span style={{ color: '#fff' }}>SIGN </span>
+            <span style={{ background: 'linear-gradient(135deg, #FF2800 20%, #cc1f00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>IN.</span>
+          </div>
+          <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 13, color: 'rgba(255,255,255,0.4)', lineHeight: 1.6 }}>
+            Access live drops, track deals, and move fast.
+          </p>
+        </div>
+
+        {/* Auth card */}
+        <div style={{
+          background: 'rgba(255,255,255,0.04)',
+          backdropFilter: 'blur(40px) saturate(160%)',
+          WebkitBackdropFilter: 'blur(40px) saturate(160%)',
+          border: '1px solid rgba(255,255,255,0.09)',
+          borderRadius: 24,
+          padding: '32px 28px',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.5)',
+        }}>
+
+          {/* Google */}
+          <button
+            onClick={() => signIn('google')}
+            disabled={loading !== null}
+            style={{
+              width: '100%', padding: '14px 20px', marginBottom: 12,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+              background: loading === 'google' ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: 14,
+              color: '#fff',
+              fontFamily: 'var(--font-barlow-cond)', fontWeight: 700,
+              fontSize: 13, letterSpacing: '0.08em',
+              cursor: loading !== null ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s',
+              opacity: loading !== null && loading !== 'google' ? 0.5 : 1,
+            }}
+          >
+            {loading === 'google' ? (
+              <Spinner />
+            ) : (
+              <GoogleIcon />
+            )}
+            CONTINUE WITH GOOGLE
+          </button>
+
+          {/* Apple */}
+          <button
+            onClick={() => signIn('apple')}
+            disabled={loading !== null}
+            style={{
+              width: '100%', padding: '14px 20px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+              background: loading === 'apple' ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.16)',
+              borderRadius: 14,
+              color: '#fff',
+              fontFamily: 'var(--font-barlow-cond)', fontWeight: 700,
+              fontSize: 13, letterSpacing: '0.08em',
+              cursor: loading !== null ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s',
+              opacity: loading !== null && loading !== 'apple' ? 0.5 : 1,
+            }}
+          >
+            {loading === 'apple' ? (
+              <Spinner />
+            ) : (
+              <AppleIcon />
+            )}
+            CONTINUE WITH APPLE
+          </button>
+
+          {error && (
+            <div style={{
+              marginTop: 16, padding: '10px 14px',
+              background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.3)',
+              borderRadius: 10,
+              fontFamily: 'var(--font-barlow)', fontSize: 12,
+              color: 'rgba(255,100,60,0.9)',
+            }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{
+            marginTop: 24, paddingTop: 20,
+            borderTop: '1px solid rgba(255,255,255,0.07)',
+            textAlign: 'center',
+          }}>
+            <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 11, color: 'rgba(255,255,255,0.25)', lineHeight: 1.7 }}>
+              By continuing you agree to our Terms of Service and Privacy Policy.
+              Your role can be set after sign-in.
+            </p>
+          </div>
+        </div>
+
+        {/* Role preview */}
+        <div style={{ marginTop: 24, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+          {[
+            { label: 'USERS', desc: 'Browse & apply for drops', icon: '◎' },
+            { label: 'SELLERS', desc: 'Post & manage listings', icon: '◈' },
+            { label: 'MODS', desc: 'Review & approve drops', icon: '◉' },
+          ].map(r => (
+            <div key={r.label} style={{
+              padding: '12px 10px',
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderRadius: 12,
+              textAlign: 'center',
+            }}>
+              <div style={{ fontSize: 14, marginBottom: 6, color: 'rgba(255,255,255,0.3)' }}>{r.icon}</div>
+              <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginBottom: 4 }}>{r.label}</div>
+              <div style={{ fontFamily: 'var(--font-barlow)', fontSize: 10, color: 'rgba(255,255,255,0.25)', lineHeight: 1.4 }}>{r.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+      <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 7.294C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M14.05 9.36c-.02-2.07 1.69-3.07 1.77-3.12-1.0-1.4-2.48-1.58-3.01-1.6-1.27-.13-2.52.76-3.17.76-.66 0-1.65-.75-2.72-.72-1.38.02-2.67.81-3.38 2.05-1.46 2.53-.37 6.26 1.03 8.31.7 1 1.52 2.12 2.6 2.08 1.05-.04 1.44-.67 2.71-.67 1.27 0 1.63.67 2.73.65 1.12-.02 1.84-.99 2.52-2 .8-1.14 1.12-2.25 1.14-2.31-.03-.01-2.19-.84-2.22-3.43z" fill="white"/>
+      <path d="M11.9 3.17c.57-.7.96-1.66.85-2.63-.82.03-1.82.55-2.41 1.24-.53.61-.99 1.59-.87 2.53.92.07 1.86-.47 2.43-1.14z" fill="white"/>
+    </svg>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ animation: 'spin 0.8s linear infinite' }}>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <circle cx="9" cy="9" r="7" stroke="rgba(255,255,255,0.15)" strokeWidth="2"/>
+      <path d="M9 2a7 7 0 0 1 7 7" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round"/>
+    </svg>
+  );
+}

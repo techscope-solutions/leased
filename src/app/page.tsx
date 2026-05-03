@@ -4,19 +4,23 @@ import HeroSlideshow from '@/components/HeroSlideshow';
 import HeroCTA from '@/components/HeroCTA';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
-import { DEALS_BY_CATEGORY, STATS, TICKER_DEALS } from '@/lib/data';
+import { getLiveDeals, getLiveDealsStats } from '@/lib/deals';
 
-export default function Home() {
+export default async function Home() {
+  const [deals, stats] = await Promise.all([getLiveDeals(), getLiveDealsStats()]);
+
   const heroDeals = [
-    DEALS_BY_CATEGORY.Daily[0],
-    DEALS_BY_CATEGORY.Luxury[0],
-    DEALS_BY_CATEGORY.Supercar[0],
-  ];
+    deals.find(d => d.category === 'Daily'),
+    deals.find(d => d.category === 'Luxury'),
+    deals.find(d => d.category === 'Supercar'),
+  ].filter(Boolean) as typeof deals;
+
+  const tickerDeals = deals.slice(0, 6);
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative', zIndex: 2 }}>
       <Nav />
-      <Ticker deals={TICKER_DEALS} />
+      <Ticker deals={tickerDeals} />
 
       {/* ── Hero ── */}
       <section className="r-hero-section" style={{ position: 'relative' }}>
@@ -44,7 +48,7 @@ export default function Home() {
             }}>
               <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
               <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>
-                {STATS.liveDrops} LIVE DROPS
+                {stats.liveDrops} LIVE DROP{stats.liveDrops !== 1 ? 'S' : ''}
               </span>
             </div>
 
@@ -76,9 +80,11 @@ export default function Home() {
           </div>
 
           {/* Right — fanned glass slideshow */}
-          <div className="r-hero-slideshow">
-            <HeroSlideshow deals={heroDeals} />
-          </div>
+          {heroDeals.length > 0 && (
+            <div className="r-hero-slideshow">
+              <HeroSlideshow deals={heroDeals} />
+            </div>
+          )}
         </div>
       </section>
 

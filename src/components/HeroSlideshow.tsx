@@ -44,7 +44,7 @@ export default function HeroSlideshow({ deals }: { deals: CarDeal[] }) {
   };
 
   useEffect(() => {
-    const id = setInterval(() => goTo((idx + 1) % 3), 5000);
+    const id = setInterval(() => goTo((idx + 1) % deals.length), 5000);
     return () => clearInterval(id);
   }, [idx, goTo]);
 

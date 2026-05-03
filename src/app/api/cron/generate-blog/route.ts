@@ -66,26 +66,30 @@ export async function generateBlogPost(): Promise<{ ok: true; title: string } | 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 2048,
-      messages: [{
-        role: 'user',
-        content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED. Topic: "${topic}"
+      messages: [
+        {
+          role: 'user',
+          content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED. Topic: "${topic}"
 
-Return ONLY valid JSON (no markdown fences, no explanation) with these exact fields:
-{
-  "title": "compelling title",
-  "slug": "url-friendly-slug",
-  "excerpt": "2-3 sentence summary for previews",
-  "content": "full HTML content using h2, h3, p, ul, li tags — at least 600 words",
-  "seoTitle": "SEO title tag (under 60 chars)",
-  "seoDescription": "meta description (under 160 chars)",
-  "tags": ["tag1", "tag2", "tag3"],
-  "imageQuery": "2-3 word Pexels image search query"
-}`,
-      }],
+Respond with a single JSON object using these exact keys:
+- title: compelling post title
+- slug: url-friendly slug (lowercase, hyphens only)
+- excerpt: 2-3 sentence preview summary
+- content: full HTML using h2, h3, p, ul, li — at least 600 words
+- seoTitle: SEO title tag under 60 chars
+- seoDescription: meta description under 160 chars
+- tags: array of 3 string tags
+- imageQuery: 2-3 word Pexels search query`,
+        },
+        // Prefill forces the model to start directly with { — guarantees JSON-only output
+        { role: 'assistant', content: '{' },
+      ],
     });
 
-    const raw = (message.content[0] as { type: string; text: string }).text.trim();
-    post = JSON.parse(extractJson(raw));
+    const partial = (message.content[0] as { type: string; text: string }).text.trim();
+    // The model continued from the '{' prefill, so prepend it back
+    const raw = '{' + partial;
+    post = JSON.parse(raw);
   } catch (err) {
     return { ok: false, error: `AI generation failed: ${err instanceof Error ? err.message : String(err)}` };
   }

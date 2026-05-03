@@ -66,30 +66,28 @@ export async function generateBlogPost(): Promise<{ ok: true; title: string } | 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
       max_tokens: 2048,
-      messages: [
-        {
-          role: 'user',
-          content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED. Topic: "${topic}"
+      system: 'You are a JSON API. Output only a single valid JSON object — no prose, no markdown fences, no explanation. Your entire response must be parseable by JSON.parse().',
+      messages: [{
+        role: 'user',
+        content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED.
+Topic: "${topic}"
 
-Respond with a single JSON object using these exact keys:
-- title: compelling post title
-- slug: url-friendly slug (lowercase, hyphens only)
-- excerpt: 2-3 sentence preview summary
-- content: full HTML using h2, h3, p, ul, li — at least 600 words
-- seoTitle: SEO title tag under 60 chars
-- seoDescription: meta description under 160 chars
-- tags: array of 3 string tags
-- imageQuery: 2-3 word Pexels search query`,
-        },
-        // Prefill forces the model to start directly with { — guarantees JSON-only output
-        { role: 'assistant', content: '{' },
-      ],
+Return a JSON object with exactly these fields:
+{
+  "title": "compelling post title",
+  "slug": "url-friendly-slug-lowercase-hyphens",
+  "excerpt": "2-3 sentence preview summary",
+  "content": "full HTML using h2 h3 p ul li tags, at least 600 words",
+  "seoTitle": "SEO title under 60 chars",
+  "seoDescription": "meta description under 160 chars",
+  "tags": ["tag1", "tag2", "tag3"],
+  "imageQuery": "2-3 word pexels search query"
+}`,
+      }],
     });
 
-    const partial = (message.content[0] as { type: string; text: string }).text.trim();
-    // The model continued from the '{' prefill, so prepend it back
-    const raw = '{' + partial;
-    post = JSON.parse(raw);
+    const raw = (message.content[0] as { type: string; text: string }).text.trim();
+    post = JSON.parse(extractJson(raw));
   } catch (err) {
     return { ok: false, error: `AI generation failed: ${err instanceof Error ? err.message : String(err)}` };
   }

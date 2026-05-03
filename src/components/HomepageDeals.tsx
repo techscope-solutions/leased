@@ -1,109 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { CarDeal, DealCategory } from '@/lib/types';
+import { CarDeal } from '@/lib/types';
 import CarSilhouette from './CarSilhouette';
 import CountdownTimer from './CountdownTimer';
-
-const TABS: { label: DealCategory; tag: string; color: string }[] = [
-  { label: 'Daily',    tag: 'Practical · Affordable · Everyday',   color: 'rgba(255,255,255,0.7)' },
-  { label: 'Luxury',   tag: 'Premium comfort · Status · Refined',   color: '#8b9ab8' },
-  { label: 'Supercar', tag: 'Performance · Exotic · Rare',          color: '#b8932a' },
-];
 
 export default function HomepageDeals({ dealsByCategory }: {
   dealsByCategory: { Daily: CarDeal[]; Luxury: CarDeal[]; Supercar: CarDeal[] };
 }) {
-  const [active, setActive] = useState<DealCategory>('Daily');
-  const deals = dealsByCategory[active].slice(0, 3);
-  const tab = TABS.find(t => t.label === active)!;
+  const deals = [
+    ...dealsByCategory.Daily.slice(0, 1),
+    ...dealsByCategory.Luxury.slice(0, 1),
+    ...dealsByCategory.Supercar.slice(0, 1),
+  ];
 
   return (
     <section style={{ padding: '0 40px 80px', maxWidth: 1400, margin: '0 auto' }}>
-
-      {/* Section header */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'space-between',
-        marginBottom: 28,
-      }}>
-        <div>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            marginBottom: 10,
-          }}>
-            <span style={{ color: '#FF2800', fontSize: 10 }}>◆</span>
-            <span style={{
-              fontFamily: 'var(--font-barlow-cond)',
-              fontWeight: 700,
-              fontSize: 11,
-              letterSpacing: '0.14em',
-              color: 'rgba(255,255,255,0.4)',
-            }}>LIVE DROPS</span>
-          </div>
-
-          {/* Category tabs */}
-          <div style={{ display: 'flex', gap: 0 }}>
-            {TABS.map(t => (
-              <button
-                key={t.label}
-                onClick={() => setActive(t.label)}
-                style={{
-                  padding: '8px 24px 8px 0',
-                  background: 'transparent',
-                  border: 'none',
-                  borderBottom: `2px solid ${active === t.label ? '#FF2800' : 'transparent'}`,
-                  color: active === t.label ? '#fff' : 'rgba(255,255,255,0.3)',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 900,
-                  fontSize: 28,
-                  letterSpacing: '-0.01em',
-                  transition: 'color 0.2s, border-color 0.2s',
-                  marginRight: 8,
-                  cursor: 'pointer',
-                }}
-              >
-                {t.label.toUpperCase()}
-              </button>
-            ))}
-          </div>
-          <div style={{
-            fontFamily: 'var(--font-barlow-cond)',
-            fontWeight: 500,
-            fontSize: 11,
-            letterSpacing: '0.08em',
-            color: tab.color,
-            marginTop: 6,
-            opacity: 0.8,
-          }}>
-            {tab.tag}
-          </div>
-        </div>
-
-        <Link href="/browse" style={{ textDecoration: 'none' }}>
-          <button style={{
-            padding: '9px 20px',
-            border: '1px solid rgba(255,255,255,0.12)',
-            background: 'transparent',
-            color: 'rgba(255,255,255,0.5)',
-            fontFamily: 'var(--font-barlow-cond)',
-            fontWeight: 700,
-            fontSize: 11,
-            letterSpacing: '0.1em',
-            cursor: 'pointer',
-            transition: 'all 0.2s',
-          }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(255,40,0,0.4)'; e.currentTarget.style.color = '#FF2800'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'; e.currentTarget.style.color = 'rgba(255,255,255,0.5)'; }}
-          >
-            VIEW ALL DROPS →
-          </button>
-        </Link>
-      </div>
 
       {/* Cards */}
       <div style={{

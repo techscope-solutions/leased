@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CarDeal } from '@/lib/types';
 import CarSilhouette from './CarSilhouette';
 import CountdownTimer from './CountdownTimer';
+import { trackDealClick } from '@/lib/analytics';
 
 const TIER_COLORS: Record<string, string> = {
   GOLD: '#b8932a',
@@ -23,6 +24,7 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
 
   return (
     <div
+      onClick={() => trackDealClick(deal.dropId)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{

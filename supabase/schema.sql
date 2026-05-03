@@ -6,6 +6,8 @@
 -- ============================================================
 alter table public.profiles
   add column if not exists last_seen timestamptz;
+alter table public.profiles
+  add column if not exists login_count integer default 0;
 
 -- Backfill profile rows for any existing auth.users that pre-date the trigger.
 insert into public.profiles (id, email, full_name, avatar_url)
@@ -88,7 +90,8 @@ create table if not exists public.support_tickets (
   email text not null,
   subject text not null,
   message text not null,
-  status text not null default 'open' check (status in ('open', 'in_progress', 'closed')),
+  status text not null default 'open' check (status in ('open', 'in_progress', 'resolved', 'closed')),
+  priority text not null default 'medium' check (priority in ('low', 'medium', 'high', 'urgent')),
   created_at timestamptz default now()
 );
 
@@ -97,15 +100,21 @@ create index if not exists support_tickets_created_at_idx on public.support_tick
 
 alter table public.support_tickets enable row level security;
 
+-- Backfill priority for tickets that were created before this column existed.
+update public.support_tickets set priority = 'medium' where priority is null;
+
 drop policy if exists "Anyone can submit a ticket" on public.support_tickets;
 create policy "Anyone can submit a ticket" on public.support_tickets
   for insert with check (true);
 
+-- Mods see all; users see their own.
 drop policy if exists "Moderators can read tickets" on public.support_tickets;
-create policy "Moderators can read tickets" on public.support_tickets
+drop policy if exists "Users see own, mods see all tickets" on public.support_tickets;
+create policy "Users see own, mods see all tickets" on public.support_tickets
   for select using (
-    exists (select 1 from public.profiles p
-            where p.id = auth.uid() and p.role = 'moderator')
+    auth.uid() = user_id
+    or exists (select 1 from public.profiles p
+               where p.id = auth.uid() and p.role = 'moderator')
   );
 
 drop policy if exists "Moderators can update tickets" on public.support_tickets;

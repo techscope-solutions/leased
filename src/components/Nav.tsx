@@ -111,15 +111,38 @@ export default function Nav() {
   const router = useRouter();
   const liveCount = useLiveCount();
   const [user, setUser] = useState<{ email?: string } | null>(null);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
+
+    async function loadUser() {
+      const { data } = await supabase.auth.getUser();
+      setUser(data.user ?? null);
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles').select('role').eq('id', data.user.id).single();
+        setRole(profile?.role ?? null);
+      } else {
+        setRole(null);
+      }
+    }
+
+    loadUser();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        supabase.from('profiles').select('role').eq('id', session.user.id).single()
+          .then(({ data: profile }) => setRole(profile?.role ?? null));
+      } else {
+        setRole(null);
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  const dashHref = role === 'moderator' ? '/admin' : role === 'seller' ? '/seller/dashboard' : null;
+  const dashLabel = role === 'moderator' ? 'ADMIN' : 'DASHBOARD';
 
   const signOut = async () => {
     const supabase = createClient();
@@ -175,13 +198,21 @@ export default function Nav() {
           <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
 
           {user ? (
-            <button
-              className="r-nav-links"
-              onClick={signOut}
-              style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 8, background: 'transparent', color: 'rgba(255,255,255,0.6)', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}
-            >
-              SIGN OUT
-            </button>
+            <div className="r-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {dashHref && (
+                <Link href={dashHref} style={{ textDecoration: 'none' }}>
+                  <button style={{ padding: '6px 16px', border: '1px solid rgba(255,40,0,0.4)', borderRadius: 8, background: 'rgba(255,40,0,0.1)', color: '#FF2800', fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}>
+                    {dashLabel} →
+                  </button>
+                </Link>
+              )}
+              <button
+                onClick={signOut}
+                style={{ padding: '6px 14px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, background: 'transparent', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-barlow-cond)', fontWeight: 600, fontSize: 11, letterSpacing: '0.1em', cursor: 'pointer' }}
+              >
+                SIGN OUT
+              </button>
+            </div>
           ) : (
             <Link href="/login" className="r-nav-links" style={{ textDecoration: 'none' }}>
               <button style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}>
@@ -220,19 +251,19 @@ export default function Nav() {
             </Link>
           );
         })}
-        {user ? (
-          <button
-            onClick={signOut}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, background: 'transparent', border: 'none', borderTop: '2px solid transparent', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', padding: 0 }}
-          >
+        {user && dashHref ? (
+          <Link href={dashHref} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, textDecoration: 'none', color: path === dashHref ? '#FF2800' : 'rgba(255,255,255,0.35)', borderTop: path === dashHref ? '2px solid #FF2800' : '2px solid transparent' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M12 3H16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              <path d="M8 13l-4-4 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M4 9h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <rect x="2" y="2" width="7" height="9" rx="1.5" fill="currentColor" opacity="0.8"/>
+              <rect x="11" y="2" width="7" height="5" rx="1.5" fill="currentColor" opacity="0.8"/>
+              <rect x="2" y="13" width="7" height="5" rx="1.5" fill="currentColor" opacity="0.5"/>
+              <rect x="11" y="9" width="7" height="9" rx="1.5" fill="currentColor" opacity="0.8"/>
             </svg>
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>SIGN OUT</span>
-          </button>
-        ) : (
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>
+              {role === 'moderator' ? 'ADMIN' : 'DASH'}
+            </span>
+          </Link>
+        ) : !user ? (
           <Link href="/login" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, textDecoration: 'none', color: 'rgba(255,255,255,0.35)', borderTop: '2px solid transparent' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="7" r="3.5" fill="currentColor"/>
@@ -240,6 +271,17 @@ export default function Nav() {
             </svg>
             <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>LOG IN</span>
           </Link>
+        ) : (
+          <button
+            onClick={signOut}
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, background: 'transparent', border: 'none', borderTop: '2px solid transparent', color: 'rgba(255,255,255,0.35)', cursor: 'pointer', padding: 0 }}
+          >
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="7" r="3.5" fill="currentColor"/>
+              <path d="M3 18C3 14.5 6.1 11.5 10 11.5C13.9 11.5 17 14.5 17 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>ACCOUNT</span>
+          </button>
         )}
       </div>
     </>

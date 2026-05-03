@@ -36,7 +36,9 @@ async function fetchPexelsImage(query: string): Promise<{ url: string; alt: stri
 function extractJson(raw: string): string {
   const start = raw.indexOf('{');
   const end = raw.lastIndexOf('}');
-  if (start === -1 || end === -1) throw new Error('No JSON object found in response');
+  if (start === -1 || end === -1) {
+    throw new Error(`No JSON object found. Raw response (first 400 chars): ${JSON.stringify(raw.slice(0, 400))}`);
+  }
   return raw.slice(start, end + 1);
 }
 
@@ -86,7 +88,11 @@ Return a JSON object with exactly these fields:
       }],
     });
 
-    const raw = (message.content[0] as { type: string; text: string }).text.trim();
+    const block = message.content[0];
+    if (!block || block.type !== 'text') {
+      throw new Error(`Unexpected block type: ${block?.type ?? 'none'}, stop_reason: ${message.stop_reason}`);
+    }
+    const raw = block.text.trim();
     post = JSON.parse(extractJson(raw));
   } catch (err) {
     return { ok: false, error: `AI generation failed: ${err instanceof Error ? err.message : String(err)}` };

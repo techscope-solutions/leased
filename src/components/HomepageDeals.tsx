@@ -15,15 +15,10 @@ export default function HomepageDeals({ dealsByCategory }: {
   ];
 
   return (
-    <section style={{ padding: '0 40px 80px', maxWidth: 1400, margin: '0 auto' }}>
+    <section className="r-hp-deals" style={{ maxWidth: 1400, margin: '0 auto' }}>
 
       {/* Cards */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 1,
-        border: '1px solid rgba(255,255,255,0.07)',
-      }}>
+      <div className="r-hp-deals-grid" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {deals.map(deal => (
           <HomepageDealCard key={deal.id} deal={deal} />
         ))}

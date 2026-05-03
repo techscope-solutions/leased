@@ -25,11 +25,6 @@ export default async function Home() {
         {/* Inner layout */}
         <div className="r-hero-inner" style={{ maxWidth: 1320, width: '100%', margin: '0 auto', position: 'relative', zIndex: 5 }}>
 
-          {/* Right — delivery scene */}
-          <div className="r-hero-slideshow" style={{ flex: '0 0 auto' }}>
-            <HeroDelivery />
-          </div>
-
           {/* Left */}
           <div className="r-hero-left" style={{ position: 'relative', zIndex: 6 }}>
             {/* 2-line headline */}
@@ -57,6 +52,11 @@ export default async function Home() {
             </p>
 
             <HeroCTA />
+          </div>
+
+          {/* Right — deal preview (desktop only) */}
+          <div className="r-hero-slideshow">
+            <HeroDelivery />
           </div>
 
         </div>

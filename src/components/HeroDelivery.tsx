@@ -2,344 +2,276 @@
 
 export default function HeroDelivery() {
   return (
-    <>
+    <div style={{
+      position: 'relative', width: '100%', height: '100%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+    }}>
       <style>{`
-        @keyframes hd-car-arrive {
-          0%   { transform: translateX(60px); opacity: 0; }
-          100% { transform: translateX(0);    opacity: 1; }
+        @keyframes hd-in {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-        @keyframes hd-glow-pulse {
-          0%, 100% { opacity: 0.5; transform: scaleX(1); }
-          50%       { opacity: 1;   transform: scaleX(1.12); }
+        @keyframes hd-badge {
+          from { opacity: 0; transform: translateX(-14px) scale(0.92); }
+          to   { opacity: 1; transform: translateX(0) scale(1); }
         }
-        @keyframes hd-contract-in {
-          0%   { transform: translateY(-18px) rotate(-3deg); opacity: 0; }
-          100% { transform: translateY(0)     rotate(-3deg); opacity: 1; }
+        @keyframes hd-float-a {
+          0%, 100% { transform: translateY(0); }
+          50%       { transform: translateY(-7px); }
         }
-        @keyframes hd-sig-draw {
-          0%   { stroke-dashoffset: 160; opacity: 0; }
-          8%   { opacity: 1; }
-          55%  { stroke-dashoffset: 0; }
-          100% { stroke-dashoffset: 0; opacity: 1; }
+        @keyframes hd-float-b {
+          0%, 100% { transform: translateY(0); }
+          50%       { transform: translateY(-5px); }
+        }
+        @keyframes hd-blink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0.25; }
         }
         @keyframes hd-stamp {
-          0%, 45% { transform: scale(0) rotate(-15deg); opacity: 0; }
-          60%     { transform: scale(1.15) rotate(-8deg); opacity: 1; }
-          70%, 100% { transform: scale(1) rotate(-8deg); opacity: 1; }
+          0%, 52% { opacity: 0; transform: scale(0.45) rotate(-12deg); }
+          68%     { opacity: 1; transform: scale(1.08) rotate(-8deg); }
+          80%, 100% { opacity: 1; transform: scale(1) rotate(-8deg); }
         }
-        @keyframes hd-keys-in {
-          0%   { transform: translateX(24px) rotate(-20deg); opacity: 0; }
-          100% { transform: translateX(0)    rotate(-8deg);  opacity: 1; }
-        }
-        @keyframes hd-keys-float {
-          0%, 100% { transform: translateY(0) rotate(-8deg); }
-          50%       { transform: translateY(-6px) rotate(-4deg); }
-        }
-        @keyframes hd-tag-in {
-          0%   { transform: scaleX(0); opacity: 0; transform-origin: left; }
-          100% { transform: scaleX(1); opacity: 1; transform-origin: left; }
-        }
-        @keyframes hd-hand-sign {
-          0%   { transform: translate(0, 0) rotate(-8deg); }
-          40%  { transform: translate(38px, -4px) rotate(-8deg); }
-          80%  { transform: translate(60px, 2px) rotate(-8deg); }
-          100% { transform: translate(72px, 0) rotate(-8deg); }
-        }
-        @keyframes hd-fade-float {
-          0%, 100% { transform: translateY(0); }
-          50%       { transform: translateY(-8px); }
-        }
-        @keyframes hd-particle {
-          0%   { transform: translate(0,0); opacity: 0.7; }
-          100% { transform: translate(var(--px), var(--py)); opacity: 0; }
-        }
-        @keyframes hd-status-blink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0.4; }
+        @keyframes hd-glow {
+          0%, 100% { opacity: 0.28; }
+          50%       { opacity: 0.65; }
         }
       `}</style>
 
+      {/* Ambient red glow behind scene */}
       <div style={{
-        position: 'relative',
-        width: '100%',
-        height: 560,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
+        position: 'absolute', inset: 0, pointerEvents: 'none',
+        background: 'radial-gradient(ellipse 55% 45% at 58% 72%, rgba(255,40,0,0.09) 0%, transparent 70%)',
+      }} />
+
+      {/* ── Floating: DELIVERY CONFIRMED ── */}
+      <div style={{
+        position: 'absolute', top: 72, left: 12,
+        display: 'flex', alignItems: 'center', gap: 8,
+        background: 'rgba(10,10,13,0.94)',
+        border: '1px solid rgba(34,197,94,0.26)',
+        borderRadius: 99, padding: '9px 18px',
+        backdropFilter: 'blur(24px)',
+        boxShadow: '0 8px 36px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)',
+        animation: 'hd-badge 0.55s cubic-bezier(0.23,1,0.32,1) 1.3s both, hd-float-a 4.8s ease-in-out 2s infinite',
+        zIndex: 4,
+      }}>
+        <span style={{
+          width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block',
+          animation: 'hd-blink 2s ease-in-out 2s infinite',
+        }} />
+        <span style={{
+          fontFamily: 'var(--font-barlow-cond)', fontWeight: 700,
+          fontSize: 10, letterSpacing: '0.14em', color: '#22c55e',
+        }}>DELIVERY CONFIRMED</span>
+      </div>
+
+      {/* ── Floating: savings stat ── */}
+      <div style={{
+        position: 'absolute', bottom: 116, left: 12,
+        background: 'rgba(10,10,13,0.94)',
+        border: '1px solid rgba(255,255,255,0.09)',
+        borderRadius: 16, padding: '13px 18px',
+        backdropFilter: 'blur(24px)',
+        boxShadow: '0 8px 36px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.05)',
+        animation: 'hd-badge 0.55s cubic-bezier(0.23,1,0.32,1) 1.7s both, hd-float-b 5.5s ease-in-out 2.5s infinite',
+        zIndex: 4, minWidth: 116,
+      }}>
+        <div style={{
+          fontFamily: 'var(--font-barlow-cond)', fontSize: 8,
+          letterSpacing: '0.14em', color: 'rgba(255,255,255,0.28)', marginBottom: 5,
+        }}>SAVINGS VS RETAIL</div>
+        <div style={{
+          fontFamily: 'var(--font-display)', fontWeight: 900,
+          fontSize: 28, color: '#FF2800', letterSpacing: '-0.03em', lineHeight: 1,
+        }}>−$340</div>
+        <div style={{
+          fontFamily: 'var(--font-barlow-cond)', fontSize: 8,
+          color: 'rgba(255,255,255,0.22)', letterSpacing: '0.08em', marginTop: 4,
+        }}>PER MONTH</div>
+      </div>
+
+      {/* ── Main deal card ── */}
+      <div style={{
+        width: 320,
+        background: 'rgba(10,10,13,0.97)',
+        border: '1px solid rgba(255,255,255,0.09)',
+        borderRadius: 24,
         overflow: 'hidden',
+        boxShadow: '0 40px 100px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.07)',
+        animation: 'hd-in 0.85s cubic-bezier(0.23,1,0.32,1) 0.15s both',
+        position: 'relative', zIndex: 3,
       }}>
 
-        {/* Ambient background glow */}
+        {/* ── Car image zone ── */}
         <div style={{
-          position: 'absolute', bottom: 0, left: '50%',
-          transform: 'translateX(-50%)',
-          width: '120%', height: '55%',
-          background: 'radial-gradient(ellipse at 50% 100%, rgba(255,40,0,0.12) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-
-        {/* ── Contract card ── */}
-        <div style={{
-          position: 'absolute', top: 0, right: 24,
-          width: 200,
-          background: 'rgba(14,14,14,0.92)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          borderRadius: 16,
-          padding: '16px 18px',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)',
-          backdropFilter: 'blur(20px)',
-          animation: 'hd-contract-in 0.8s cubic-bezier(0.23,1,0.32,1) 0.3s both',
-          zIndex: 10,
+          height: 195, position: 'relative', overflow: 'hidden',
+          background: 'linear-gradient(158deg, #0c1324 0%, #07080e 55%, #0f0608 100%)',
         }}>
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 12 }}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <rect width="14" height="14" rx="3" fill="rgba(255,40,0,0.2)" stroke="rgba(255,40,0,0.5)" strokeWidth="0.8"/>
-              <rect x="3" y="4" width="8" height="1" rx="0.5" fill="#FF2800" opacity="0.8"/>
-              <rect x="3" y="6.5" width="6" height="1" rx="0.5" fill="rgba(255,255,255,0.3)"/>
-              <rect x="3" y="9" width="7" height="1" rx="0.5" fill="rgba(255,255,255,0.3)"/>
-            </svg>
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 10, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.7)' }}>LEASE AGREEMENT</span>
-          </div>
+          {/* Subtle grid texture — same pattern as HowItWorks step cards */}
+          <div style={{
+            position: 'absolute', inset: 0, opacity: 0.038,
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }} />
 
-          {/* Redacted lines */}
-          {[80, 100, 65, 90, 55].map((w, i) => (
-            <div key={i} style={{ height: 4, width: `${w}%`, background: 'rgba(255,255,255,0.08)', borderRadius: 2, marginBottom: 6 }} />
-          ))}
+          {/* Underglow pulse */}
+          <div style={{
+            position: 'absolute', bottom: -8, left: '50%', transform: 'translateX(-50%)',
+            width: '72%', height: '48%',
+            background: 'radial-gradient(ellipse, rgba(255,40,0,0.2) 0%, transparent 70%)',
+            animation: 'hd-glow 3.5s ease-in-out 1s infinite',
+          }} />
 
-          {/* Vehicle line */}
-          <div style={{ marginTop: 10, marginBottom: 14 }}>
-            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 8, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)', marginBottom: 3 }}>VEHICLE</div>
-            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>2024 BMW M3</div>
-            <div style={{ fontFamily: 'var(--font-barlow)', fontSize: 10, color: '#FF2800' }}>$1,350 / MONTH</div>
-          </div>
+          {/* Drop shadow under car */}
+          <div style={{
+            position: 'absolute', bottom: 14, left: '50%', transform: 'translateX(-50%)',
+            width: '70%', height: 10, background: 'rgba(0,0,0,0.38)',
+            filter: 'blur(7px)', borderRadius: '50%',
+          }} />
 
-          {/* Signature field */}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 10, position: 'relative' }}>
-            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 8, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.25)', marginBottom: 6 }}>SIGNATURE</div>
-            <div style={{ position: 'relative', height: 34, overflow: 'hidden' }}>
-              {/* Signature SVG path */}
-              <svg width="164" height="34" viewBox="0 0 164 34" style={{ position: 'absolute', top: 0, left: 0 }}>
-                <path
-                  d="M4 22 C12 22 14 10 22 12 C30 14 28 28 36 26 C44 24 42 8 52 10 C58 11 56 24 64 22 C70 20 72 16 78 18 C86 21 84 14 92 12 C100 10 100 26 108 24 C114 23 114 16 120 18 C128 22 126 10 136 8 C142 7 142 22 150 20 C156 19 158 14 164 16"
-                  stroke="rgba(255,255,255,0.75)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  fill="none"
-                  strokeDasharray="160"
-                  style={{
-                    animation: 'hd-sig-draw 2.2s cubic-bezier(0.4,0,0.2,1) 1.2s both',
-                  }}
+          {/* Car SVG — clean luxury sedan matching site's illustration style */}
+          <div style={{
+            position: 'absolute', bottom: 22, left: '50%', transform: 'translateX(-50%)',
+            width: '84%',
+          }}>
+            <svg viewBox="0 0 280 88" width="100%" fill="none">
+              {/* Body */}
+              <path d="M26 62 L26 45 L48 28 L88 20 L188 20 L224 28 L252 45 L252 62 Z"
+                fill="rgba(20,24,36,0.96)" stroke="rgba(255,255,255,0.11)" strokeWidth="1" />
+              {/* Roof */}
+              <path d="M66 20 L84 7 L190 7 L210 20"
+                fill="rgba(14,17,27,0.98)" stroke="rgba(255,255,255,0.07)" strokeWidth="1" />
+              {/* Windshield */}
+              <path d="M70 20 L86 8 L140 8 L140 20 Z"
+                fill="rgba(100,160,255,0.06)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8" />
+              {/* Rear glass */}
+              <path d="M148 8 L196 8 L206 20 L148 20 Z"
+                fill="rgba(100,160,255,0.04)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
+              {/* Body highlight stripe */}
+              <path d="M50 42 L244 42" stroke="rgba(255,255,255,0.044)" strokeWidth="1.5" strokeLinecap="round" />
+              {/* Front headlight */}
+              <path d="M246 43 L260 49 L260 58 L246 60 Z"
+                fill="rgba(255,220,180,0.88)"
+                style={{ filter: 'drop-shadow(0 0 6px rgba(255,220,180,0.6))' }} />
+              {/* Rear taillight */}
+              <path d="M26 45 L14 50 L14 58 L26 60 Z"
+                fill="rgba(255,40,0,0.82)"
+                style={{ filter: 'drop-shadow(0 0 5px rgba(255,40,0,0.7))' }} />
+              {/* Front wheel */}
+              <circle cx="208" cy="70" r="18" fill="rgba(6,6,8,0.98)" stroke="rgba(255,255,255,0.13)" strokeWidth="1.5" />
+              <circle cx="208" cy="70" r="10" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+              {[0,60,120,180,240,300].map(a => (
+                <line key={a}
+                  x1={208 + 7 * Math.cos(a * Math.PI / 180)} y1={70 + 7 * Math.sin(a * Math.PI / 180)}
+                  x2={208 + 12 * Math.cos(a * Math.PI / 180)} y2={70 + 12 * Math.sin(a * Math.PI / 180)}
+                  stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinecap="round"
                 />
-              </svg>
-              {/* Signing hand */}
-              <div style={{
-                position: 'absolute', bottom: 0, left: 0,
-                animation: 'hd-hand-sign 2.2s cubic-bezier(0.4,0,0.2,1) 1.2s both',
-              }}>
-                <svg width="24" height="28" viewBox="0 0 24 28" fill="none">
-                  <path d="M8 22 C6 18 5 12 7 8 C8 5 11 4 12 6 C13 8 12 12 13 16" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeLinecap="round"/>
-                  <path d="M13 16 C14 14 16 13 17 15 C18 17 16 20 14 22" stroke="rgba(255,255,255,0.5)" strokeWidth="1.2" strokeLinecap="round"/>
-                  <path d="M14 22 L20 20" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="20" cy="20" r="1.5" fill="rgba(255,255,255,0.4)"/>
-                </svg>
+              ))}
+              <circle cx="208" cy="70" r="2.5" fill="rgba(255,255,255,0.22)" />
+              {/* Rear wheel */}
+              <circle cx="76" cy="70" r="18" fill="rgba(6,6,8,0.98)" stroke="rgba(255,255,255,0.13)" strokeWidth="1.5" />
+              <circle cx="76" cy="70" r="10" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+              {[0,60,120,180,240,300].map(a => (
+                <line key={a}
+                  x1={76 + 7 * Math.cos(a * Math.PI / 180)} y1={70 + 7 * Math.sin(a * Math.PI / 180)}
+                  x2={76 + 12 * Math.cos(a * Math.PI / 180)} y2={70 + 12 * Math.sin(a * Math.PI / 180)}
+                  stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" strokeLinecap="round"
+                />
+              ))}
+              <circle cx="76" cy="70" r="2.5" fill="rgba(255,255,255,0.22)" />
+            </svg>
+          </div>
+
+          {/* LIVE DROP badge */}
+          <div style={{
+            position: 'absolute', top: 13, left: 13,
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'rgba(255,40,0,0.1)',
+            border: '1px solid rgba(255,40,0,0.28)',
+            borderRadius: 99, padding: '4px 10px',
+          }}>
+            <span style={{
+              width: 5, height: 5, borderRadius: '50%', background: '#FF2800', display: 'inline-block',
+              animation: 'hd-blink 1.4s ease-in-out infinite',
+            }} />
+            <span style={{
+              fontFamily: 'var(--font-barlow-cond)', fontWeight: 700,
+              fontSize: 9, letterSpacing: '0.12em', color: '#FF2800',
+            }}>LIVE DROP</span>
+          </div>
+
+          {/* Countdown */}
+          <div style={{
+            position: 'absolute', top: 13, right: 13,
+            background: 'rgba(0,0,0,0.52)',
+            border: '1px solid rgba(255,255,255,0.09)',
+            borderRadius: 8, padding: '4px 10px',
+            backdropFilter: 'blur(8px)',
+          }}>
+            <span style={{
+              fontFamily: 'var(--font-barlow-cond)', fontWeight: 700,
+              fontSize: 11, color: 'rgba(255,255,255,0.62)', letterSpacing: '0.04em',
+            }}>04:22:18</span>
+          </div>
+        </div>
+
+        {/* ── Info zone ── */}
+        <div style={{ padding: '18px 22px 22px', position: 'relative' }}>
+          <div style={{
+            fontFamily: 'var(--font-barlow)', fontSize: 10,
+            color: 'rgba(255,255,255,0.26)', letterSpacing: '0.07em', marginBottom: 4,
+          }}>2024 · AWD · CALIFORNIA</div>
+
+          <div style={{
+            fontFamily: 'var(--font-barlow-cond)', fontWeight: 900,
+            fontSize: 21, color: '#fff', letterSpacing: '-0.01em', lineHeight: 1.1,
+          }}>BMW M3 Competition</div>
+
+          {/* Price + CTA row */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: 16 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 2 }}>
+                <span style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 900,
+                  fontSize: 46, color: '#FF2800', letterSpacing: '-0.04em', lineHeight: 1,
+                }}>$1,350</span>
+                <span style={{
+                  fontFamily: 'var(--font-barlow-cond)', fontWeight: 600,
+                  fontSize: 13, color: 'rgba(255,255,255,0.28)', marginBottom: 5,
+                }}>/MO</span>
               </div>
+              <div style={{
+                fontFamily: 'var(--font-barlow-cond)', fontSize: 9,
+                color: 'rgba(255,255,255,0.2)', letterSpacing: '0.07em', marginTop: 4,
+              }}>ZERO DOWN · 36 MO · 10K MI/YR</div>
             </div>
-            <div style={{ height: 1, background: 'rgba(255,255,255,0.15)', marginTop: 2 }} />
+
+            <button style={{
+              padding: '11px 20px',
+              background: '#FF2800',
+              border: '1px solid rgba(255,80,40,0.4)',
+              borderRadius: 12,
+              fontFamily: 'var(--font-barlow-cond)', fontWeight: 800,
+              fontSize: 11, letterSpacing: '0.09em', color: '#fff',
+              boxShadow: '0 4px 20px rgba(255,40,0,0.38), inset 0 1px 0 rgba(255,255,255,0.15)',
+              cursor: 'pointer',
+            }}>APPLY →</button>
           </div>
 
           {/* SIGNED stamp */}
           <div style={{
-            position: 'absolute', top: 48, right: 12,
-            border: '2px solid rgba(34,197,94,0.7)',
-            borderRadius: 6, padding: '3px 8px',
+            position: 'absolute', bottom: 44, right: 18,
+            border: '2px solid rgba(34,197,94,0.52)',
+            borderRadius: 6, padding: '3px 9px',
             fontFamily: 'var(--font-barlow-cond)', fontWeight: 900,
-            fontSize: 11, letterSpacing: '0.18em',
-            color: 'rgba(34,197,94,0.9)',
+            fontSize: 10, letterSpacing: '0.2em', color: 'rgba(34,197,94,0.78)',
             transform: 'rotate(-8deg)',
-            animation: 'hd-stamp 3s cubic-bezier(0.23,1,0.32,1) 1.2s both',
-          }}>
-            SIGNED ✓
-          </div>
+            animation: 'hd-stamp 3.8s cubic-bezier(0.23,1,0.32,1) 0.8s both',
+            pointerEvents: 'none',
+          }}>SIGNED ✓</div>
         </div>
-
-        {/* ── Keys card ── */}
-        <div style={{
-          position: 'absolute', top: 60, left: 16,
-          background: 'rgba(12,12,12,0.9)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 14, padding: '14px 16px',
-          boxShadow: '0 16px 48px rgba(0,0,0,0.5)',
-          backdropFilter: 'blur(20px)',
-          animation: 'hd-keys-in 0.7s cubic-bezier(0.23,1,0.32,1) 2.8s both',
-          zIndex: 10,
-        }}>
-          {/* Key SVG */}
-          <div style={{ animation: 'hd-keys-float 3s ease-in-out 3.5s infinite' }}>
-            <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-              {/* Key fob body */}
-              <rect x="2" y="14" width="32" height="24" rx="8" fill="rgba(30,30,30,0.95)" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
-              <rect x="6" y="18" width="24" height="8" rx="2" fill="rgba(255,40,0,0.15)" stroke="rgba(255,40,0,0.3)" strokeWidth="0.8"/>
-              <rect x="8" y="19.5" width="5" height="5" rx="1" fill="rgba(255,40,0,0.6)"/>
-              <rect x="15" y="19.5" width="5" height="5" rx="1" fill="rgba(255,255,255,0.15)"/>
-              <rect x="22" y="19.5" width="5" height="5" rx="1" fill="rgba(255,255,255,0.15)"/>
-              <rect x="6" y="29" width="24" height="4" rx="1.5" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
-              {/* Key ring */}
-              <circle cx="18" cy="10" r="5" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5" fill="none"/>
-              <line x1="18" y1="14" x2="18" y2="15" stroke="rgba(255,255,255,0.35)" strokeWidth="1.5"/>
-              {/* Physical key */}
-              <line x1="32" y1="26" x2="50" y2="26" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round"/>
-              <rect x="40" y="22" width="3" height="4" rx="1" fill="rgba(255,255,255,0.4)"/>
-              <rect x="45" y="23" width="2" height="5" rx="0.5" fill="rgba(255,255,255,0.3)"/>
-              <circle cx="50" cy="26" r="1.5" fill="rgba(255,255,255,0.4)"/>
-              {/* Glow behind fob */}
-              <ellipse cx="18" cy="38" rx="12" ry="3" fill="rgba(255,40,0,0.15)" style={{ filter: 'blur(3px)' }}/>
-            </svg>
-          </div>
-          <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 8, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: 4 }}>YOUR KEYS</div>
-        </div>
-
-        {/* ── Status pill ── */}
-        <div style={{
-          position: 'absolute', top: 180, left: 16,
-          display: 'flex', alignItems: 'center', gap: 7,
-          background: 'rgba(34,197,94,0.08)',
-          border: '1px solid rgba(34,197,94,0.25)',
-          borderRadius: 99, padding: '6px 14px',
-          animation: 'hd-tag-in 0.5s cubic-bezier(0.23,1,0.32,1) 3.4s both',
-          zIndex: 10,
-        }}>
-          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block', animation: 'hd-status-blink 1.8s ease-in-out 3.5s infinite' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.14em', color: '#22c55e' }}>DELIVERY CONFIRMED</span>
-        </div>
-
-        {/* ── Car ── */}
-        <div style={{
-          width: '100%',
-          paddingBottom: 40,
-          position: 'relative',
-          animation: 'hd-car-arrive 1.1s cubic-bezier(0.23,1,0.32,1) 0.1s both',
-        }}>
-          {/* Car SVG — luxury sedan */}
-          <svg viewBox="0 0 560 200" width="100%" fill="none" style={{ display: 'block', filter: 'drop-shadow(0 12px 32px rgba(0,0,0,0.7))' }}>
-            <defs>
-              <radialGradient id="hd-body-grad" cx="50%" cy="30%" r="70%">
-                <stop offset="0%" stopColor="rgba(255,255,255,0.18)"/>
-                <stop offset="100%" stopColor="rgba(255,255,255,0.04)"/>
-              </radialGradient>
-              <radialGradient id="hd-underglow" cx="50%" cy="0%" r="50%">
-                <stop offset="0%" stopColor="rgba(255,40,0,0.9)"/>
-                <stop offset="100%" stopColor="rgba(255,40,0,0)"/>
-              </radialGradient>
-            </defs>
-
-            {/* Ground underglow */}
-            <ellipse cx="280" cy="188" rx="220" ry="14" fill="url(#hd-underglow)" opacity="0.6"
-              style={{ animation: 'hd-glow-pulse 2.5s ease-in-out 1s infinite' }} />
-
-            {/* Ground shadow */}
-            <ellipse cx="280" cy="185" rx="200" ry="8" fill="rgba(0,0,0,0.5)" style={{ filter: 'blur(4px)' }}/>
-
-            {/* Body main */}
-            <path d="M60 130 L60 104 L96 60 L180 44 L372 44 L444 60 L500 104 L500 130 Z"
-              fill="rgba(18,18,24,0.95)" stroke="rgba(255,255,255,0.15)" strokeWidth="1"/>
-            <path d="M60 130 L60 104 L96 60 L180 44 L372 44 L444 60 L500 104 L500 130 Z"
-              fill="url(#hd-body-grad)" opacity="0.6"/>
-
-            {/* Roofline */}
-            <path d="M140 44 L172 16 L364 16 L412 44" fill="rgba(14,14,20,0.98)" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
-            <path d="M140 44 L172 16 L364 16 L412 44" fill="url(#hd-body-grad)" opacity="0.4"/>
-
-            {/* Windshield */}
-            <path d="M148 42 L176 18 L280 18 L280 42 Z" fill="rgba(120,180,255,0.08)" stroke="rgba(255,255,255,0.12)" strokeWidth="0.8"/>
-            {/* Rear glass */}
-            <path d="M300 18 L356 18 L400 42 L300 42 Z" fill="rgba(120,180,255,0.06)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.8"/>
-
-            {/* Door line */}
-            <line x1="270" y1="44" x2="275" y2="130" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
-
-            {/* Door handles */}
-            <rect x="200" y="86" width="22" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
-            <rect x="298" y="86" width="22" height="4" rx="2" fill="rgba(255,255,255,0.2)"/>
-
-            {/* Sill */}
-            <rect x="80" y="126" width="400" height="8" rx="2" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5"/>
-
-            {/* Front headlight */}
-            <path d="M494 80 L510 88 L510 98 L494 102 Z" fill="rgba(255,220,180,0.9)" style={{ filter: 'drop-shadow(0 0 8px rgba(255,220,180,0.8))' }}/>
-            <path d="M500 95 L520 88 L530 95 L520 102 Z" fill="rgba(255,220,180,0.5)" opacity="0.6"/>
-
-            {/* DRL strip */}
-            <path d="M470 76 L500 80" stroke="rgba(255,220,180,0.6)" strokeWidth="2.5" strokeLinecap="round"/>
-
-            {/* Rear taillight */}
-            <path d="M60 82 L46 88 L46 102 L60 104 Z" fill="rgba(255,40,0,0.85)" style={{ filter: 'drop-shadow(0 0 6px rgba(255,40,0,0.9))' }}/>
-            <path d="M60 92 L52 95 L52 100 L60 100 Z" fill="rgba(255,80,60,0.9)"/>
-
-            {/* Front wheel */}
-            <circle cx="418" cy="148" r="38" fill="rgba(8,8,8,0.98)" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
-            <circle cx="418" cy="148" r="26" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
-            <circle cx="418" cy="148" r="14" fill="rgba(20,20,20,0.9)" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
-            {[0,60,120,180,240,300].map(a => (
-              <line key={a}
-                x1={418 + 16 * Math.cos(a * Math.PI / 180)}
-                y1={148 + 16 * Math.sin(a * Math.PI / 180)}
-                x2={418 + 26 * Math.cos(a * Math.PI / 180)}
-                y2={148 + 26 * Math.sin(a * Math.PI / 180)}
-                stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round"
-              />
-            ))}
-            <circle cx="418" cy="148" r="4" fill="rgba(255,255,255,0.3)"/>
-
-            {/* Rear wheel */}
-            <circle cx="154" cy="148" r="38" fill="rgba(8,8,8,0.98)" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5"/>
-            <circle cx="154" cy="148" r="26" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
-            <circle cx="154" cy="148" r="14" fill="rgba(20,20,20,0.9)" stroke="rgba(255,255,255,0.12)" strokeWidth="1"/>
-            {[0,60,120,180,240,300].map(a => (
-              <line key={a}
-                x1={154 + 16 * Math.cos(a * Math.PI / 180)}
-                y1={148 + 16 * Math.sin(a * Math.PI / 180)}
-                x2={154 + 26 * Math.cos(a * Math.PI / 180)}
-                y2={148 + 26 * Math.sin(a * Math.PI / 180)}
-                stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round"
-              />
-            ))}
-            <circle cx="154" cy="148" r="4" fill="rgba(255,255,255,0.3)"/>
-
-            {/* Grille */}
-            <path d="M486 110 L514 104 L516 118 L486 122 Z" fill="rgba(14,14,14,0.9)" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8"/>
-            {[113,117,121].map(y => (
-              <line key={y} x1="488" y1={y - 2} x2="514" y2={y - 4} stroke="rgba(255,255,255,0.07)" strokeWidth="0.5"/>
-            ))}
-
-            {/* Badge (front) */}
-            <circle cx="500" cy="112" r="5" fill="rgba(20,20,20,0.9)" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8"/>
-            <text x="500" y="115" textAnchor="middle" fill="rgba(255,255,255,0.5)" fontSize="5" fontWeight="bold">M</text>
-
-            {/* Roof shine */}
-            <path d="M190 22 L340 22" stroke="rgba(255,255,255,0.12)" strokeWidth="3" strokeLinecap="round" style={{ filter: 'blur(1px)' }}/>
-
-            {/* Body highlight */}
-            <path d="M100 90 L480 90" stroke="rgba(255,255,255,0.06)" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </div>
-
-        {/* ── Delivery tag ── */}
-        <div style={{
-          position: 'absolute', bottom: 32, right: 20,
-          background: 'rgba(12,12,12,0.9)',
-          border: '1px solid rgba(255,40,0,0.3)',
-          borderRadius: 10, padding: '8px 14px',
-          backdropFilter: 'blur(16px)',
-          animation: 'hd-fade-float 4s ease-in-out 2s infinite, hd-contract-in 0.6s cubic-bezier(0.23,1,0.32,1) 2.2s both',
-          zIndex: 10,
-        }}>
-          <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 8, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.3)', marginBottom: 2 }}>DELIVER TO</div>
-          <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 12, color: '#fff' }}>YOU.</div>
-        </div>
-
       </div>
-    </>
+    </div>
   );
 }

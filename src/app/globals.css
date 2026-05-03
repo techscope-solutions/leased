@@ -204,6 +204,10 @@ button { cursor: pointer; font-family: var(--font-cond); }
 /* Deal card image */
 .r-deal-card-img { height: 180px; position: relative; overflow: hidden; border-radius: 20px 20px 0 0; }
 
+/* Homepage deals section */
+.r-hp-deals { padding: 64px 48px 80px; }
+.r-hp-deals-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+
 @keyframes sheet-up {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
@@ -225,12 +229,16 @@ button { cursor: pointer; font-family: var(--font-cond); }
 
   /* Hero */
   .r-hero-section        { min-height: auto; align-items: flex-start; overflow: visible; }
-  .r-hero-inner          { grid-template-columns: 1fr; padding: 36px 20px 40px; gap: 32px; }
+  .r-hero-inner          { grid-template-columns: 1fr; padding: 36px 20px 40px; gap: 0; }
   .r-hero-left           { padding-right: 0; }
-  .r-hero-slideshow      { height: auto; }
+  .r-hero-slideshow      { display: none; }
   .r-cta-row             { flex-direction: column; }
   .r-slideshow-desktop   { display: none; }
   .r-slideshow-mobile    { display: block; }
+
+  /* Homepage deals */
+  .r-hp-deals            { padding: 40px 20px 56px; }
+  .r-hp-deals-grid       { grid-template-columns: 1fr; }
 
   /* How It Works */
   .r-how-section  { padding: 48px 20px 56px; gap: 36px; }

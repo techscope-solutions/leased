@@ -14,6 +14,7 @@ const TESTIMONIALS = [
     carColor: '#1a3a6b',
     accentColor: 'rgba(100,140,220,0.85)',
     avatarSeed: 1,
+    carImage: 'https://images.pexels.com/photos/18285499/pexels-photo-18285499.jpeg?auto=compress&cs=tinysrgb&w=1200',
   },
   {
     name: 'Priya K.',
@@ -25,6 +26,7 @@ const TESTIMONIALS = [
     carColor: '#2a1a0a',
     accentColor: 'rgba(220,160,80,0.85)',
     avatarSeed: 2,
+    carImage: 'https://images.pexels.com/photos/463711/pexels-photo-463711.jpeg?auto=compress&cs=tinysrgb&w=1200',
   },
   {
     name: 'Jordan R.',
@@ -36,6 +38,7 @@ const TESTIMONIALS = [
     carColor: '#0a2a1a',
     accentColor: 'rgba(80,220,140,0.85)',
     avatarSeed: 3,
+    carImage: 'https://images.pexels.com/photos/9300916/pexels-photo-9300916.jpeg?auto=compress&cs=tinysrgb&w=1200',
   },
   {
     name: 'Sofia M.',
@@ -47,6 +50,7 @@ const TESTIMONIALS = [
     carColor: '#1a1a2a',
     accentColor: 'rgba(160,140,220,0.85)',
     avatarSeed: 4,
+    carImage: 'https://images.pexels.com/photos/20220998/pexels-photo-20220998.jpeg?auto=compress&cs=tinysrgb&w=1200',
   },
 ];
 
@@ -269,32 +273,54 @@ export default function Testimonials() {
               </div>
             </div>
 
-            {/* Right — car side */}
+            {/* Right — car photo */}
             <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 24,
-              padding: '40px 32px',
-              background: `radial-gradient(ellipse at 50% 60%, ${t.carColor} 0%, rgba(8,8,8,0.6) 65%)`,
               position: 'relative',
               overflow: 'hidden',
+              minHeight: 260,
             }}>
-              {/* Grid texture */}
+              {/* Photo or gradient fallback */}
+              {t.carImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={t.carImage}
+                  alt={t.car}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                  }}
+                />
+              ) : (
+                <>
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: `radial-gradient(ellipse at 50% 60%, ${t.carColor} 0%, rgba(8,8,8,0.6) 65%)`,
+                  }}/>
+                  <div style={{
+                    position: 'absolute', inset: 0, opacity: 0.05,
+                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+                    backgroundSize: '32px 32px',
+                  }}/>
+                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CarSilhouetteMini type={t.carType} color={t.carColor} accent={t.accentColor} />
+                  </div>
+                </>
+              )}
+
+              {/* Gradient overlay at bottom */}
               <div style={{
-                position: 'absolute', inset: 0, opacity: 0.05,
-                backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
-                backgroundSize: '32px 32px',
-              }}/>
-
-              <CarSilhouetteMini type={t.carType} color={t.carColor} accent={t.accentColor} />
-
-              <div style={{ textAlign: 'center', position: 'relative' }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 48, color: '#FF2800', letterSpacing: '-0.04em', lineHeight: 1 }}>
+                position: 'absolute', bottom: 0, left: 0, right: 0,
+                background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, transparent 100%)',
+                padding: '32px 24px 24px',
+              }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 44, color: '#FF2800', letterSpacing: '-0.04em', lineHeight: 1 }}>
                   ${t.monthly}
                 </div>
-                <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 600, fontSize: 11, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.1em', marginTop: 4 }}>
+                <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 600, fontSize: 11, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em', marginTop: 4 }}>
                   PER MONTH · {t.car.toUpperCase()}
                 </div>
               </div>

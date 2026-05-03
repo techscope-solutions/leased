@@ -51,7 +51,16 @@ export default function DealCard({ deal }: { deal: CarDeal }) {
           transform: hovered ? 'scale(1.04)' : 'scale(1)',
           transition: 'transform 0.5s cubic-bezier(0.23,1,0.32,1)',
         }}>
-          <CarSilhouette type={deal.carType} stripe={deal.stripe} />
+          {deal.images && deal.images.length > 0 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={deal.images[0]}
+              alt={`${deal.year} ${deal.make} ${deal.model}`}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <CarSilhouette type={deal.carType} stripe={deal.stripe} />
+          )}
         </div>
 
         {/* Top-left: slots left or zero down badge */}

@@ -72,6 +72,7 @@ export function dbRowToCarDeal(row: DbDeal): CarDeal {
     category: row.category as DealCategory,
     stripe,
     accent,
+    images: row.images ?? [],
   };
 }
 

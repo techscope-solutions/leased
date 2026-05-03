@@ -29,4 +29,5 @@ export interface CarDeal {
   category: DealCategory;
   stripe: string;
   accent: string;
+  images: string[];
 }

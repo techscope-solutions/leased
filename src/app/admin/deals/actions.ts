@@ -75,6 +75,7 @@ export async function updateDeal(formData: FormData) {
       featured: formData.get('featured') === 'true',
       expires_at: new Date(Date.now() + parseInt((formData.get('expires_days') as string) || '7') * 24 * 3600 * 1000).toISOString(),
       rejection_reason: (formData.get('rejection_reason') as string) || null,
+      images: JSON.parse((formData.get('images') as string) || '[]'),
     })
     .eq('id', dealId);
 

@@ -1,19 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { DbDeal } from '@/lib/deals';
 import { updateDeal } from './actions';
+import { guessCarSpecs, POPULAR_MAKES } from '@/lib/carHeuristics';
 
 const ACCENT: Record<string, string> = {
   Daily: '#111827', Luxury: '#0a0f1e', Supercar: '#161616',
 };
 
-type Props = {
-  userId: string;
-  deal?: DbDeal; // present = edit mode, absent = create mode
-};
+type Props = { userId: string; deal?: DbDeal };
 
 export default function AdminDealForm({ userId, deal }: Props) {
   const router = useRouter();
@@ -42,13 +40,55 @@ export default function AdminDealForm({ userId, deal }: Props) {
   const [featured, setFeatured] = useState(deal?.featured ?? false);
   const [expiresDays, setExpiresDays] = useState('7');
   const [rejectionReason, setRejectionReason] = useState(deal?.rejection_reason ?? '');
-  const [images, setImages] = useState<File[]>([]);
+
+  // Images
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>(deal?.images ?? []);
+
+  // Lookup
+  const [models, setModels] = useState<string[]>([]);
+  const [specsFilled, setSpecsFilled] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) setImages(Array.from(e.target.files).slice(0, 5));
+  // Generate previews for new images
+  useEffect(() => {
+    const urls = newImages.map(f => URL.createObjectURL(f));
+    setPreviews(urls);
+    return () => urls.forEach(u => URL.revokeObjectURL(u));
+  }, [newImages]);
+
+  // Load NHTSA models when make+year change
+  useEffect(() => {
+    if (!make || make.length < 2) { setModels([]); return; }
+    const id = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/car-lookup?make=${encodeURIComponent(make)}&year=${year}`);
+        const data = await res.json();
+        setModels(data.models ?? []);
+      } catch { /* ignore */ }
+    }, 450);
+    return () => clearTimeout(id);
+  }, [make, year]);
+
+  const handleAutoFill = () => {
+    const specs = guessCarSpecs(make, model);
+    if (!specs) return;
+    setDrive(specs.drive);
+    setCarType(specs.carType);
+    setCategory(specs.category);
+    setSpecsFilled(true);
+    setTimeout(() => setSpecsFilled(false), 3000);
   };
+
+  const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) setNewImages(prev => [...prev, ...Array.from(e.target.files!)].slice(0, 8));
+  };
+
+  const removeNewImage = (i: number) => setNewImages(prev => prev.filter((_, j) => j !== i));
+  const removeExistingImage = (url: string) => setExistingImages(prev => prev.filter(u => u !== url));
 
   const handleSubmit = async () => {
     setError('');
@@ -59,8 +99,8 @@ export default function AdminDealForm({ userId, deal }: Props) {
     setSubmitting(true);
     const supabase = createClient();
 
-    const imageUrls: string[] = deal?.images ?? [];
-    for (const file of images) {
+    const imageUrls: string[] = [...existingImages];
+    for (const file of newImages) {
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
       const path = `${userId}/${Date.now()}-${safeName}`;
       const { error: upErr } = await supabase.storage.from('deal-images').upload(path, file);
@@ -84,33 +124,21 @@ export default function AdminDealForm({ userId, deal }: Props) {
       fd.append('slots_left', slots); fd.append('status', status); fd.append('tier', tier);
       fd.append('featured', String(featured)); fd.append('expires_days', expiresDays);
       fd.append('rejection_reason', rejectionReason);
+      fd.append('images', JSON.stringify(imageUrls));
       await updateDeal(fd);
       router.push('/admin/deals');
     } else {
       const { error: insertErr } = await supabase.from('deals').insert({
-        seller_id: userId,
-        status,
-        make: make.trim().toUpperCase(),
-        model: model.trim().toUpperCase(),
-        trim: trim.trim().toUpperCase(),
-        year: parseInt(year),
-        drive, car_type: carType, category,
-        color: color || null,
-        deal_type: dealType,
-        monthly: parseInt(monthly),
-        due_at_signing: parseInt(das),
-        term: parseInt(term),
-        miles_per_year: parseInt(mpy),
-        msrp: parseInt(msrp),
-        zero_deal: zeroDeal,
-        state: state.trim().toUpperCase(),
-        city: city.trim(),
+        seller_id: userId, status,
+        make: make.trim().toUpperCase(), model: model.trim().toUpperCase(), trim: trim.trim().toUpperCase(),
+        year: parseInt(year), drive, car_type: carType, category,
+        color: color || null, deal_type: dealType,
+        monthly: parseInt(monthly), due_at_signing: parseInt(das),
+        term: parseInt(term), miles_per_year: parseInt(mpy), msrp: parseInt(msrp),
+        zero_deal: zeroDeal, state: state.trim().toUpperCase(), city: city.trim(),
         slots_left: slots ? parseInt(slots) : null,
-        tier, featured,
-        expires_at: expiresAt,
-        images: imageUrls,
-        accent,
-        stripe: `linear-gradient(135deg, ${accent} 0%, ${accent}ee 100%)`,
+        tier, featured, expires_at: expiresAt, images: imageUrls,
+        accent, stripe: `linear-gradient(135deg, ${accent} 0%, ${accent}ee 100%)`,
       });
       if (insertErr) { setError(insertErr.message); setSubmitting(false); return; }
       router.push('/admin/deals');
@@ -171,24 +199,58 @@ export default function AdminDealForm({ userId, deal }: Props) {
 
       {/* Vehicle */}
       <Section label="VEHICLE">
-        <Row>
-          <Field label="MAKE *"><Inp value={make} onChange={setMake} placeholder="BMW" /></Field>
-          <Field label="MODEL *"><Inp value={model} onChange={setModel} placeholder="M3 COMPETITION" /></Field>
-        </Row>
-        <Row>
-          <Field label="TRIM"><Inp value={trim} onChange={setTrim} placeholder="XDRIVE" /></Field>
+        {/* Lookup row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr auto', gap: 10, alignItems: 'flex-end' }}>
           <Field label="YEAR">
             <Sel value={year} onChange={setYear}>
-              {[2026,2025,2024,2023,2022,2021,2020].map(y => <option key={y}>{y}</option>)}
+              {[2027,2026,2025,2024,2023,2022,2021,2020].map(y => <option key={y}>{y}</option>)}
             </Sel>
           </Field>
+          <Field label="MAKE *">
+            <Inp value={make} onChange={setMake} placeholder="BMW" list="makes-list" />
+            <datalist id="makes-list">
+              {POPULAR_MAKES.map(m => <option key={m} value={m} />)}
+            </datalist>
+          </Field>
+          <Field label="MODEL *">
+            <Inp value={model} onChange={setModel} placeholder="M3 Competition" list="models-list" />
+            <datalist id="models-list">
+              {models.map(m => <option key={m} value={m} />)}
+            </datalist>
+          </Field>
+          <button
+            type="button"
+            onClick={handleAutoFill}
+            disabled={!make || !model}
+            style={{
+              padding: '8px 14px', borderRadius: 8, marginBottom: 1,
+              background: specsFilled ? 'rgba(34,197,94,0.2)' : (!make || !model) ? 'rgba(255,255,255,0.04)' : 'rgba(255,40,0,0.15)',
+              border: `1px solid ${specsFilled ? 'rgba(34,197,94,0.4)' : (!make || !model) ? 'rgba(255,255,255,0.08)' : 'rgba(255,40,0,0.35)'}`,
+              color: specsFilled ? '#22c55e' : (!make || !model) ? 'rgba(255,255,255,0.25)' : '#FF2800',
+              fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 10,
+              letterSpacing: '0.1em', cursor: (!make || !model) ? 'not-allowed' : 'pointer',
+              whiteSpace: 'nowrap', transition: 'all 0.2s',
+            }}
+          >
+            {specsFilled ? '✓ FILLED' : '⚡ AUTO-FILL'}
+          </button>
+        </div>
+
+        <Row>
+          <Field label="TRIM"><Inp value={trim} onChange={setTrim} placeholder="xDrive" /></Field>
+          <Field label="COLOR" note="optional"><Inp value={color} onChange={setColor} placeholder="Midnight Black" /></Field>
         </Row>
         <Row>
-          <Field label="DRIVETRAIN"><Sel value={drive} onChange={setDrive}>{['AWD','RWD','FWD','4WD'].map(d=><option key={d}>{d}</option>)}</Sel></Field>
-          <Field label="CAR TYPE"><Sel value={carType} onChange={setCarType}>{['Sedan','SUV','Coupe','Truck','EV'].map(t=><option key={t}>{t}</option>)}</Sel></Field>
-          <Field label="CATEGORY"><Sel value={category} onChange={setCategory}>{['Daily','Luxury','Supercar'].map(c=><option key={c}>{c}</option>)}</Sel></Field>
+          <Field label="DRIVETRAIN">
+            <Sel value={drive} onChange={setDrive}>{['AWD','RWD','FWD','4WD'].map(d=><option key={d}>{d}</option>)}</Sel>
+          </Field>
+          <Field label="CAR TYPE">
+            <Sel value={carType} onChange={setCarType}>{['Sedan','SUV','Coupe','Truck','EV'].map(t=><option key={t}>{t}</option>)}</Sel>
+          </Field>
+          <Field label="CATEGORY">
+            <Sel value={category} onChange={setCategory}>{['Daily','Luxury','Supercar'].map(c=><option key={c}>{c}</option>)}</Sel>
+          </Field>
         </Row>
-        <Row><Field label="COLOR" note="optional"><Inp value={color} onChange={setColor} placeholder="Midnight Black" /></Field></Row>
       </Section>
 
       {/* Deal Terms */}
@@ -219,24 +281,57 @@ export default function AdminDealForm({ userId, deal }: Props) {
       </Section>
 
       {/* Images */}
-      <Section label={isEdit ? 'ADD MORE IMAGES' : 'IMAGES'}>
-        <div style={{ border: '1px dashed rgba(255,255,255,0.15)', borderRadius: 14, padding: '20px', background: 'rgba(255,255,255,0.02)', position: 'relative', cursor: 'pointer' }}>
-          <input type="file" accept="image/*" multiple onChange={handleImages} style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', zIndex: 2 }} />
-          {images.length === 0 ? (
-            <div style={{ textAlign: 'center', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)' }}>
-              {isEdit ? 'CLICK TO ADD IMAGES' : 'CLICK OR DROP FILES'}
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-              {images.map((f, i) => (
-                <div key={i} style={{ padding: '5px 10px', background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.3)', borderRadius: 8, fontFamily: 'var(--font-barlow)', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>{f.name}</div>
+      <Section label="IMAGES">
+        {/* Existing images */}
+        {existingImages.length > 0 && (
+          <div>
+            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 9, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>EXISTING</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8 }}>
+              {existingImages.map(url => (
+                <div key={url} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removeExistingImage(url)}
+                    style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >×</button>
+                </div>
               ))}
             </div>
-          )}
-        </div>
-        {isEdit && deal && deal.images.length > 0 && (
-          <div style={{ fontFamily: 'var(--font-barlow)', fontSize: 11, color: 'rgba(255,255,255,0.25)', marginTop: 6 }}>{deal.images.length} existing image{deal.images.length > 1 ? 's' : ''} kept</div>
+          </div>
         )}
+
+        {/* New image previews */}
+        {previews.length > 0 && (
+          <div>
+            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 9, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>NEW</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8 }}>
+              {previews.map((src, i) => (
+                <div key={i} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,40,0,0.25)' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removeNewImage(i)}
+                    style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  >×</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Upload area */}
+        <label style={{ border: '1px dashed rgba(255,255,255,0.15)', borderRadius: 12, padding: '16px', background: 'rgba(255,255,255,0.02)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <input type="file" accept="image/*" multiple onChange={handleImages} style={{ display: 'none' }} />
+          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)' }}>
+            + ADD PHOTOS
+          </span>
+          <span style={{ fontFamily: 'var(--font-barlow)', fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>
+            JPG · PNG · WEBP
+          </span>
+        </label>
       </Section>
 
       {error && (
@@ -277,8 +372,8 @@ function Field({ label, note, children }: { label: string; note?: string; childr
     </div>
   );
 }
-function Inp({ value, onChange, placeholder, type = 'text', maxLength }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string; maxLength?: number }) {
-  return <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box' }} />;
+function Inp({ value, onChange, placeholder, type = 'text', maxLength, list }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string; maxLength?: number; list?: string }) {
+  return <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} list={list} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box' }} />;
 }
 function Sel({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
   return <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', cursor: 'pointer' }}>{children}</select>;

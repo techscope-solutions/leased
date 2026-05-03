@@ -199,3 +199,168 @@ create policy "Moderators can read errors" on public.errors
     exists (select 1 from public.profiles p
             where p.id = auth.uid() and p.role = 'moderator')
   );
+
+-- ============================================================
+-- deals (seller-posted, moderator-approved car listings)
+-- ============================================================
+create table if not exists public.deals (
+  id uuid primary key default gen_random_uuid(),
+  seller_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending'
+    check (status in ('pending', 'live', 'rejected')),
+
+  -- Vehicle
+  make text not null,
+  model text not null,
+  trim text not null default '',
+  year integer not null,
+  drive text not null check (drive in ('AWD', 'RWD', 'FWD', '4WD')),
+  car_type text not null check (car_type in ('Sedan', 'SUV', 'Coupe', 'Truck', 'EV')),
+  category text not null check (category in ('Daily', 'Luxury', 'Supercar')),
+  color text,
+
+  -- Deal terms
+  deal_type text not null check (deal_type in ('LEASE', 'FINANCE')),
+  monthly integer not null,
+  due_at_signing integer not null,
+  term integer not null,
+  miles_per_year integer not null,
+  msrp integer not null,
+  zero_deal boolean not null default false,
+
+  -- Location + inventory
+  state text not null,
+  city text not null,
+  slots_left integer,
+
+  -- Mod-controlled fields (sellers cannot set these)
+  tier text not null default 'VERIFIED'
+    check (tier in ('GOLD', 'PLATINUM', 'VERIFIED')),
+  featured boolean not null default false,
+  expires_at timestamptz,
+
+  -- Images stored in the deal-images bucket; this array holds public URLs
+  images text[] not null default '{}',
+
+  -- Visual accents (hex color strings; default to derived from make/category)
+  stripe text,
+  accent text,
+
+  -- Generated identifier ("DROP" id) for display
+  drop_id text not null default ('D' || floor(random() * 900000 + 100000)::text),
+
+  rejection_reason text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create index if not exists deals_status_created_at_idx
+  on public.deals(status, created_at desc);
+create index if not exists deals_seller_id_idx on public.deals(seller_id);
+create index if not exists deals_category_idx on public.deals(category);
+
+alter table public.deals enable row level security;
+
+-- Anyone can view live deals (public marketplace).
+drop policy if exists "Anyone can view live deals" on public.deals;
+create policy "Anyone can view live deals" on public.deals
+  for select using (status = 'live');
+
+-- Sellers see their own deals at any status.
+drop policy if exists "Sellers see own deals" on public.deals;
+create policy "Sellers see own deals" on public.deals
+  for select using (auth.uid() = seller_id);
+
+-- Moderators see all deals (including pending/rejected).
+drop policy if exists "Moderators see all deals" on public.deals;
+create policy "Moderators see all deals" on public.deals
+  for select using (
+    exists (select 1 from public.profiles p
+            where p.id = auth.uid() and p.role = 'moderator')
+  );
+
+-- Sellers can insert their own deals; status forced to 'pending' by check
+-- below. Moderators can insert directly with any status.
+drop policy if exists "Sellers can post deals" on public.deals;
+create policy "Sellers can post deals" on public.deals
+  for insert with check (
+    auth.uid() = seller_id
+    and exists (select 1 from public.profiles p
+                where p.id = auth.uid()
+                  and p.role in ('seller', 'moderator'))
+    and (
+      status = 'pending'
+      or exists (select 1 from public.profiles p
+                 where p.id = auth.uid() and p.role = 'moderator')
+    )
+  );
+
+-- Sellers can edit their own deals while pending or rejected (after fixes).
+drop policy if exists "Sellers can edit own pending deals" on public.deals;
+create policy "Sellers can edit own pending deals" on public.deals
+  for update using (
+    auth.uid() = seller_id and status in ('pending', 'rejected')
+  ) with check (auth.uid() = seller_id);
+
+-- Sellers can delete their own deals.
+drop policy if exists "Sellers can delete own deals" on public.deals;
+create policy "Sellers can delete own deals" on public.deals
+  for delete using (auth.uid() = seller_id);
+
+-- Moderators can update any deal (approve, reject, edit fields like tier).
+drop policy if exists "Moderators can update any deal" on public.deals;
+create policy "Moderators can update any deal" on public.deals
+  for update using (
+    exists (select 1 from public.profiles p
+            where p.id = auth.uid() and p.role = 'moderator')
+  );
+
+-- Auto-bump updated_at on every update.
+create or replace function public.set_updated_at()
+returns trigger language plpgsql as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$;
+
+drop trigger if exists deals_set_updated_at on public.deals;
+create trigger deals_set_updated_at
+  before update on public.deals
+  for each row execute function public.set_updated_at();
+
+-- ============================================================
+-- Storage bucket for deal images
+-- ============================================================
+-- Bucket creation must be done in the dashboard or via the storage API,
+-- but the policies below assume a bucket named 'deal-images'.
+-- After running this migration, also create the bucket:
+--   Supabase Dashboard -> Storage -> New bucket
+--     Name: deal-images
+--     Public bucket: ON
+--
+-- Then the policies below take effect.
+
+-- Anyone can view deal images (they're already public via the bucket).
+drop policy if exists "Anyone can view deal images" on storage.objects;
+create policy "Anyone can view deal images" on storage.objects
+  for select using (bucket_id = 'deal-images');
+
+-- Sellers and moderators can upload to a folder named after their user id.
+-- Path convention: deal-images/<auth.uid()>/<filename>
+drop policy if exists "Sellers can upload own deal images" on storage.objects;
+create policy "Sellers can upload own deal images" on storage.objects
+  for insert with check (
+    bucket_id = 'deal-images'
+    and auth.uid()::text = (storage.foldername(name))[1]
+    and exists (select 1 from public.profiles p
+                where p.id = auth.uid()
+                  and p.role in ('seller', 'moderator'))
+  );
+
+drop policy if exists "Sellers can delete own deal images" on storage.objects;
+create policy "Sellers can delete own deal images" on storage.objects
+  for delete using (
+    bucket_id = 'deal-images'
+    and auth.uid()::text = (storage.foldername(name))[1]
+  );

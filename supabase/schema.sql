@@ -49,6 +49,13 @@ create policy "Moderators can read all profiles" on public.profiles
             where p.id = auth.uid() and p.role = 'moderator')
   );
 
+-- Users must be able to insert their own profile row from the auth callback.
+-- Without this policy, RLS silently blocks the callback's INSERT and no row
+-- ever lands in public.profiles, even though the user exists in auth.users.
+drop policy if exists "Users can insert own profile" on public.profiles;
+create policy "Users can insert own profile" on public.profiles
+  for insert with check (auth.uid() = id);
+
 -- ============================================================
 -- page_events  (analytics: page views + deal clicks)
 -- ============================================================

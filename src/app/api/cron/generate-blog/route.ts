@@ -33,28 +33,44 @@ async function fetchPexelsImage(query: string): Promise<{ url: string; alt: stri
   }
 }
 
-export async function POST(request: Request) {
-  const secret = request.headers.get('x-cron-secret');
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+function extractJson(raw: string): string {
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start === -1 || end === -1) throw new Error('No JSON object found in response');
+  return raw.slice(start, end + 1);
+}
 
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  const supabase = await createClient();
+export async function generateBlogPost(): Promise<{ ok: true; title: string } | { ok: false; error: string }> {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return { ok: false, error: 'ANTHROPIC_API_KEY is not configured' };
+  }
 
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
   );
   const topic = TOPICS[dayOfYear % TOPICS.length];
 
-  const message = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
-    messages: [{
-      role: 'user',
-      content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED. Topic: "${topic}"
+  let post: {
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    seoTitle: string;
+    seoDescription: string;
+    tags: string[];
+    imageQuery: string;
+  };
 
-Return ONLY valid JSON (no markdown) with these exact fields:
+  try {
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 2048,
+      messages: [{
+        role: 'user',
+        content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED. Topic: "${topic}"
+
+Return ONLY valid JSON (no markdown fences, no explanation) with these exact fields:
 {
   "title": "compelling title",
   "slug": "url-friendly-slug",
@@ -65,18 +81,24 @@ Return ONLY valid JSON (no markdown) with these exact fields:
   "tags": ["tag1", "tag2", "tag3"],
   "imageQuery": "2-3 word Pexels image search query"
 }`,
-    }],
-  });
+      }],
+    });
 
-  const raw = (message.content[0] as { type: string; text: string }).text.trim();
-  const jsonStr = raw.startsWith('{') ? raw : raw.slice(raw.indexOf('{'), raw.lastIndexOf('}') + 1);
-  const post = JSON.parse(jsonStr);
+    const raw = (message.content[0] as { type: string; text: string }).text.trim();
+    post = JSON.parse(extractJson(raw));
+  } catch (err) {
+    return { ok: false, error: `AI generation failed: ${err instanceof Error ? err.message : String(err)}` };
+  }
 
   const image = await fetchPexelsImage(post.imageQuery ?? 'luxury car');
 
+  // Append a short unique suffix to prevent slug collisions on repeat runs
+  const uniqueSlug = `${post.slug}-${Date.now().toString(36)}`;
+
+  const supabase = await createClient();
   const { error } = await supabase.from('blogs').insert({
     title: post.title,
-    slug: post.slug,
+    slug: uniqueSlug,
     content: post.content,
     excerpt: post.excerpt,
     cover_image_url: image?.url ?? null,
@@ -87,6 +109,16 @@ Return ONLY valid JSON (no markdown) with these exact fields:
     published: true,
   });
 
-  if (error) return Response.json({ error: error.message }, { status: 500 });
-  return Response.json({ ok: true, title: post.title });
+  if (error) return { ok: false, error: `DB insert failed: ${error.message}` };
+  return { ok: true, title: post.title };
+}
+
+export async function POST(request: Request) {
+  const secret = request.headers.get('x-cron-secret');
+  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const result = await generateBlogPost();
+  return Response.json(result, { status: result.ok ? 200 : 500 });
 }

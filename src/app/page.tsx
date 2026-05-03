@@ -1,18 +1,16 @@
 import Nav from '@/components/Nav';
-import Ticker from '@/components/Ticker';
 import HeroCTA from '@/components/HeroCTA';
 import HowItWorks from '@/components/HowItWorks';
+import HomepageDeals from '@/components/HomepageDeals';
 import Testimonials from '@/components/Testimonials';
-import { getLiveDeals } from '@/lib/deals';
+import { getLiveDealsByCategory } from '@/lib/deals';
 
 export default async function Home() {
-  const deals = await getLiveDeals();
-  const tickerDeals = deals.slice(0, 6);
+  const dealsByCategory = await getLiveDealsByCategory();
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative', zIndex: 2 }}>
       <Nav />
-      <Ticker deals={tickerDeals} />
 
       {/* ── Hero ── */}
       <section className="r-hero-section" style={{ position: 'relative' }}>
@@ -57,6 +55,11 @@ export default async function Home() {
 
         </div>
       </section>
+
+      {/* ── Deals of the Day ── */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+        <HomepageDeals dealsByCategory={dealsByCategory} />
+      </div>
 
       {/* ── How It Works ── */}
       <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>

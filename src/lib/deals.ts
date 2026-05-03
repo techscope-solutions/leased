@@ -134,12 +134,35 @@ export async function getSellerDeals(sellerId: string): Promise<DbDeal[]> {
   return (data ?? []) as DbDeal[];
 }
 
-export async function getPendingDeals(): Promise<(DbDeal & { profiles: { full_name: string | null; email: string | null } | null })[]> {
+export type DealWithSeller = DbDeal & {
+  profiles: { full_name: string | null; email: string | null } | null;
+};
+
+export async function getPendingDeals(): Promise<DealWithSeller[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from('deals')
     .select('*, profiles!seller_id(full_name, email)')
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
-  return (data ?? []) as (DbDeal & { profiles: { full_name: string | null; email: string | null } | null })[];
+  return (data ?? []) as DealWithSeller[];
+}
+
+export async function getAllDeals(): Promise<DealWithSeller[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('deals')
+    .select('*, profiles!seller_id(full_name, email)')
+    .order('created_at', { ascending: false });
+  return (data ?? []) as DealWithSeller[];
+}
+
+export async function getDealById(id: string): Promise<DbDeal | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('deals')
+    .select('*')
+    .eq('id', id)
+    .single();
+  return (data ?? null) as DbDeal | null;
 }

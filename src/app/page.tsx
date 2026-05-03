@@ -1,20 +1,12 @@
 import Nav from '@/components/Nav';
 import Ticker from '@/components/Ticker';
-import HeroSlideshow from '@/components/HeroSlideshow';
 import HeroCTA from '@/components/HeroCTA';
 import HowItWorks from '@/components/HowItWorks';
 import Testimonials from '@/components/Testimonials';
-import { getLiveDeals, getLiveDealsStats } from '@/lib/deals';
+import { getLiveDeals } from '@/lib/deals';
 
 export default async function Home() {
-  const [deals, stats] = await Promise.all([getLiveDeals(), getLiveDealsStats()]);
-
-  const heroDeals = [
-    deals.find(d => d.category === 'Daily'),
-    deals.find(d => d.category === 'Luxury'),
-    deals.find(d => d.category === 'Supercar'),
-  ].filter(Boolean) as typeof deals;
-
+  const deals = await getLiveDeals();
   const tickerDeals = deals.slice(0, 6);
 
   return (
@@ -36,22 +28,6 @@ export default async function Home() {
 
           {/* Left */}
           <div className="r-hero-left" style={{ position: 'relative', zIndex: 6 }}>
-            {/* Live pill */}
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              background: 'rgba(255,255,255,0.05)',
-              backdropFilter: 'blur(20px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
-              borderRadius: 99, padding: '6px 16px', marginBottom: 28,
-            }}>
-              <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
-              <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>
-                {stats.liveDrops} LIVE DROP{stats.liveDrops !== 1 ? 'S' : ''}
-              </span>
-            </div>
-
             {/* 2-line headline */}
             <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.025em', marginBottom: 24 }}>
               <div style={{ fontSize: 'clamp(44px, 7.5vw, 108px)', color: '#fff' }}>
@@ -79,12 +55,6 @@ export default async function Home() {
             <HeroCTA />
           </div>
 
-          {/* Right — fanned glass slideshow */}
-          {heroDeals.length > 0 && (
-            <div className="r-hero-slideshow">
-              <HeroSlideshow deals={heroDeals} />
-            </div>
-          )}
         </div>
       </section>
 

@@ -7,9 +7,9 @@ const TESTIMONIALS = [
   {
     name: 'Marcus T.',
     location: 'Los Angeles, CA',
-    quote: 'Found a $649/mo BMW M3 with zero down. Clicked the drop, applied through the dealer, signed three days later. Nothing else comes close.',
+    quote: 'Found a $1,350/mo BMW M3 with zero down. Clicked the drop, applied through the dealer, signed three days later. Nothing else comes close.',
     car: 'BMW M3 Competition',
-    monthly: 649,
+    monthly: 1350,
     carType: 'sedan',
     carColor: '#1a3a6b',
     accentColor: 'rgba(100,140,220,0.85)',

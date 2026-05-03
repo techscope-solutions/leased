@@ -191,7 +191,7 @@ export default function Nav() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
             <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
             <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.7)', fontVariantNumeric: 'tabular-nums', minWidth: 28, display: 'inline-block' }}>
-              {liveCount ?? BASE} LIVE
+              {liveCount ?? BASE} PEOPLE LIVE
             </span>
           </div>
 

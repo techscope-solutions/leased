@@ -33,15 +33,6 @@ async function fetchPexelsImage(query: string): Promise<{ url: string; alt: stri
   }
 }
 
-function extractJson(raw: string): string {
-  const start = raw.indexOf('{');
-  const end = raw.lastIndexOf('}');
-  if (start === -1 || end === -1) {
-    throw new Error(`No JSON object found. Raw response (first 400 chars): ${JSON.stringify(raw.slice(0, 400))}`);
-  }
-  return raw.slice(start, end + 1);
-}
-
 export async function generateBlogPost(): Promise<{ ok: true; title: string } | { ok: false; error: string }> {
   if (!process.env.ANTHROPIC_API_KEY) {
     return { ok: false, error: 'ANTHROPIC_API_KEY is not configured' };
@@ -67,40 +58,43 @@ export async function generateBlogPost(): Promise<{ ok: true; title: string } | 
     const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 2048,
-      system: 'You are a JSON API. Output only a single valid JSON object — no prose, no markdown fences, no explanation. Your entire response must be parseable by JSON.parse().',
+      max_tokens: 4096,
+      tools: [{
+        name: 'publish_blog_post',
+        description: 'Publish a structured blog post for the Leased car lease marketplace.',
+        input_schema: {
+          type: 'object' as const,
+          properties: {
+            title: { type: 'string', description: 'Compelling post title' },
+            slug: { type: 'string', description: 'URL-friendly slug, lowercase hyphens only' },
+            excerpt: { type: 'string', description: '2-3 sentence preview summary' },
+            content: { type: 'string', description: 'Full HTML using h2 h3 p ul li tags, at least 600 words' },
+            seoTitle: { type: 'string', description: 'SEO title under 60 chars' },
+            seoDescription: { type: 'string', description: 'Meta description under 160 chars' },
+            tags: { type: 'array', items: { type: 'string' }, description: 'Array of 3-5 tags' },
+            imageQuery: { type: 'string', description: '2-3 word Pexels search query' },
+          },
+          required: ['title', 'slug', 'excerpt', 'content', 'seoTitle', 'seoDescription', 'tags', 'imageQuery'],
+        },
+      }],
+      tool_choice: { type: 'tool', name: 'publish_blog_post' },
       messages: [{
         role: 'user',
-        content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED.
-Topic: "${topic}"
-
-Return a JSON object with exactly these fields:
-{
-  "title": "compelling post title",
-  "slug": "url-friendly-slug-lowercase-hyphens",
-  "excerpt": "2-3 sentence preview summary",
-  "content": "full HTML using h2 h3 p ul li tags, at least 600 words",
-  "seoTitle": "SEO title under 60 chars",
-  "seoDescription": "meta description under 160 chars",
-  "tags": ["tag1", "tag2", "tag3"],
-  "imageQuery": "2-3 word pexels search query"
-}`,
+        content: `Write an SEO-optimized blog post for a car lease marketplace called LEASED.\nTopic: "${topic}"`,
       }],
     });
 
-    const block = message.content[0];
-    if (!block || block.type !== 'text') {
-      throw new Error(`Unexpected block type: ${block?.type ?? 'none'}, stop_reason: ${message.stop_reason}`);
+    const toolBlock = message.content.find(b => b.type === 'tool_use');
+    if (!toolBlock || toolBlock.type !== 'tool_use') {
+      throw new Error(`No tool_use block in response. stop_reason: ${message.stop_reason}`);
     }
-    const raw = block.text.trim();
-    post = JSON.parse(extractJson(raw));
+    post = toolBlock.input as typeof post;
   } catch (err) {
     return { ok: false, error: `AI generation failed: ${err instanceof Error ? err.message : String(err)}` };
   }
 
   const image = await fetchPexelsImage(post.imageQuery ?? 'luxury car');
 
-  // Append a short unique suffix to prevent slug collisions on repeat runs
   const uniqueSlug = `${post.slug}-${Date.now().toString(36)}`;
 
   const supabase = await createClient();

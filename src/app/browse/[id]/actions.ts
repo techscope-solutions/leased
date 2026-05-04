@@ -36,9 +36,17 @@ export async function submitInquiry(payload: InquiryPayload): Promise<InquiryRes
   });
 
   if (error) {
-    // unique violation = already submitted
     if (error.code === '23505') return { ok: false, error: 'You have already sent an inquiry for this deal.' };
-    return { ok: false, error: error.message };
+
+    // Log unexpected errors to admin panel instead of leaking details to user
+    await supabase.from('errors').insert({
+      user_id:  user.id,
+      message:  error.message,
+      page:     `/browse/${payload.dealId}`,
+      metadata: { code: error.code, action: 'submitInquiry' },
+    });
+
+    return { ok: false, error: 'Something went wrong. Our team has been notified — please try again shortly.' };
   }
 
   return { ok: true };

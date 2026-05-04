@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { submitInquiry } from './actions';
 
-const A   = 'oklch(0.55 0.22 18)';
-const SF  = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
+const A    = 'oklch(0.55 0.22 18)';
+const SF   = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
 const MONO = '"JetBrains Mono", ui-monospace, monospace';
 const SERIF = '"Instrument Serif", Georgia, serif';
 
@@ -40,14 +40,11 @@ function StatusTracker({ status }: { status: Status }) {
         {STATUS_STEPS.map((step, i) => {
           const done    = i < idx;
           const current = i === idx;
-          const future  = i > idx;
           return (
             <div key={step.key} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0', position: 'relative' }}>
-              {/* Line connector */}
               {i < STATUS_STEPS.length - 1 && (
                 <div style={{ position: 'absolute', left: 7, top: 24, width: 2, height: 'calc(100% - 8px)', background: done ? A : 'rgba(255,255,255,0.08)', zIndex: 0 }} />
               )}
-              {/* Dot */}
               <div style={{
                 width: 16, height: 16, borderRadius: '50%', flexShrink: 0, zIndex: 1,
                 background: done ? A : current ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.08)',
@@ -94,14 +91,13 @@ export default function InquiryApplyCard({
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState('');
 
-  // Form state
-  const [prefTerm, setPrefTerm]     = useState(term);
-  const [prefDown, setPrefDown]     = useState(String(dueAtSigning));
-  const [income, setIncome]         = useState('');
-  const [credit, setCredit]         = useState('700-749');
-  const [message, setMessage]       = useState('');
+  const [prefTerm, setPrefTerm] = useState(term);
+  const [prefDown, setPrefDown] = useState(String(dueAtSigning));
+  const [income, setIncome]     = useState('');
+  const [credit, setCredit]     = useState('700-749');
+  const [message, setMessage]   = useState('');
 
-  const isOwnDeal = userId === sellerId;
+  const isOwnDeal  = userId === sellerId;
   const hasInquiry = submitted || !!existingInquiry;
   const inquiryStatus: Status = submitted ? 'sent' : (existingInquiry?.status ?? 'sent');
 
@@ -110,12 +106,11 @@ export default function InquiryApplyCard({
     if (!income) { setError('Please enter your estimated annual income.'); return; }
     setLoading(true);
     const result = await submitInquiry({
-      dealId,
-      sellerId,
-      preferredTerm:    prefTerm,
-      preferredDown:    parseInt(prefDown) || 0,
-      estimatedIncome:  parseInt(income) || 0,
-      estimatedCredit:  credit,
+      dealId, sellerId,
+      preferredTerm:   prefTerm,
+      preferredDown:   parseInt(prefDown) || 0,
+      estimatedIncome: parseInt(income) || 0,
+      estimatedCredit: credit,
       message,
     });
     setLoading(false);
@@ -124,16 +119,24 @@ export default function InquiryApplyCard({
     setOpen(false);
   }
 
-  const inputStyle = {
-    width: '100%', padding: '10px 12px', borderRadius: 8,
+  const field: React.CSSProperties = {
+    width: '100%', padding: '13px 14px', borderRadius: 10,
     background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-    color: 'white', fontFamily: SF, fontSize: 14, outline: 'none',
-    boxSizing: 'border-box' as const, transition: 'border-color 0.15s',
+    color: 'white', fontFamily: SF, fontSize: 16, outline: 'none',
+    boxSizing: 'border-box', WebkitAppearance: 'none', appearance: 'none',
   };
-  const labelStyle = {
+
+  const selectField: React.CSSProperties = {
+    ...field,
+    paddingRight: 40, cursor: 'pointer',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center',
+  };
+
+  const label: React.CSSProperties = {
     fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em',
-    color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' as const,
-    display: 'block', marginBottom: 6,
+    color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase',
+    display: 'block', marginBottom: 8,
   };
 
   return (
@@ -161,23 +164,21 @@ export default function InquiryApplyCard({
           ${dueAtSigning.toLocaleString()} due at signing · {term}mo · {milesLabel} mi/yr
         </div>
 
-        {/* Terms summary */}
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '16px 0', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
           {[
-            { label: 'MSRP',          value: `$${msrp.toLocaleString()}` },
-            { label: 'Due at signing', value: `$${dueAtSigning.toLocaleString()}` },
-            { label: 'Term',           value: `${term} months` },
-            { label: 'Miles / year',   value: milesLabel },
+            { label: 'MSRP',           value: `$${msrp.toLocaleString()}` },
+            { label: 'Due at signing',  value: `$${dueAtSigning.toLocaleString()}` },
+            { label: 'Term',            value: `${term} months` },
+            { label: 'Miles / year',    value: milesLabel },
             ...(slotsLeft != null ? [{ label: 'Slots left', value: String(slotsLeft) }] : []),
-          ].map(({ label, value }) => (
-            <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-              <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>{label}</span>
+          ].map(({ label: l, value }) => (
+            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+              <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>{l}</span>
               <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: SF }}>{value}</span>
             </div>
           ))}
         </div>
 
-        {/* CTA area */}
         {isOwnDeal ? (
           <div style={{ padding: '12px 0', fontSize: 13, color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontFamily: SF }}>
             This is your listing
@@ -205,7 +206,6 @@ export default function InquiryApplyCard({
           </button>
         )}
 
-        {/* Trust grid */}
         {!hasInquiry && !isOwnDeal && (
           <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.07)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
             {[
@@ -222,112 +222,118 @@ export default function InquiryApplyCard({
         )}
       </div>
 
-      {/* ── Modal overlay ──────────────────────────────── */}
+      {/* ── Bottom-sheet modal ─────────────────────────── */}
       {open && (
         <div
           onClick={e => { if (e.target === e.currentTarget) setOpen(false); }}
           style={{
             position: 'fixed', inset: 0, zIndex: 200,
-            background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)',
+            background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(6px)',
             display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-            padding: '0 0 0 0',
           }}
         >
           <div style={{
-            width: '100%', maxWidth: 520,
-            background: '#1a1a1a', borderRadius: '24px 24px 0 0',
-            padding: '28px 24px 40px', maxHeight: '92dvh',
-            overflowY: 'auto', color: 'white',
-            border: '1px solid rgba(255,255,255,0.08)',
+            width: '100%', maxWidth: 540,
+            background: '#181818', borderRadius: '22px 22px 0 0',
+            padding: '0 20px max(32px, env(safe-area-inset-bottom))',
+            maxHeight: '92dvh', overflowY: 'auto', color: 'white',
+            border: '1px solid rgba(255,255,255,0.07)',
           }}>
-            {/* Handle bar */}
-            <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '0 auto 24px' }} />
-
-            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 6 }}>
-              Show interest
+            {/* Sticky header inside sheet */}
+            <div style={{ position: 'sticky', top: 0, background: '#181818', paddingTop: 16, paddingBottom: 12, zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: 20 }}>
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '0 auto 16px' }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 4 }}>
+                    Show interest
+                  </div>
+                  <h2 style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 400, letterSpacing: '-0.025em', margin: 0, lineHeight: 1.1 }}>
+                    Ask for a <em style={{ color: A }}>structure.</em>
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setOpen(false)}
+                  style={{ width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  aria-label="Close"
+                >
+                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+              </div>
             </div>
-            <h2 style={{ fontFamily: SERIF, fontSize: 28, fontWeight: 400, letterSpacing: '-0.025em', margin: '0 0 4px', lineHeight: 1.1 }}>
-              Ask for a <em style={{ color: A }}>structure.</em>
-            </h2>
-            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontFamily: SF, marginBottom: 24, lineHeight: 1.5 }}>
-              Tell the seller what works for you. They'll respond with options.
+
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontFamily: SF, marginBottom: 24, lineHeight: 1.5, marginTop: 0 }}>
+              Tell the seller what works for you. They&apos;ll respond with options.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-              {/* Preferred term */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {/* Preferred term duration */}
               <div>
-                <label style={labelStyle}>Preferred term</label>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                <label style={label}>Preferred Term Duration</label>
+                <select
+                  value={prefTerm}
+                  onChange={e => setPrefTerm(Number(e.target.value))}
+                  style={selectField}
+                >
                   {TERM_OPTIONS.map(t => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setPrefTerm(t)}
-                      style={{
-                        padding: '8px 14px', borderRadius: 999, border: 'none', cursor: 'pointer',
-                        background: prefTerm === t ? A : 'rgba(255,255,255,0.07)',
-                        color: prefTerm === t ? 'white' : 'rgba(255,255,255,0.6)',
-                        fontFamily: SF, fontSize: 13, fontWeight: prefTerm === t ? 600 : 400,
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      {t} mo
-                    </button>
+                    <option key={t} value={t}>{t} months</option>
                   ))}
-                </div>
+                </select>
               </div>
 
               {/* Preferred down */}
               <div>
-                <label style={labelStyle}>Preferred down payment ($)</label>
+                <label style={label}>Preferred Down Payment ($)</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={prefDown}
                   onChange={e => setPrefDown(e.target.value)}
                   placeholder="0"
-                  style={inputStyle}
+                  style={field}
                 />
               </div>
 
               {/* Income */}
               <div>
-                <label style={labelStyle}>Estimated annual income ($) *</label>
+                <label style={label}>Estimated Annual Income ($) *</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={income}
                   onChange={e => setIncome(e.target.value)}
                   placeholder="75000"
-                  style={inputStyle}
+                  style={field}
                 />
               </div>
 
-              {/* Credit */}
+              {/* Credit score */}
               <div>
-                <label style={labelStyle}>Estimated credit score</label>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <label style={label}>Estimated Credit Score</label>
+                <select
+                  value={credit}
+                  onChange={e => setCredit(e.target.value)}
+                  style={selectField}
+                >
                   {CREDIT_OPTIONS.map(opt => (
-                    <label key={opt.value} style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', padding: '9px 12px', borderRadius: 10, background: credit === opt.value ? 'rgba(255,255,255,0.07)' : 'transparent', border: `1px solid ${credit === opt.value ? 'rgba(255,255,255,0.15)' : 'transparent'}`, transition: 'all 0.1s' }}>
-                      <input type="radio" name="credit" value={opt.value} checked={credit === opt.value} onChange={() => setCredit(opt.value)} style={{ accentColor: A, flexShrink: 0 }} />
-                      <span style={{ fontFamily: SF, fontSize: 13, color: credit === opt.value ? 'white' : 'rgba(255,255,255,0.55)' }}>{opt.label}</span>
-                    </label>
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
-                </div>
+                </select>
               </div>
 
               {/* Message */}
               <div>
-                <label style={labelStyle}>Message to seller (optional)</label>
+                <label style={label}>Message to Seller (optional)</label>
                 <textarea
                   value={message}
                   onChange={e => setMessage(e.target.value)}
                   placeholder="I'm interested in a 36-month term with $0 down. Is this available in SF?"
                   rows={3}
-                  style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+                  style={{ ...field, resize: 'vertical', lineHeight: 1.6 }}
                 />
               </div>
 
               {error && (
-                <div style={{ padding: '10px 14px', borderRadius: 10, background: `${A}18`, border: `1px solid ${A}35`, fontSize: 13, color: A, fontFamily: SF }}>
+                <div style={{ padding: '12px 14px', borderRadius: 10, background: 'rgba(220,60,60,0.12)', border: '1px solid rgba(220,60,60,0.25)', fontSize: 13, color: '#ff8080', fontFamily: SF }}>
                   {error}
                 </div>
               )}
@@ -336,10 +342,10 @@ export default function InquiryApplyCard({
                 onClick={handleSubmit}
                 disabled={loading}
                 style={{
-                  width: '100%', padding: '15px', borderRadius: 999,
+                  width: '100%', padding: '16px', borderRadius: 999,
                   background: loading ? 'rgba(255,255,255,0.1)' : A,
                   border: 'none', color: 'white',
-                  fontFamily: SF, fontWeight: 600, fontSize: 15,
+                  fontFamily: SF, fontWeight: 600, fontSize: 16,
                   cursor: loading ? 'not-allowed' : 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                   transition: 'background 0.15s',
@@ -350,10 +356,10 @@ export default function InquiryApplyCard({
                     <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
                     Sending…
                   </>
-                ) : 'Send inquiry →'}
+                ) : 'Send Inquiry →'}
               </button>
 
-              <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.25)', fontFamily: SF, margin: 0 }}>
+              <p style={{ textAlign: 'center', fontSize: 11, color: 'rgba(255,255,255,0.2)', fontFamily: SF, margin: '0 0 4px' }}>
                 Your financial info is only shared with this seller.
               </p>
             </div>
@@ -361,7 +367,10 @@ export default function InquiryApplyCard({
         </div>
       )}
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        select option { background: #1a1a1a; color: white; }
+      `}</style>
     </>
   );
 }

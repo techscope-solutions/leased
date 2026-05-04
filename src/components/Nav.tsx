@@ -304,14 +304,6 @@ export default function Nav({ light = false }: { light?: boolean }) {
             </svg>
             <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>LOG IN</span>
           </Link>
-        ) : (
-          <Link href="/account" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4, textDecoration: 'none', color: path === '/account' ? '#FF2800' : 'rgba(255,255,255,0.35)', borderTop: path === '/account' ? '2px solid #FF2800' : '2px solid transparent' }}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="7" r="3.5" fill="currentColor"/>
-              <path d="M3 18C3 14.5 6.1 11.5 10 11.5C13.9 11.5 17 14.5 17 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-            </svg>
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>ACCOUNT</span>
-          </Link>
         )}
       </div>
     </>

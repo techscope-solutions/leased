@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 
 const A = 'oklch(0.55 0.22 18)';

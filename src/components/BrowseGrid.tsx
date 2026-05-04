@@ -140,24 +140,33 @@ function GlassDealCard({ deal, compact = false }: { deal: CarDeal; compact?: boo
         </div>
       </div>
 
-      <div style={{ padding: '16px 18px 18px' }}>
-        <div style={{ fontFamily: SF, fontSize: 17, fontWeight: 600, letterSpacing: '-0.025em', color: '#0a0a0a', marginBottom: 4 }}>
-          {deal.year} {deal.make} {deal.model}
-        </div>
-        <div style={{ fontFamily: SF, fontSize: 13, color: 'rgba(10,10,10,0.45)', marginBottom: 14 }}>
-          {deal.trim} · {deal.city}, {deal.state}
+      <div style={{ padding: '14px 16px 16px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 10 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontFamily: SF, fontSize: 17, fontWeight: 600, letterSpacing: '-0.025em', color: '#0a0a0a', marginBottom: 3 }}>
+            {deal.year} {deal.make} {deal.model}
+          </div>
+          <div style={{ fontFamily: SF, fontSize: 13, color: 'rgba(10,10,10,0.45)' }}>
+            {deal.trim} · {deal.city}, {deal.state}
+          </div>
         </div>
         <button
+          title="View deal"
           style={{
-            width: '100%', padding: '10px', borderRadius: 999,
-            background: '#0a0a0a', color: 'white', border: 'none', cursor: 'pointer',
-            fontFamily: SF, fontSize: 14, fontWeight: 500,
-            transition: 'opacity 0.15s',
+            flexShrink: 0,
+            width: 32, height: 32, borderRadius: 999,
+            background: 'rgba(10,10,10,0.06)', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'rgba(10,10,10,0.5)',
+            transition: 'background 0.15s, color 0.15s',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}
+          onMouseEnter={e => { const el = e.currentTarget; el.style.background = '#0a0a0a'; el.style.color = 'white'; }}
+          onMouseLeave={e => { const el = e.currentTarget; el.style.background = 'rgba(10,10,10,0.06)'; el.style.color = 'rgba(10,10,10,0.5)'; }}
         >
-          Apply now →
+          <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M5 2H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9" />
+            <path d="M8 1h5v5" />
+            <path d="M13 1L6 8" />
+          </svg>
         </button>
       </div>
     </div>

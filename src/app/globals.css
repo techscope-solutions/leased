@@ -350,6 +350,10 @@ button { cursor: pointer; font-family: var(--font-cond); }
 .lz-input::placeholder { color: rgba(10,10,10,0.3); }
 .lz-input:focus { outline: none; }
 
+/* Hover lift for action cards (avoids JS event handlers in Server Components) */
+.lz-action-card { transition: transform 0.2s; }
+.lz-action-card:hover { transform: translateY(-2px); }
+
 /* ─── Marketplace / Browse layout ──────────────────────────────────── */
 
 .lz-browse-layout {

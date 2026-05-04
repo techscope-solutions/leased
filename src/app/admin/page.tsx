@@ -236,10 +236,8 @@ export default async function AdminDashboard() {
           {quickActions.map(a => (
             <Link key={a.title} href={a.href} style={{ textDecoration: 'none' }}>
               <div
-                className="lz-glass"
-                style={{ borderRadius: 18, padding: 18, cursor: 'pointer', color: 'inherit', display: 'flex', flexDirection: 'column', gap: 12, transition: 'transform 0.2s' }}
-                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ''; }}
+                className="lz-glass lz-action-card"
+                style={{ borderRadius: 18, padding: 18, cursor: 'pointer', color: 'inherit', display: 'flex', flexDirection: 'column', gap: 12 }}
               >
                 <div style={{ width: 32, height: 32, borderRadius: 10, background: a.color, opacity: 0.15 }} />
                 <div>

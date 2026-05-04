@@ -33,12 +33,14 @@ function Lbl({ children }: { children: React.ReactNode }) {
 
 export default async function AdminDealsPage() {
   const supabase = createAdminClient();
-  const [allDeals, pending, { count: liveCount }, { count: rejectedCount }] = await Promise.all([
+  const [allDeals, pending, liveResult, rejectedResult] = await Promise.all([
     getAllDeals(),
     getPendingDeals(),
     supabase.from('deals').select('*', { count: 'exact', head: true }).eq('status', 'live'),
     supabase.from('deals').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
   ]);
+  const liveCount = liveResult.count;
+  const rejectedCount = rejectedResult.count;
 
   return (
     <div style={{ padding: '32px 40px 80px', maxWidth: 1100 }}>

@@ -11,6 +11,13 @@ const ACCENT: Record<string, string> = {
   Daily: '#111827', Luxury: '#0a0f1e', Supercar: '#161616',
 };
 
+const A = 'oklch(0.55 0.22 18)';
+const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+const MONO = '"JetBrains Mono", ui-monospace, monospace';
+const SERIF = '"Instrument Serif", Georgia, serif';
+const INK = '#0a0a0a';
+const MUTED = 'rgba(10,10,10,0.4)';
+
 type Props = { userId: string; deal?: DbDeal };
 
 export default function AdminDealForm({ userId, deal }: Props) {
@@ -35,32 +42,27 @@ export default function AdminDealForm({ userId, deal }: Props) {
   const [state, setState] = useState(deal?.state ?? '');
   const [city, setCity] = useState(deal?.city ?? '');
   const [slots, setSlots] = useState(deal?.slots_left != null ? String(deal.slots_left) : '');
-  const [status, setStatus] = useState(deal?.status ?? 'live');
+  const [status, setStatus] = useState<'live' | 'pending' | 'rejected'>(deal?.status ?? 'live');
   const [tier, setTier] = useState(deal?.tier ?? 'VERIFIED');
   const [featured, setFeatured] = useState(deal?.featured ?? false);
   const [expiresDays, setExpiresDays] = useState('7');
   const [rejectionReason, setRejectionReason] = useState(deal?.rejection_reason ?? '');
 
-  // Images
   const [newImages, setNewImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>(deal?.images ?? []);
 
-  // Lookup
   const [models, setModels] = useState<string[]>([]);
   const [specsFilled, setSpecsFilled] = useState(false);
-
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  // Generate previews for new images
   useEffect(() => {
     const urls = newImages.map(f => URL.createObjectURL(f));
     setPreviews(urls);
     return () => urls.forEach(u => URL.revokeObjectURL(u));
   }, [newImages]);
 
-  // Load NHTSA models when make+year change
   useEffect(() => {
     if (!make || make.length < 2) { setModels([]); return; }
     const id = setTimeout(async () => {
@@ -146,37 +148,36 @@ export default function AdminDealForm({ userId, deal }: Props) {
   };
 
   return (
-    <div style={{ padding: '40px 32px 100px', maxWidth: 800 }}>
+    <div style={{ padding: '32px 40px 100px', maxWidth: 800, fontFamily: SF, color: INK }}>
       {/* Header */}
-      <div style={{ marginBottom: 36 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.35)' }}>MODERATOR</span>
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: A, display: 'inline-block' }} />
+          <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: MUTED }}>Moderator</span>
         </div>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(24px, 4vw, 40px)', letterSpacing: '-0.025em', lineHeight: 0.92 }}>
-          <span style={{ color: '#fff' }}>{isEdit ? 'EDIT ' : 'NEW '}</span>
-          <span style={{ color: '#FF2800' }}>DEAL.</span>
-        </div>
+        <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(32px, 4vw, 48px)', margin: 0, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: 400 }}>
+          {isEdit ? 'Edit ' : 'New '}<em style={{ color: A }}>deal.</em>
+        </h1>
       </div>
 
-      {/* Mod controls */}
-      <Section label="MODERATION">
+      {/* Moderation */}
+      <Section label="Moderation">
         <Row>
-          <Field label="STATUS">
-            <Sel value={status} onChange={v => setStatus(v as typeof status)}>
-              <option value="live">LIVE</option>
-              <option value="pending">PENDING</option>
-              <option value="rejected">REJECTED</option>
+          <Field label="Status">
+            <Sel value={status} onChange={v => setStatus(v as 'live' | 'pending' | 'rejected')}>
+              <option value="live">Live</option>
+              <option value="pending">Pending</option>
+              <option value="rejected">Rejected</option>
             </Sel>
           </Field>
-          <Field label="TIER">
+          <Field label="Tier">
             <Sel value={tier} onChange={setTier}>
-              <option value="VERIFIED">VERIFIED</option>
-              <option value="PLATINUM">PLATINUM</option>
-              <option value="GOLD">GOLD</option>
+              <option value="VERIFIED">Verified</option>
+              <option value="PLATINUM">Platinum</option>
+              <option value="GOLD">Gold</option>
             </Sel>
           </Field>
-          <Field label="EXPIRES IN">
+          <Field label="Expires in">
             <Sel value={expiresDays} onChange={setExpiresDays}>
               <option value="1">1 day</option>
               <option value="3">3 days</option>
@@ -187,163 +188,161 @@ export default function AdminDealForm({ userId, deal }: Props) {
           </Field>
         </Row>
         <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
-          <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#FF2800' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)' }}>MARK AS FEATURED</span>
+          <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} style={{ width: 16, height: 16, accentColor: A }} />
+          <span style={{ fontFamily: SF, fontSize: 14, color: INK }}>Mark as featured</span>
         </label>
         {status === 'rejected' && (
-          <Field label="REJECTION REASON">
+          <Field label="Rejection reason">
             <Inp value={rejectionReason} onChange={setRejectionReason} placeholder="Reason shown to seller…" />
           </Field>
         )}
       </Section>
 
       {/* Vehicle */}
-      <Section label="VEHICLE">
-        {/* Lookup row */}
+      <Section label="Vehicle">
         <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 1fr auto', gap: 10, alignItems: 'flex-end' }}>
-          <Field label="YEAR">
+          <Field label="Year">
             <Sel value={year} onChange={setYear}>
-              {[2027,2026,2025,2024,2023,2022,2021,2020].map(y => <option key={y}>{y}</option>)}
+              {[2027, 2026, 2025, 2024, 2023, 2022, 2021, 2020].map(y => <option key={y}>{y}</option>)}
             </Sel>
           </Field>
-          <Field label="MAKE *">
+          <Field label="Make *">
             <Inp value={make} onChange={setMake} placeholder="BMW" list="makes-list" />
-            <datalist id="makes-list">
-              {POPULAR_MAKES.map(m => <option key={m} value={m} />)}
-            </datalist>
+            <datalist id="makes-list">{POPULAR_MAKES.map(m => <option key={m} value={m} />)}</datalist>
           </Field>
-          <Field label="MODEL *">
+          <Field label="Model *">
             <Inp value={model} onChange={setModel} placeholder="M3 Competition" list="models-list" />
-            <datalist id="models-list">
-              {models.map(m => <option key={m} value={m} />)}
-            </datalist>
+            <datalist id="models-list">{models.map(m => <option key={m} value={m} />)}</datalist>
           </Field>
           <button
             type="button"
             onClick={handleAutoFill}
             disabled={!make || !model}
             style={{
-              padding: '8px 14px', borderRadius: 8, marginBottom: 1,
-              background: specsFilled ? 'rgba(34,197,94,0.2)' : (!make || !model) ? 'rgba(255,255,255,0.04)' : 'rgba(255,40,0,0.15)',
-              border: `1px solid ${specsFilled ? 'rgba(34,197,94,0.4)' : (!make || !model) ? 'rgba(255,255,255,0.08)' : 'rgba(255,40,0,0.35)'}`,
-              color: specsFilled ? '#22c55e' : (!make || !model) ? 'rgba(255,255,255,0.25)' : '#FF2800',
-              fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 10,
-              letterSpacing: '0.1em', cursor: (!make || !model) ? 'not-allowed' : 'pointer',
+              padding: '9px 14px', borderRadius: 10, marginBottom: 1,
+              background: specsFilled ? 'rgba(34,197,94,0.12)' : (!make || !model) ? 'rgba(10,10,10,0.04)' : 'rgba(10,10,10,0.08)',
+              border: `1px solid ${specsFilled ? 'rgba(34,197,94,0.35)' : (!make || !model) ? 'rgba(10,10,10,0.08)' : 'rgba(10,10,10,0.15)'}`,
+              color: specsFilled ? 'oklch(0.55 0.16 145)' : (!make || !model) ? MUTED : INK,
+              fontFamily: SF, fontWeight: 500, fontSize: 13,
+              cursor: (!make || !model) ? 'not-allowed' : 'pointer',
               whiteSpace: 'nowrap', transition: 'all 0.2s',
             }}
           >
-            {specsFilled ? '✓ FILLED' : '⚡ AUTO-FILL'}
+            {specsFilled ? '✓ Filled' : '⚡ Auto-fill'}
           </button>
         </div>
-
         <Row>
-          <Field label="TRIM"><Inp value={trim} onChange={setTrim} placeholder="xDrive" /></Field>
-          <Field label="COLOR" note="optional"><Inp value={color} onChange={setColor} placeholder="Midnight Black" /></Field>
+          <Field label="Trim"><Inp value={trim} onChange={setTrim} placeholder="xDrive" /></Field>
+          <Field label="Color" note="optional"><Inp value={color} onChange={setColor} placeholder="Midnight Black" /></Field>
         </Row>
         <Row>
-          <Field label="DRIVETRAIN">
-            <Sel value={drive} onChange={setDrive}>{['AWD','RWD','FWD','4WD'].map(d=><option key={d}>{d}</option>)}</Sel>
+          <Field label="Drivetrain">
+            <Sel value={drive} onChange={setDrive}>{['AWD', 'RWD', 'FWD', '4WD'].map(d => <option key={d}>{d}</option>)}</Sel>
           </Field>
-          <Field label="CAR TYPE">
-            <Sel value={carType} onChange={setCarType}>{['Sedan','SUV','Coupe','Truck','EV'].map(t=><option key={t}>{t}</option>)}</Sel>
+          <Field label="Car type">
+            <Sel value={carType} onChange={setCarType}>{['Sedan', 'SUV', 'Coupe', 'Truck', 'EV'].map(t => <option key={t}>{t}</option>)}</Sel>
           </Field>
-          <Field label="CATEGORY">
-            <Sel value={category} onChange={setCategory}>{['Daily','Luxury','Supercar'].map(c=><option key={c}>{c}</option>)}</Sel>
+          <Field label="Category">
+            <Sel value={category} onChange={setCategory}>{['Daily', 'Luxury', 'Supercar'].map(c => <option key={c}>{c}</option>)}</Sel>
           </Field>
         </Row>
       </Section>
 
-      {/* Deal Terms */}
-      <Section label="DEAL TERMS">
+      {/* Deal terms */}
+      <Section label="Deal terms">
         <Row>
-          <Field label="DEAL TYPE"><Sel value={dealType} onChange={setDealType}><option value="LEASE">LEASE</option><option value="FINANCE">FINANCE</option></Sel></Field>
-          <Field label="MONTHLY ($) *"><Inp type="number" value={monthly} onChange={setMonthly} placeholder="899" /></Field>
-          <Field label="DUE AT SIGNING ($)"><Inp type="number" value={das} onChange={setDas} placeholder="0" /></Field>
+          <Field label="Deal type"><Sel value={dealType} onChange={setDealType}><option value="LEASE">Lease</option><option value="FINANCE">Finance</option></Sel></Field>
+          <Field label="Monthly ($) *"><Inp type="number" value={monthly} onChange={setMonthly} placeholder="899" /></Field>
+          <Field label="Due at signing ($)"><Inp type="number" value={das} onChange={setDas} placeholder="0" /></Field>
         </Row>
         <Row>
-          <Field label="TERM (MO)"><Sel value={term} onChange={setTerm}>{['24','36','39','48'].map(t=><option key={t}>{t}</option>)}</Sel></Field>
-          <Field label="MILES / YEAR"><Sel value={mpy} onChange={setMpy}>{['7500','10000','12000','15000'].map(m=><option key={m}>{m}</option>)}</Sel></Field>
+          <Field label="Term (mo)"><Sel value={term} onChange={setTerm}>{['24', '36', '39', '48'].map(t => <option key={t}>{t}</option>)}</Sel></Field>
+          <Field label="Miles / year"><Sel value={mpy} onChange={setMpy}>{['7500', '10000', '12000', '15000'].map(m => <option key={m}>{m}</option>)}</Sel></Field>
           <Field label="MSRP ($) *"><Inp type="number" value={msrp} onChange={setMsrp} placeholder="92800" /></Field>
         </Row>
         <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', paddingTop: 4 }}>
-          <input type="checkbox" checked={zeroDeal} onChange={e => setZeroDeal(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#FF2800' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)' }}>ZERO DOWN DEAL</span>
+          <input type="checkbox" checked={zeroDeal} onChange={e => setZeroDeal(e.target.checked)} style={{ width: 16, height: 16, accentColor: A }} />
+          <span style={{ fontFamily: SF, fontSize: 14, color: INK }}>Zero down deal</span>
         </label>
       </Section>
 
       {/* Location */}
-      <Section label="LOCATION & INVENTORY">
+      <Section label="Location & inventory">
         <Row>
-          <Field label="STATE *" note="2-letter"><Inp value={state} onChange={setState} placeholder="CA" maxLength={2} /></Field>
-          <Field label="CITY *"><Inp value={city} onChange={setCity} placeholder="Los Angeles" /></Field>
-          <Field label="SLOTS" note="blank=∞"><Inp type="number" value={slots} onChange={setSlots} placeholder="∞" /></Field>
+          <Field label="State *" note="2-letter"><Inp value={state} onChange={setState} placeholder="CA" maxLength={2} /></Field>
+          <Field label="City *"><Inp value={city} onChange={setCity} placeholder="Los Angeles" /></Field>
+          <Field label="Slots" note="blank = ∞"><Inp type="number" value={slots} onChange={setSlots} placeholder="∞" /></Field>
         </Row>
       </Section>
 
       {/* Images */}
-      <Section label="IMAGES">
-        {/* Existing images */}
+      <Section label="Images">
         {existingImages.length > 0 && (
           <div>
-            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 9, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>EXISTING</div>
+            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: MUTED, marginBottom: 8 }}>Existing</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8 }}>
               {existingImages.map(url => (
-                <div key={url} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div key={url} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(10,10,10,0.1)' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button
-                    type="button"
-                    onClick={() => removeExistingImage(url)}
-                    style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >×</button>
+                  <button type="button" onClick={() => removeExistingImage(url)} style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(10,10,10,0.65)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                 </div>
               ))}
             </div>
           </div>
         )}
-
-        {/* New image previews */}
         {previews.length > 0 && (
           <div>
-            <div style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 9, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.3)', marginBottom: 8 }}>NEW</div>
+            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase', color: MUTED, marginBottom: 8 }}>New</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8 }}>
               {previews.map((src, i) => (
-                <div key={i} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,40,0,0.25)' }}>
+                <div key={i} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 10, overflow: 'hidden', border: `1px solid ${A}40` }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  <button
-                    type="button"
-                    onClick={() => removeNewImage(i)}
-                    style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >×</button>
+                  <button type="button" onClick={() => removeNewImage(i)} style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(10,10,10,0.65)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                 </div>
               ))}
             </div>
           </div>
         )}
-
-        {/* Upload area */}
-        <label style={{ border: '1px dashed rgba(255,255,255,0.15)', borderRadius: 12, padding: '16px', background: 'rgba(255,255,255,0.02)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <label style={{ border: `1px dashed rgba(10,10,10,0.15)`, borderRadius: 12, padding: '16px', background: 'rgba(10,10,10,0.02)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
           <input type="file" accept="image/*" multiple onChange={handleImages} style={{ display: 'none' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.35)' }}>
-            + ADD PHOTOS
-          </span>
-          <span style={{ fontFamily: 'var(--font-barlow)', fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>
-            JPG · PNG · WEBP
-          </span>
+          <span style={{ fontFamily: SF, fontWeight: 500, fontSize: 14, color: MUTED }}>+ Add photos</span>
+          <span style={{ fontFamily: MONO, fontSize: 10, color: 'rgba(10,10,10,0.25)' }}>JPG · PNG · WEBP</span>
         </label>
       </Section>
 
       {error && (
-        <div style={{ padding: '12px 16px', background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.3)', borderRadius: 10, marginBottom: 20, fontFamily: 'var(--font-barlow)', fontSize: 12, color: '#ff6b6b' }}>{error}</div>
+        <div style={{ padding: '12px 16px', background: `${A}10`, border: `1px solid ${A}30`, borderRadius: 10, marginBottom: 20, fontFamily: SF, fontSize: 13, color: A }}>
+          {error}
+        </div>
       )}
 
       <div style={{ display: 'flex', gap: 12 }}>
-        <button onClick={handleSubmit} disabled={submitting} style={{ flex: 1, padding: '16px', borderRadius: 14, background: submitting ? 'rgba(255,40,0,0.4)' : 'rgba(255,40,0,0.9)', border: '1px solid rgba(255,80,40,0.4)', boxShadow: submitting ? 'none' : '0 4px 28px rgba(255,40,0,0.3)', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 14, letterSpacing: '0.1em', cursor: submitting ? 'not-allowed' : 'pointer' }}>
-          {submitting ? 'SAVING…' : isEdit ? 'SAVE CHANGES →' : 'CREATE DEAL →'}
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          style={{
+            flex: 1, padding: '15px', borderRadius: 999,
+            background: submitting ? 'rgba(10,10,10,0.35)' : INK,
+            border: 'none', color: 'white',
+            fontFamily: SF, fontWeight: 500, fontSize: 15,
+            cursor: submitting ? 'not-allowed' : 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+        >
+          {submitting ? 'Saving…' : isEdit ? 'Save changes →' : 'Create deal →'}
         </button>
-        <button onClick={() => router.push('/admin/deals')} disabled={submitting} style={{ padding: '16px 24px', borderRadius: 14, background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 13, letterSpacing: '0.08em', cursor: 'pointer' }}>
-          CANCEL
+        <button
+          onClick={() => router.push('/admin/deals')}
+          disabled={submitting}
+          style={{
+            padding: '15px 24px', borderRadius: 999,
+            background: 'transparent', border: '1px solid rgba(10,10,10,0.12)',
+            color: MUTED, fontFamily: SF, fontWeight: 500, fontSize: 15, cursor: 'pointer',
+          }}
+        >
+          Cancel
         </button>
       </div>
     </div>
@@ -351,30 +350,66 @@ export default function AdminDealForm({ userId, deal }: Props) {
 }
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
+  const MONO = '"JetBrains Mono", ui-monospace, monospace';
+  const MUTED = 'rgba(10,10,10,0.4)';
   return (
-    <div style={{ marginBottom: 28 }}>
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.3)', marginBottom: 12 }}>{label}</div>
-      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, display: 'flex', flexDirection: 'column', gap: 14 }}>{children}</div>
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: MUTED, marginBottom: 10 }}>{label}</div>
+      <div style={{ padding: '20px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.7)', boxShadow: '0 1px 0 rgba(255,255,255,0.8) inset, 0 4px 16px rgba(10,10,10,0.04)', borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {children}
+      </div>
     </div>
   );
 }
+
 function Row({ children }: { children: React.ReactNode }) {
   return <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>{children}</div>;
 }
+
 function Field({ label, note, children }: { label: string; note?: string; children: React.ReactNode }) {
+  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+  const MUTED = 'rgba(10,10,10,0.4)';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-        <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.4)' }}>{label}</span>
-        {note && <span style={{ fontFamily: 'var(--font-barlow)', fontSize: 9, color: 'rgba(255,255,255,0.2)' }}>{note}</span>}
+        <span style={{ fontFamily: SF, fontWeight: 500, fontSize: 11, color: MUTED }}>{label}</span>
+        {note && <span style={{ fontFamily: SF, fontSize: 10, color: 'rgba(10,10,10,0.25)' }}>{note}</span>}
       </div>
       {children}
     </div>
   );
 }
+
 function Inp({ value, onChange, placeholder, type = 'text', maxLength, list }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string; maxLength?: number; list?: string }) {
-  return <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} list={list} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box' }} />;
+  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+  return (
+    <input
+      type={type} value={value} onChange={e => onChange(e.target.value)}
+      placeholder={placeholder} maxLength={maxLength} list={list}
+      className="lz-input"
+      style={{
+        background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(10,10,10,0.12)',
+        borderRadius: 10, padding: '9px 11px',
+        color: '#0a0a0a', fontFamily: SF, fontSize: 13,
+        width: '100%', boxSizing: 'border-box',
+      }}
+    />
+  );
 }
+
 function Sel({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
-  return <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '8px 10px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', cursor: 'pointer' }}>{children}</select>;
+  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+  return (
+    <select
+      value={value} onChange={e => onChange(e.target.value)}
+      style={{
+        background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(10,10,10,0.12)',
+        borderRadius: 10, padding: '9px 11px',
+        color: '#0a0a0a', fontFamily: SF, fontSize: 13,
+        width: '100%', cursor: 'pointer', outline: 'none',
+      }}
+    >
+      {children}
+    </select>
+  );
 }

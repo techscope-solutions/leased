@@ -1,6 +1,32 @@
 import { createClient } from '@/lib/supabase/server';
 import TicketStatusButton from '@/components/TicketStatusButton';
 
+const A = 'oklch(0.55 0.22 18)';
+const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
+const MONO = '"JetBrains Mono", ui-monospace, monospace';
+const SERIF = '"Instrument Serif", Georgia, serif';
+const INK = '#0a0a0a';
+const MUTED = 'rgba(10,10,10,0.4)';
+
+const STATUS_COLOR: Record<string, string> = {
+  open:        'oklch(0.65 0.14 70)',
+  in_progress: 'oklch(0.55 0.18 250)',
+  resolved:    'oklch(0.55 0.16 145)',
+  closed:      MUTED,
+};
+const STATUS_BG: Record<string, string> = {
+  open:        'rgba(200,140,40,0.10)',
+  in_progress: 'rgba(60,80,220,0.08)',
+  resolved:    'rgba(34,197,94,0.10)',
+  closed:      'rgba(10,10,10,0.05)',
+};
+const PRIORITY_COLOR: Record<string, string> = {
+  urgent: A,
+  high:   'oklch(0.65 0.14 70)',
+  medium: MUTED,
+  low:    'rgba(10,10,10,0.25)',
+};
+
 type TicketRow = {
   id: string;
   name: string;
@@ -12,23 +38,8 @@ type TicketRow = {
   created_at: string;
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  open: '#f59e0b',
-  in_progress: '#4a7fd4',
-  resolved: '#22c55e',
-  closed: 'rgba(255,255,255,0.3)',
-};
-
-const PRIORITY_COLORS: Record<string, string> = {
-  urgent: '#FF2800',
-  high: '#f59e0b',
-  medium: 'rgba(255,255,255,0.5)',
-  low: 'rgba(255,255,255,0.25)',
-};
-
 export default async function AdminTickets() {
   const supabase = await createClient();
-
   const { data: tickets } = await supabase
     .from('support_tickets')
     .select('id, name, email, subject, message, status, priority, created_at')
@@ -37,60 +48,45 @@ export default async function AdminTickets() {
   const open = (tickets ?? []).filter((t: TicketRow) => t.status === 'open').length;
 
   return (
-    <div style={{ padding: '40px 32px 80px', maxWidth: 1100 }}>
+    <div style={{ padding: '32px 40px 80px', maxWidth: 1100, fontFamily: SF, color: INK }}>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.35)' }}>SUPPORT</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'oklch(0.65 0.14 70)', display: 'inline-block' }} />
+          <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: MUTED }}>Support</span>
         </div>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(24px, 3vw, 36px)', letterSpacing: '-0.02em', color: '#fff' }}>
-          TICKETS <span style={{ color: open > 0 ? '#f59e0b' : 'rgba(255,255,255,0.3)' }}>({open} OPEN)</span>
-        </div>
+        <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(32px, 4vw, 48px)', margin: 0, lineHeight: 1, letterSpacing: '-0.03em', fontWeight: 400 }}>
+          Tickets <em style={{ color: open > 0 ? 'oklch(0.65 0.14 70)' : MUTED }}>({open} open)</em>
+        </h1>
       </div>
 
       {/* Ticket list */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {(tickets as TicketRow[] ?? []).map(t => (
-          <div key={t.id} style={{
-            padding: '20px 24px',
-            background: 'rgba(255,255,255,0.02)',
-            border: `1px solid ${t.status === 'open' ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)'}`,
-            borderRadius: 14,
-          }}>
+          <div key={t.id} className="lz-glass" style={{ padding: '18px 22px', borderRadius: 16, borderColor: t.status === 'open' ? 'rgba(200,140,40,0.25)' : undefined }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
                   <span style={{
-                    fontFamily: 'var(--font-barlow-cond)',
-                    fontWeight: 700,
-                    fontSize: 9,
-                    letterSpacing: '0.12em',
-                    color: STATUS_COLORS[t.status] ?? 'rgba(255,255,255,0.4)',
-                    background: `${STATUS_COLORS[t.status]}18`,
-                    padding: '2px 8px',
-                    borderRadius: 99,
+                    fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase',
+                    color: STATUS_COLOR[t.status] ?? MUTED,
+                    background: STATUS_BG[t.status] ?? 'rgba(10,10,10,0.05)',
+                    padding: '2px 8px', borderRadius: 999,
                   }}>
-                    {t.status.replace('_', ' ').toUpperCase()}
+                    {t.status.replace('_', ' ')}
                   </span>
-                  <span style={{
-                    fontFamily: 'var(--font-barlow-cond)',
-                    fontWeight: 700,
-                    fontSize: 9,
-                    letterSpacing: '0.1em',
-                    color: PRIORITY_COLORS[t.priority] ?? 'rgba(255,255,255,0.4)',
-                  }}>
-                    {t.priority.toUpperCase()}
+                  <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.08em', textTransform: 'uppercase', color: PRIORITY_COLOR[t.priority] ?? MUTED }}>
+                    {t.priority}
                   </span>
-                  <span style={{ fontFamily: 'var(--font-barlow-cond)', fontSize: 10, color: 'rgba(255,255,255,0.25)' }}>
+                  <span style={{ fontFamily: MONO, fontSize: 10, color: MUTED }}>
                     {new Date(t.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                   </span>
                 </div>
-                <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 15, color: '#fff', marginBottom: 4 }}>{t.subject}</div>
-                <div style={{ fontFamily: 'var(--font-barlow)', fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 8 }}>
+                <div style={{ fontFamily: SF, fontWeight: 600, fontSize: 15, color: INK, marginBottom: 4 }}>{t.subject}</div>
+                <div style={{ fontFamily: SF, fontSize: 13, color: MUTED, marginBottom: 8 }}>
                   {t.name} · {t.email}
                 </div>
-                <div style={{ fontFamily: 'var(--font-barlow)', fontSize: 12, color: 'rgba(255,255,255,0.35)', lineHeight: 1.6 }}>
+                <div style={{ fontFamily: SF, fontSize: 13, color: 'rgba(10,10,10,0.55)', lineHeight: 1.6 }}>
                   {t.message}
                 </div>
               </div>
@@ -100,7 +96,7 @@ export default async function AdminTickets() {
         ))}
 
         {(tickets?.length ?? 0) === 0 && (
-          <div style={{ padding: '60px 0', textAlign: 'center', fontFamily: 'var(--font-barlow)', fontSize: 13, color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ padding: '60px 0', textAlign: 'center', fontFamily: SF, fontSize: 14, color: MUTED }}>
             No support tickets yet
           </div>
         )}

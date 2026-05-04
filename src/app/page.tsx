@@ -21,6 +21,8 @@ export default async function Home() {
       color: '#0a0a0a',
       fontFamily: SF,
       WebkitFontSmoothing: 'antialiased',
+      position: 'relative',
+      zIndex: 2,
     }}>
       <Nav light />
 

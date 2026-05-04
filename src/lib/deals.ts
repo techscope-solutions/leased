@@ -196,3 +196,27 @@ export async function getDealById(id: string): Promise<DbDeal | null> {
     .single();
   return (data ?? null) as DbDeal | null;
 }
+
+export async function getSimilarDeals(id: string, category: string): Promise<CarDeal[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('deals')
+    .select('*')
+    .eq('status', 'live')
+    .eq('category', category)
+    .neq('id', id)
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(4);
+  if (data && data.length >= 2) return data.map(r => dbRowToCarDeal(r as DbDeal));
+  // Fall back to any live deals if not enough in same category
+  const { data: fallback } = await supabase
+    .from('deals')
+    .select('*')
+    .eq('status', 'live')
+    .neq('id', id)
+    .order('featured', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(4);
+  return (fallback ?? []).map(r => dbRowToCarDeal(r as DbDeal));
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { CarDeal } from '@/lib/types';
 import { trackDealClick } from '@/lib/analytics';
 
@@ -17,13 +18,19 @@ const SORTS = [
 
 function GlassDealCard({ deal, compact = false }: { deal: CarDeal; compact?: boolean }) {
   const [hovered, setHovered] = useState(false);
+  const router = useRouter();
+
+  const handleClick = () => {
+    trackDealClick(deal.dropId);
+    router.push(`/browse/${deal.id}`);
+  };
 
   if (compact) {
     return (
       <div
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onClick={() => trackDealClick(deal.dropId)}
+        onClick={handleClick}
         style={{
           display: 'flex',
           gap: 0,
@@ -85,7 +92,7 @@ function GlassDealCard({ deal, compact = false }: { deal: CarDeal; compact?: boo
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={() => trackDealClick(deal.dropId)}
+      onClick={handleClick}
       style={{
         background: 'rgba(255,255,255,0.55)',
         backdropFilter: 'blur(20px) saturate(140%)',

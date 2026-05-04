@@ -140,23 +140,35 @@ export type DealWithSeller = DbDeal & {
   profiles: { full_name: string | null; email: string | null } | null;
 };
 
+async function attachProfiles(deals: DbDeal[]): Promise<DealWithSeller[]> {
+  if (deals.length === 0) return [];
+  const supabase = createAdminClient();
+  const sellerIds = [...new Set(deals.map(d => d.seller_id))];
+  const { data: profiles } = await supabase
+    .from('profiles')
+    .select('id, full_name, email')
+    .in('id', sellerIds);
+  const map = Object.fromEntries((profiles ?? []).map(p => [p.id, p]));
+  return deals.map(d => ({ ...d, profiles: map[d.seller_id] ?? null }));
+}
+
 export async function getPendingDeals(): Promise<DealWithSeller[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from('deals')
-    .select('*, profiles!seller_id(full_name, email)')
+    .select('*')
     .eq('status', 'pending')
     .order('created_at', { ascending: true });
-  return (data ?? []) as DealWithSeller[];
+  return attachProfiles((data ?? []) as DbDeal[]);
 }
 
 export async function getAllDeals(): Promise<DealWithSeller[]> {
   const supabase = createAdminClient();
   const { data } = await supabase
     .from('deals')
-    .select('*, profiles!seller_id(full_name, email)')
+    .select('*')
     .order('created_at', { ascending: false });
-  return (data ?? []) as DealWithSeller[];
+  return attachProfiles((data ?? []) as DbDeal[]);
 }
 
 export async function getDealById(id: string): Promise<DbDeal | null> {

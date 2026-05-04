@@ -186,6 +186,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
   const [sortIdx, setSortIdx] = useState(0);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [budget, setBudget] = useState(1500);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return deals
@@ -312,7 +313,24 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
 
         {/* Quick chips */}
         <div style={{ maxWidth: 1280, margin: '0 auto', padding: '14px 24px', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          {quickChips.map(chip => (
+          {/* Filters toggle — mobile only */}
+          <button
+            className="lz-browse-filters-btn"
+            onClick={() => setFiltersOpen(o => !o)}
+            style={{
+              padding: '7px 14px', borderRadius: 999,
+              background: filtersOpen ? '#0a0a0a' : 'rgba(255,255,255,0.6)',
+              backdropFilter: 'blur(12px)',
+              border: `1px solid ${filtersOpen ? 'transparent' : 'rgba(255,255,255,0.75)'}`,
+              color: filtersOpen ? 'white' : '#0a0a0a',
+              fontFamily: SF, fontSize: 13, cursor: 'pointer',
+              boxShadow: '0 1px 4px rgba(10,10,10,0.04)',
+            }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6 }}><path d="M4 6h16M7 12h10M10 18h4" /></svg>
+            Filters{hasActiveFilters ? ' ·' : ''}
+          </button>
+          {quickChips.filter(c => c.label !== 'All').map(chip => (
             <button
               key={chip.label}
               onClick={chip.onClick}
@@ -338,8 +356,8 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
 
         {/* Two-column layout */}
         <div className="lz-browse-layout" style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px 80px' }}>
-          {/* Sidebar */}
-          <aside className="lz-browse-sidebar">
+          {/* Sidebar — always visible on desktop, toggle on mobile */}
+          <aside className={`lz-browse-sidebar${filtersOpen ? '' : ' lz-browse-sidebar-hidden'}`}>
             <div className="lz-glass" style={{ borderRadius: 20, padding: 20 }}>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)', marginBottom: 18 }}>Filters</div>
 

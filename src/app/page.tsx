@@ -37,7 +37,7 @@ export default async function Home() {
       {/* Footer */}
       <footer style={{ padding: '48px 24px 32px', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto' }}>
-          <div className="lz-footer-grid">
+          <div className="lz-footer-grid" style={{ rowGap: 32 }}>
             <div>
               {/* Logo */}
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#0a0a0a', fontWeight: 600, fontSize: 22, letterSpacing: '-0.03em', fontFamily: SF }}>

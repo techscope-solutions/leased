@@ -7,7 +7,7 @@ const SFD = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-
 export default function CTASection() {
   return (
     <section style={{ padding: '40px 24px 80px', maxWidth: 1280, margin: '0 auto' }}>
-      <div style={{
+      <div className="lz-cta-pad" style={{
         position: 'relative',
         borderRadius: 28,
         overflow: 'hidden',
@@ -22,28 +22,12 @@ export default function CTASection() {
           pointerEvents: 'none',
         }} />
 
-        <div style={{
-          position: 'relative',
-          display: 'grid',
-          gridTemplateColumns: '1.4fr 1fr',
-          gap: 48,
-          alignItems: 'end',
-        }}>
+        <div className="lz-cta-grid" style={{ position: 'relative' }}>
           <div>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: 'rgba(255,255,255,0.18)', color: 'white',
-              backdropFilter: 'blur(10px)',
-              padding: '6px 12px', borderRadius: 999,
-              fontFamily: SF, fontSize: 12, fontWeight: 500,
-            }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'white', display: 'inline-block' }} />
-              Free to start
-            </div>
             <h2 style={{
-              fontSize: 'clamp(48px, 6vw, 88px)',
+              fontSize: 'clamp(40px, 6vw, 88px)',
               lineHeight: 0.95,
-              margin: '20px 0 0',
+              margin: '0 0 0',
               letterSpacing: '-0.03em',
               fontWeight: 600,
               fontFamily: SFD,

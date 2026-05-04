@@ -36,37 +36,28 @@ export default function HowItWorks() {
     <section id="how-it-works" style={{ padding: '80px 24px', background: '#0a0a0a', color: 'white' }}>
       <div style={{ maxWidth: 1280, margin: '0 auto' }}>
         {/* Header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 48,
-          alignItems: 'end',
-          marginBottom: 56,
-        }}>
-          <div>
-            <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6,
-              background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)',
-              padding: '6px 12px', borderRadius: 999,
-              fontFamily: 'JetBrains Mono, ui-monospace, monospace',
-              fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase' as const,
-            }}>
-              02 — How it works
-            </div>
-            <h2 style={{
-              fontSize: 'clamp(40px, 5vw, 72px)',
-              lineHeight: 1,
-              margin: '16px 0 0',
-              letterSpacing: '-0.03em',
-              fontWeight: 600,
-              fontFamily: SFD,
-              color: 'white',
-            }}>
-              From browsing to driving<br />
-              in <span style={{ fontStyle: 'italic', color: A }}>four steps</span>.
-            </h2>
+        <div style={{ marginBottom: 56 }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.7)',
+            padding: '6px 12px', borderRadius: 999,
+            fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+            fontSize: 10, fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+          }}>
+            02 — How it works
           </div>
-          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, maxWidth: 460, fontFamily: SF }}>
+          <h2 className="lz-hiw-h2" style={{
+            fontSize: 'clamp(28px, 5vw, 72px)',
+            lineHeight: 1,
+            margin: '16px 0 12px',
+            letterSpacing: '-0.03em',
+            fontWeight: 600,
+            fontFamily: SFD,
+            color: 'white',
+          }}>
+            From browsing to driving in <span style={{ fontStyle: 'italic', color: A }}>four steps</span>.
+          </h2>
+          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, maxWidth: 560, fontFamily: SF, margin: 0 }}>
             We sit between shoppers and dealers — never in the way. The numbers you see are the numbers you pay.
           </p>
         </div>

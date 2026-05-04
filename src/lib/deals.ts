@@ -141,34 +141,50 @@ export type DealWithSeller = DbDeal & {
 };
 
 async function attachProfiles(deals: DbDeal[]): Promise<DealWithSeller[]> {
-  if (deals.length === 0) return [];
-  const supabase = createAdminClient();
-  const sellerIds = [...new Set(deals.map(d => d.seller_id))];
-  const { data: profiles } = await supabase
-    .from('profiles')
-    .select('id, full_name, email')
-    .in('id', sellerIds);
-  const map = Object.fromEntries((profiles ?? []).map(p => [p.id, p]));
-  return deals.map(d => ({ ...d, profiles: map[d.seller_id] ?? null }));
+  if (deals.length === 0) return deals.map(d => ({ ...d, profiles: null }));
+  try {
+    const supabase = createAdminClient();
+    const sellerIds = [...new Set(deals.map(d => d.seller_id))];
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, full_name, email')
+      .in('id', sellerIds);
+    const map = Object.fromEntries((profiles ?? []).map((p: { id: string; full_name: string | null; email: string | null }) => [p.id, p]));
+    return deals.map(d => ({ ...d, profiles: map[d.seller_id] ?? null }));
+  } catch {
+    return deals.map(d => ({ ...d, profiles: null }));
+  }
 }
 
 export async function getPendingDeals(): Promise<DealWithSeller[]> {
-  const supabase = createAdminClient();
-  const { data } = await supabase
-    .from('deals')
-    .select('*')
-    .eq('status', 'pending')
-    .order('created_at', { ascending: true });
-  return attachProfiles((data ?? []) as DbDeal[]);
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('deals')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: true });
+    if (error) { console.error('getPendingDeals error:', error.message); return []; }
+    return attachProfiles((data ?? []) as DbDeal[]);
+  } catch (e) {
+    console.error('getPendingDeals threw:', e);
+    return [];
+  }
 }
 
 export async function getAllDeals(): Promise<DealWithSeller[]> {
-  const supabase = createAdminClient();
-  const { data } = await supabase
-    .from('deals')
-    .select('*')
-    .order('created_at', { ascending: false });
-  return attachProfiles((data ?? []) as DbDeal[]);
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from('deals')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) { console.error('getAllDeals error:', error.message); return []; }
+    return attachProfiles((data ?? []) as DbDeal[]);
+  } catch (e) {
+    console.error('getAllDeals threw:', e);
+    return [];
+  }
 }
 
 export async function getDealById(id: string): Promise<DbDeal | null> {

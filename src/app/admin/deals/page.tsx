@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { getAllDeals, getPendingDeals } from '@/lib/deals';
+import { getAllDeals, getPendingDeals, DealWithSeller } from '@/lib/deals';
 import { approveDeal, rejectDeal, deleteDeal } from './actions';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -33,14 +33,16 @@ function Lbl({ children }: { children: React.ReactNode }) {
 
 export default async function AdminDealsPage() {
   const supabase = createAdminClient();
+  const liveQ = supabase.from('deals').select('*', { count: 'exact', head: true }).eq('status', 'live');
+  const rejQ = supabase.from('deals').select('*', { count: 'exact', head: true }).eq('status', 'rejected');
   const [allDeals, pending, liveResult, rejectedResult] = await Promise.all([
     getAllDeals(),
     getPendingDeals(),
-    supabase.from('deals').select('*', { count: 'exact', head: true }).eq('status', 'live'),
-    supabase.from('deals').select('*', { count: 'exact', head: true }).eq('status', 'rejected'),
+    liveQ,
+    rejQ,
   ]);
-  const liveCount = liveResult.count;
-  const rejectedCount = rejectedResult.count;
+  const liveCount = liveResult.count ?? 0;
+  const rejectedCount = rejectedResult.count ?? 0;
 
   return (
     <div style={{ padding: '32px 40px 80px', maxWidth: 1100 }}>

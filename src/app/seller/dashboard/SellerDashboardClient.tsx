@@ -58,9 +58,11 @@ type Tab = 'overview' | 'listings';
 type Props = {
   profile: { full_name: string | null; email: string | null; role: string };
   deals: DbDeal[];
+  inquiryCounts: Record<string, number>;
+  newInquiryCounts: Record<string, number>;
 };
 
-export default function SellerDashboardClient({ profile, deals }: Props) {
+export default function SellerDashboardClient({ profile, deals, inquiryCounts, newInquiryCounts }: Props) {
   const [tab, setTab] = useState<Tab>('overview');
 
   const name = profile.full_name ?? profile.email ?? 'Seller';
@@ -187,8 +189,8 @@ export default function SellerDashboardClient({ profile, deals }: Props) {
         {/* ── MAIN ──────────────────────────────────────────────── */}
         <main className="lz-seller-main" style={{ padding: '32px 40px 60px', minWidth: 0 }}>
           {tab === 'overview'
-            ? <OverviewTab firstName={firstName} deals={deals} live={live} pending={pending} rejected={rejected} setTab={setTab} />
-            : <ListingsTab deals={deals} />
+            ? <OverviewTab firstName={firstName} deals={deals} live={live} pending={pending} rejected={rejected} newInquiryCounts={newInquiryCounts} setTab={setTab} />
+            : <ListingsTab deals={deals} inquiryCounts={inquiryCounts} newInquiryCounts={newInquiryCounts} />
           }
         </main>
       </div>
@@ -242,17 +244,19 @@ export default function SellerDashboardClient({ profile, deals }: Props) {
 }
 
 /* ─── Overview Tab ──────────────────────────────────────────────────── */
-function OverviewTab({ firstName, deals, live, pending, rejected, setTab }: {
+function OverviewTab({ firstName, deals, live, pending, rejected, newInquiryCounts, setTab }: {
   firstName: string; deals: DbDeal[]; live: DbDeal[]; pending: DbDeal[]; rejected: DbDeal[];
+  newInquiryCounts: Record<string, number>;
   setTab: (t: Tab) => void;
 }) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const totalNew = Object.values(newInquiryCounts).reduce((a, b) => a + b, 0);
 
   const stats = [
     { label: 'Active', value: live.length || '—', sub: live.length ? 'live now' : 'Post your first', tone: live.length ? 'up' : 'neutral' },
     { label: 'Pending', value: pending.length || '—', sub: pending.length ? 'In review' : 'None pending', tone: 'neutral' },
-    { label: 'Rejected', value: rejected.length || '—', sub: rejected.length ? 'Needs revision' : 'None', tone: rejected.length ? 'down' : 'neutral' },
+    { label: 'New inquiries', value: totalNew || '—', sub: totalNew ? 'Unread' : 'All caught up', tone: totalNew ? 'up' : 'neutral', onClick: totalNew ? () => setTab('listings') : undefined },
     { label: 'Total', value: deals.length || '—', sub: 'All time', tone: 'neutral' },
   ];
 
@@ -284,11 +288,22 @@ function OverviewTab({ firstName, deals, live, pending, rejected, setTab }: {
       {/* Stats grid */}
       <div className="lz-seller-stats">
         {stats.map(s => (
-          <div key={s.label} style={{ borderRadius: 16, padding: '16px', background: 'rgba(255,255,255,0.65)', border: '1px solid rgba(255,255,255,0.8)', backdropFilter: 'blur(12px)', boxShadow: '0 1px 4px rgba(10,10,10,0.04)' }}>
-            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', color: MUTED, textTransform: 'uppercase' }}>{s.label}</div>
+          <div
+            key={s.label}
+            onClick={s.onClick}
+            style={{
+              borderRadius: 16, padding: '16px',
+              background: s.onClick ? INK : 'rgba(255,255,255,0.65)',
+              border: s.onClick ? 'none' : '1px solid rgba(255,255,255,0.8)',
+              backdropFilter: 'blur(12px)', boxShadow: '0 1px 4px rgba(10,10,10,0.04)',
+              cursor: s.onClick ? 'pointer' : 'default',
+              color: s.onClick ? 'white' : 'inherit',
+            }}
+          >
+            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', color: s.onClick ? 'rgba(255,255,255,0.45)' : MUTED, textTransform: 'uppercase' }}>{s.label}</div>
             <div style={{ fontFamily: SERIF, fontSize: 38, lineHeight: 1, margin: '8px 0 4px', letterSpacing: '-0.03em' }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: s.tone === 'up' ? 'oklch(0.55 0.16 145)' : s.tone === 'down' ? A : MUTED }}>
-              {s.sub}
+            <div style={{ fontSize: 11, color: s.onClick ? 'rgba(255,255,255,0.6)' : s.tone === 'up' ? 'oklch(0.55 0.16 145)' : s.tone === 'down' ? A : MUTED }}>
+              {s.sub}{s.onClick ? ' →' : ''}
             </div>
           </div>
         ))}
@@ -350,7 +365,7 @@ function OverviewTab({ firstName, deals, live, pending, rejected, setTab }: {
 }
 
 /* ─── Listings Tab ──────────────────────────────────────────────────── */
-function ListingsTab({ deals }: { deals: DbDeal[] }) {
+function ListingsTab({ deals, inquiryCounts, newInquiryCounts }: { deals: DbDeal[]; inquiryCounts: Record<string, number>; newInquiryCounts: Record<string, number> }) {
   const [filter, setFilter] = useState<'all' | 'live' | 'pending' | 'rejected'>('all');
   const filtered = filter === 'all' ? deals : deals.filter(d => d.status === filter);
 
@@ -403,8 +418,17 @@ function ListingsTab({ deals }: { deals: DbDeal[] }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                   <Thumb deal={deal} />
                   <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {deal.year} {deal.make} {deal.model}
+                    <div style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deal.year} {deal.make} {deal.model}</span>
+                      {newInquiryCounts[deal.id] ? (
+                        <span style={{ flexShrink: 0, fontSize: 10, fontFamily: MONO, background: A, color: 'white', padding: '2px 7px', borderRadius: 999 }}>
+                          {newInquiryCounts[deal.id]} new
+                        </span>
+                      ) : inquiryCounts[deal.id] ? (
+                        <span style={{ flexShrink: 0, fontSize: 10, fontFamily: MONO, background: 'rgba(10,10,10,0.07)', color: MUTED2, padding: '2px 7px', borderRadius: 999 }}>
+                          {inquiryCounts[deal.id]}
+                        </span>
+                      ) : null}
                     </div>
                     <div style={{ fontSize: 11, color: MUTED, marginTop: 1 }}>
                       {deal.trim ? `${deal.trim} · ` : ''}{deal.city}, {deal.state}

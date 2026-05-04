@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { sendInquiryNotification } from '@/lib/email';
 
 export type InquiryPayload = {
   dealId: string;
@@ -38,7 +39,6 @@ export async function submitInquiry(payload: InquiryPayload): Promise<InquiryRes
   if (error) {
     if (error.code === '23505') return { ok: false, error: 'You have already sent an inquiry for this deal.' };
 
-    // Log unexpected errors to admin panel instead of leaking details to user
     await supabase.from('errors').insert({
       user_id:  user.id,
       message:  error.message,
@@ -47,6 +47,31 @@ export async function submitInquiry(payload: InquiryPayload): Promise<InquiryRes
     });
 
     return { ok: false, error: 'Something went wrong. Our team has been notified — please try again shortly.' };
+  }
+
+  // Fire email notification to seller (non-blocking — don't fail the inquiry if email errors)
+  try {
+    const [{ data: sellerProfile }, { data: deal }] = await Promise.all([
+      supabase.from('profiles').select('email, full_name').eq('id', payload.sellerId).single(),
+      supabase.from('deals').select('year, make, model').eq('id', payload.dealId).single(),
+    ]);
+
+    if (sellerProfile?.email && deal) {
+      await sendInquiryNotification({
+        sellerEmail:     sellerProfile.email,
+        sellerName:      sellerProfile.full_name ?? 'there',
+        buyerEmail:      user.email ?? 'A buyer',
+        dealTitle:       `${deal.year} ${deal.make} ${deal.model}`,
+        dealId:          payload.dealId,
+        preferredTerm:   payload.preferredTerm,
+        preferredDown:   payload.preferredDown,
+        estimatedIncome: payload.estimatedIncome,
+        estimatedCredit: payload.estimatedCredit,
+        message:         payload.message,
+      });
+    }
+  } catch {
+    // Email failure never blocks the inquiry submission
   }
 
   return { ok: true };

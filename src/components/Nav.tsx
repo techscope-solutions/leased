@@ -304,7 +304,7 @@ export default function Nav({ light = false }: { light?: boolean }) {
             </svg>
             <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 9, letterSpacing: '0.1em' }}>LOG IN</span>
           </Link>
-        )}
+        ) : null}
       </div>
     </>
   );

@@ -72,7 +72,7 @@ export default function SellerDashboardClient({ profile, deals }: Props) {
   const rejected = deals.filter(d => d.status === 'rejected');
 
   return (
-    <div style={{ background: '#f7f5f2', minHeight: '100vh', color: INK, fontFamily: SF, WebkitFontSmoothing: 'antialiased' }}>
+    <div style={{ background: '#f7f5f2', minHeight: '100vh', color: INK, fontFamily: SF, WebkitFontSmoothing: 'antialiased', position: 'relative', zIndex: 2 }}>
 
       {/* ── MOBILE STICKY HEADER ─────────────────────────────── */}
       <div className="lz-seller-mobile-header" style={{

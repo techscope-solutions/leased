@@ -122,7 +122,7 @@ export default function DealForm({ userId }: { userId: string }) {
   };
 
   return (
-    <div style={{ background: '#f7f5f2', minHeight: '100vh', fontFamily: SF, WebkitFontSmoothing: 'antialiased', color: INK }}>
+    <div style={{ background: '#f7f5f2', minHeight: '100vh', fontFamily: SF, WebkitFontSmoothing: 'antialiased', color: INK, position: 'relative', zIndex: 2 }}>
       {/* Top nav bar */}
       <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(247,245,242,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(10,10,10,0.07)', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Link href="/seller/dashboard" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, color: MUTED, fontSize: 13 }}>

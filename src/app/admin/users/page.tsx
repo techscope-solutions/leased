@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 const A = 'oklch(0.55 0.22 18)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
@@ -29,7 +29,7 @@ type UserRow = {
 };
 
 export default async function AdminUsers() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: users } = await supabase
     .from('profiles')
     .select('id, email, full_name, role, onboarded, created_at, last_seen')

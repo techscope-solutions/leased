@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Nav from '@/components/Nav';
 import { getDealById, getSimilarDeals, dbRowToCarDeal } from '@/lib/deals';
+import { createClient } from '@/lib/supabase/server';
 import DealGallery from './DealGallery';
+import InquiryApplyCard from './InquiryApplyCard';
 import { CarDeal } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -32,23 +34,6 @@ function PinIcon() {
   );
 }
 
-function TrustRow({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'rgba(255,255,255,0.65)', fontSize: 11, fontFamily: SF }}>
-      {icon} {label}
-    </div>
-  );
-}
-
-function ShieldIcon() {
-  return <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2 4 5v7c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5z"/><path d="m9 12 2 2 4-4"/></svg>;
-}
-function BoltIcon() {
-  return <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>;
-}
-function SparkIcon() {
-  return <svg width={12} height={12} viewBox="0 0 24 24" fill="currentColor"><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z"/></svg>;
-}
 
 function SpecRow({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
@@ -93,6 +78,20 @@ export default async function DealDetailPage({ params }: Props) {
 
   const deal = dbRowToCarDeal(raw);
   const similar = await getSimilarDeals(id, raw.category);
+
+  // Auth + existing inquiry check
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let existingInquiry: { status: 'sent' | 'viewed' | 'replied' | 'application_sent' | 'complete' } | null = null;
+  if (user) {
+    const { data } = await supabase
+      .from('inquiries')
+      .select('status')
+      .eq('deal_id', raw.id)
+      .eq('buyer_id', user.id)
+      .maybeSingle();
+    if (data) existingInquiry = data as { status: 'sent' | 'viewed' | 'replied' | 'application_sent' | 'complete' };
+  }
 
   const milesLabel = deal.milesPerYear >= 1000
     ? `${(deal.milesPerYear / 1000).toFixed(0)}k`
@@ -168,65 +167,21 @@ export default async function DealDetailPage({ params }: Props) {
           <div className="lz-deal-layout">
             <DealGallery images={deal.images} make={deal.make} model={deal.model} year={deal.year} />
 
-            {/* Sticky dark apply card */}
+            {/* Interactive inquiry/apply card */}
             <aside className="lz-deal-apply-aside">
-              <div style={{
-                borderRadius: 24, padding: 24,
-                background: 'rgba(18,18,18,0.94)',
-                backdropFilter: 'blur(24px) saturate(120%)',
-                WebkitBackdropFilter: 'blur(24px) saturate(120%)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                color: 'white',
-              }}>
-                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>
-                  {deal.type === 'LEASE' ? 'Lease this car' : 'Finance this car'}
-                </div>
-
-                {/* Price */}
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, margin: '10px 0 4px' }}>
-                  <span style={{ fontFamily: SERIF, fontSize: 64, lineHeight: 0.9, color: 'white', letterSpacing: '-0.035em', fontWeight: 400 }}>
-                    ${deal.monthly.toLocaleString()}
-                  </span>
-                  <span style={{ fontSize: 16, opacity: 0.5 }}>/mo</span>
-                </div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginBottom: 20 }}>
-                  ${deal.dueAtSigning.toLocaleString()} due at signing · {deal.term}mo · {milesLabel} mi/yr
-                </div>
-
-                {/* Deal terms summary */}
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '16px 0', marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {[
-                    { label: 'MSRP', value: `$${deal.msrp.toLocaleString()}` },
-                    { label: 'Due at signing', value: `$${deal.dueAtSigning.toLocaleString()}` },
-                    { label: 'Term', value: `${deal.term} months` },
-                    { label: 'Miles / year', value: `${milesLabel}` },
-                    ...(deal.slotsLeft != null ? [{ label: 'Slots left', value: String(deal.slotsLeft) }] : []),
-                  ].map(({ label, value }) => (
-                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                      <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)' }}>{label}</span>
-                      <span style={{ color: 'rgba(255,255,255,0.85)', fontFamily: SF }}>{value}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button style={{
-                  width: '100%', padding: '14px 18px', borderRadius: 999,
-                  background: A, color: 'white', border: 'none',
-                  fontFamily: SF, fontWeight: 500, fontSize: 15, cursor: 'pointer',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                }}>
-                  Get this deal
-                  <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-                </button>
-
-                {/* Trust grid */}
-                <div style={{ marginTop: 18, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.07)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-                  <TrustRow icon={<ShieldIcon />} label="Verified listing" />
-                  <TrustRow icon={<CheckIcon />} label="No hidden fees" />
-                  <TrustRow icon={<BoltIcon />} label="Avail. this week" />
-                  <TrustRow icon={<SparkIcon />} label="Price guaranteed" />
-                </div>
-              </div>
+              <InquiryApplyCard
+                dealId={raw.id}
+                sellerId={raw.seller_id}
+                monthly={deal.monthly}
+                dueAtSigning={deal.dueAtSigning}
+                term={deal.term}
+                milesLabel={milesLabel}
+                msrp={deal.msrp}
+                slotsLeft={deal.slotsLeft ?? null}
+                dealType={raw.deal_type}
+                userId={user?.id ?? null}
+                existingInquiry={existingInquiry}
+              />
 
               {/* Slots/urgency note */}
               {deal.slotsLeft != null && deal.slotsLeft <= 5 && (

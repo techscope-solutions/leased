@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { getAllDeals, getPendingDeals } from '@/lib/deals';
 import { approveDeal, rejectDeal, deleteDeal } from './actions';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 const A = 'oklch(0.55 0.22 18)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
@@ -30,7 +30,7 @@ function Lbl({ children }: { children: React.ReactNode }) {
 }
 
 export default async function AdminDealsPage() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const [allDeals, pending, { count: liveCount }, { count: rejectedCount }] = await Promise.all([
     getAllDeals(),
     getPendingDeals(),

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import Link from 'next/link';
 
 const A = 'oklch(0.55 0.22 18)';
@@ -41,7 +41,7 @@ function StatCard({ label, value, change, trend, live }: {
 }
 
 export default async function AdminDashboard() {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);

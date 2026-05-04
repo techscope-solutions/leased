@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { CarDeal, DriveTrain, DealTier, DealType, DealCategory } from './types';
 
 export type DbDeal = {
@@ -140,7 +141,7 @@ export type DealWithSeller = DbDeal & {
 };
 
 export async function getPendingDeals(): Promise<DealWithSeller[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from('deals')
     .select('*, profiles!seller_id(full_name, email)')
@@ -150,7 +151,7 @@ export async function getPendingDeals(): Promise<DealWithSeller[]> {
 }
 
 export async function getAllDeals(): Promise<DealWithSeller[]> {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from('deals')
     .select('*, profiles!seller_id(full_name, email)')

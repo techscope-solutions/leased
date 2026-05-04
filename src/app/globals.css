@@ -524,7 +524,7 @@ button { cursor: pointer; font-family: var(--font-cond); }
   align-items: end;
 }
 
-/* Seller Dashboard */
+/* ─── Seller Dashboard ──────────────────────────────────────────────── */
 .lz-seller-grid {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -536,26 +536,43 @@ button { cursor: pointer; font-family: var(--font-cond); }
   margin-bottom: 16px;
 }
 
-@media (max-width: 900px) {
-  .lz-seller-grid {
-    grid-template-columns: 1fr;
-  }
-  .lz-seller-sidebar {
-    position: static !important;
-    height: auto !important;
-    border-right: none !important;
-    border-bottom: 1px solid rgba(10,10,10,0.06);
-  }
-  .lz-seller-main {
-    padding: 24px 20px 60px !important;
-  }
-  .lz-seller-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
+/* Mobile header & bottom nav — hidden on desktop */
+.lz-seller-mobile-header { display: none; }
+.lz-seller-mobile-nav    { display: none; }
+
+/* Desktop listings table */
+.lz-seller-table-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px 100px 80px;
+  gap: 12px;
+  align-items: center;
+}
+.lz-seller-table-head {
+  display: grid;
+  grid-template-columns: 1fr 90px 90px 100px 80px;
+  gap: 12px;
 }
 
-@media (max-width: 600px) {
-  .lz-seller-stats {
-    grid-template-columns: 1fr 1fr;
-  }
+/* Desktop: show table columns, hide mobile inline summary */
+.lz-seller-desktop-col   { display: block; }
+.lz-seller-mobile-inline { display: none !important; }
+
+@media (max-width: 900px) {
+  /* Hide sidebar, show mobile chrome */
+  .lz-seller-sidebar       { display: none !important; }
+  .lz-seller-grid          { grid-template-columns: 1fr; }
+  .lz-seller-mobile-header { display: flex; }
+  .lz-seller-mobile-nav    { display: flex; }
+
+  /* Main content clears sticky header + bottom nav */
+  .lz-seller-main { padding: 16px 16px 90px !important; }
+
+  /* Stats 2-col */
+  .lz-seller-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* Listings: collapse table to single-col cards */
+  .lz-seller-table-head    { display: none; }
+  .lz-seller-table-row     { grid-template-columns: 1fr !important; }
+  .lz-seller-desktop-col   { display: none !important; }
+  .lz-seller-mobile-inline { display: flex !important; }
 }

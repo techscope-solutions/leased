@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import { getDealById } from '@/lib/deals';
 import AdminDealForm from '../../AdminDealForm';
@@ -11,8 +12,13 @@ export default async function AdminEditDealPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const deal = await getDealById(id);
+  const admin = createAdminClient();
+  const [deal, { data: sellers }] = await Promise.all([
+    getDealById(id),
+    admin.from('profiles').select('id, full_name, email').order('full_name', { ascending: true }),
+  ]);
+
   if (!deal) notFound();
 
-  return <AdminDealForm userId={user.id} deal={deal} />;
+  return <AdminDealForm userId={user.id} deal={deal} sellers={sellers ?? []} />;
 }

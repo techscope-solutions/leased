@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { DbDeal } from '@/lib/deals';
-import { updateDeal } from './actions';
+import { updateDeal, createDeal } from './actions';
 import { guessCarSpecs, POPULAR_MAKES } from '@/lib/carHeuristics';
 
 const ACCENT: Record<string, string> = {
@@ -18,12 +18,14 @@ const SERIF = '"Instrument Serif", Georgia, serif';
 const INK = '#0a0a0a';
 const MUTED = 'rgba(10,10,10,0.4)';
 
-type Props = { userId: string; deal?: DbDeal };
+type SellerOption = { id: string; full_name: string | null; email: string | null };
+type Props = { userId: string; deal?: DbDeal; sellers?: SellerOption[] };
 
-export default function AdminDealForm({ userId, deal }: Props) {
+export default function AdminDealForm({ userId, deal, sellers = [] }: Props) {
   const router = useRouter();
   const isEdit = !!deal;
 
+  const [sellerId, setSellerId] = useState(deal?.seller_id ?? userId);
   const [make, setMake] = useState(deal?.make ?? '');
   const [model, setModel] = useState(deal?.model ?? '');
   const [trim, setTrim] = useState(deal?.trim ?? '');
@@ -99,53 +101,48 @@ export default function AdminDealForm({ userId, deal }: Props) {
       return;
     }
     setSubmitting(true);
-    const supabase = createClient();
 
     const imageUrls: string[] = [...existingImages];
-    for (const file of newImages) {
-      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const path = `${userId}/${Date.now()}-${safeName}`;
-      const { error: upErr } = await supabase.storage.from('deal-images').upload(path, file);
-      if (upErr) { setError(`Image upload failed: ${upErr.message}`); setSubmitting(false); return; }
-      const { data: { publicUrl } } = supabase.storage.from('deal-images').getPublicUrl(path);
-      imageUrls.push(publicUrl);
+    if (newImages.length > 0) {
+      const supabase = createClient();
+      for (const file of newImages) {
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${sellerId}/${Date.now()}-${safeName}`;
+        const { error: upErr } = await supabase.storage.from('deal-images').upload(path, file);
+        if (upErr) { setError(`Image upload failed: ${upErr.message}`); setSubmitting(false); return; }
+        const { data: { publicUrl } } = supabase.storage.from('deal-images').getPublicUrl(path);
+        imageUrls.push(publicUrl);
+      }
     }
 
-    const accent = ACCENT[category] ?? '#111827';
-    const expiresAt = new Date(Date.now() + parseInt(expiresDays) * 24 * 3600 * 1000).toISOString();
+    const fd = new FormData();
+    fd.append('seller_id', sellerId);
+    fd.append('make', make); fd.append('model', model); fd.append('trim', trim);
+    fd.append('year', year); fd.append('drive', drive); fd.append('car_type', carType);
+    fd.append('category', category); fd.append('color', color); fd.append('deal_type', dealType);
+    fd.append('monthly', monthly); fd.append('due_at_signing', das); fd.append('term', term);
+    fd.append('miles_per_year', mpy); fd.append('msrp', msrp);
+    fd.append('zero_deal', String(zeroDeal)); fd.append('state', state); fd.append('city', city);
+    fd.append('slots_left', slots); fd.append('status', status); fd.append('tier', tier);
+    fd.append('featured', String(featured)); fd.append('expires_days', expiresDays);
+    fd.append('rejection_reason', rejectionReason);
+    fd.append('images', JSON.stringify(imageUrls));
 
-    if (isEdit && deal) {
-      const fd = new FormData();
-      fd.append('dealId', deal.id);
-      fd.append('make', make); fd.append('model', model); fd.append('trim', trim);
-      fd.append('year', year); fd.append('drive', drive); fd.append('car_type', carType);
-      fd.append('category', category); fd.append('color', color); fd.append('deal_type', dealType);
-      fd.append('monthly', monthly); fd.append('due_at_signing', das); fd.append('term', term);
-      fd.append('miles_per_year', mpy); fd.append('msrp', msrp);
-      fd.append('zero_deal', String(zeroDeal)); fd.append('state', state); fd.append('city', city);
-      fd.append('slots_left', slots); fd.append('status', status); fd.append('tier', tier);
-      fd.append('featured', String(featured)); fd.append('expires_days', expiresDays);
-      fd.append('rejection_reason', rejectionReason);
-      fd.append('images', JSON.stringify(imageUrls));
-      await updateDeal(fd);
+    try {
+      if (isEdit && deal) {
+        fd.append('dealId', deal.id);
+        await updateDeal(fd);
+      } else {
+        await createDeal(fd);
+      }
       router.push('/admin/deals');
-    } else {
-      const { error: insertErr } = await supabase.from('deals').insert({
-        seller_id: userId, status,
-        make: make.trim().toUpperCase(), model: model.trim().toUpperCase(), trim: trim.trim().toUpperCase(),
-        year: parseInt(year), drive, car_type: carType, category,
-        color: color || null, deal_type: dealType,
-        monthly: parseInt(monthly), due_at_signing: parseInt(das),
-        term: parseInt(term), miles_per_year: parseInt(mpy), msrp: parseInt(msrp),
-        zero_deal: zeroDeal, state: state.trim().toUpperCase(), city: city.trim(),
-        slots_left: slots ? parseInt(slots) : null,
-        tier, featured, expires_at: expiresAt, images: imageUrls,
-        accent, stripe: `linear-gradient(135deg, ${accent} 0%, ${accent}ee 100%)`,
-      });
-      if (insertErr) { setError(insertErr.message); setSubmitting(false); return; }
-      router.push('/admin/deals');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Something went wrong.');
+      setSubmitting(false);
     }
   };
+
+  const sellerLabel = (s: SellerOption) => s.full_name ? `${s.full_name} (${s.email})` : (s.email ?? s.id.slice(0, 8));
 
   return (
     <div style={{ padding: '32px 40px 100px', maxWidth: 800, fontFamily: SF, color: INK }}>
@@ -162,6 +159,15 @@ export default function AdminDealForm({ userId, deal }: Props) {
 
       {/* Moderation */}
       <Section label="Moderation">
+        {sellers.length > 0 && (
+          <Field label="On behalf of seller">
+            <Sel value={sellerId} onChange={setSellerId}>
+              {sellers.map(s => (
+                <option key={s.id} value={s.id}>{sellerLabel(s)}</option>
+              ))}
+            </Sel>
+          </Field>
+        )}
         <Row>
           <Field label="Status">
             <Sel value={status} onChange={v => setStatus(v as 'live' | 'pending' | 'rejected')}>
@@ -350,8 +356,6 @@ export default function AdminDealForm({ userId, deal }: Props) {
 }
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
-  const MONO = '"JetBrains Mono", ui-monospace, monospace';
-  const MUTED = 'rgba(10,10,10,0.4)';
   return (
     <div style={{ marginBottom: 24 }}>
       <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: MUTED, marginBottom: 10 }}>{label}</div>
@@ -367,8 +371,6 @@ function Row({ children }: { children: React.ReactNode }) {
 }
 
 function Field({ label, note, children }: { label: string; note?: string; children: React.ReactNode }) {
-  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
-  const MUTED = 'rgba(10,10,10,0.4)';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
@@ -381,7 +383,6 @@ function Field({ label, note, children }: { label: string; note?: string; childr
 }
 
 function Inp({ value, onChange, placeholder, type = 'text', maxLength, list }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string; maxLength?: number; list?: string }) {
-  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
   return (
     <input
       type={type} value={value} onChange={e => onChange(e.target.value)}
@@ -398,7 +399,6 @@ function Inp({ value, onChange, placeholder, type = 'text', maxLength, list }: {
 }
 
 function Sel({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
-  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
   return (
     <select
       value={value} onChange={e => onChange(e.target.value)}

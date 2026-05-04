@@ -490,3 +490,39 @@ button { cursor: pointer; font-family: var(--font-cond); }
   .lz-testimonials-grid { grid-template-columns: 1fr; }
   .lz-footer-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* Seller Dashboard */
+.lz-seller-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+.lz-seller-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 900px) {
+  .lz-seller-grid {
+    grid-template-columns: 1fr;
+  }
+  .lz-seller-sidebar {
+    position: static !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid rgba(10,10,10,0.06);
+  }
+  .lz-seller-main {
+    padding: 24px 20px 60px !important;
+  }
+  .lz-seller-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .lz-seller-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

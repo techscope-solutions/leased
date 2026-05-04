@@ -195,8 +195,8 @@ export default async function DealDetailPage({ params }: Props) {
 
           {/* About + Specs */}
           <div className="lz-deal-info-grid">
-            {/* About */}
-            <div className="lz-glass" style={{ borderRadius: 22, padding: 28 }}>
+            {/* About — hidden on mobile (black card already shows these numbers) */}
+            <div className="lz-glass lz-deal-overview" style={{ borderRadius: 22, padding: 28 }}>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', color: MUTED, textTransform: 'uppercase' }}>Deal overview</div>
               <div className="lz-deal-highlights" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 20, paddingBottom: 20, borderBottom: '1px solid rgba(10,10,10,0.06)' }}>
                 <div>

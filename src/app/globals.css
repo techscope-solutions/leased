@@ -460,7 +460,11 @@ button { cursor: pointer; font-family: var(--font-cond); }
 
   .lz-deal-apply-aside {
     position: static;
-    order: -1; /* Apply card first on mobile */
+    order: 2; /* Apply card after gallery on mobile */
+  }
+
+  .lz-deal-overview {
+    display: none; /* Duplicate of black card info — hidden on mobile */
   }
 
   .lz-deal-info-grid {

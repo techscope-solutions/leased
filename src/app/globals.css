@@ -405,6 +405,76 @@ button { cursor: pointer; font-family: var(--font-cond); }
   .lz-admin-actions-grid { grid-template-columns: 1fr 1fr; }
 }
 
+/* ─── Deal detail page layout ───────────────────────────────────────── */
+
+.lz-deal-main {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px 24px 80px;
+}
+
+/* Gallery + sticky apply card */
+.lz-deal-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  margin-bottom: 32px;
+  align-items: start;
+}
+
+/* Apply card sticky */
+.lz-deal-apply-aside {
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
+}
+
+/* Overview + Specs */
+.lz-deal-info-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* Similar deals */
+.lz-deal-similar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .lz-deal-similar-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .lz-deal-main { padding: 16px 16px 100px; }
+  .lz-deal-highlights { grid-template-columns: 1fr !important; gap: 12px !important; }
+
+  .lz-deal-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .lz-deal-apply-aside {
+    position: static;
+    order: -1; /* Apply card first on mobile */
+  }
+
+  .lz-deal-info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .lz-deal-similar-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
 @media (max-width: 768px) {
   .lz-spotlight-grid {
     grid-template-columns: 1fr;

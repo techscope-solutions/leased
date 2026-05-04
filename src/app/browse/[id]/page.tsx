@@ -125,7 +125,7 @@ export default async function DealDetailPage({ params }: Props) {
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Nav light />
 
-        <main style={{ maxWidth: 1320, margin: '0 auto', padding: '24px 24px 80px' }}>
+        <main className="lz-deal-main">
           {/* Breadcrumb */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: MUTED, marginBottom: 20 }}>
             <Link href="/browse" style={{ color: MUTED, textDecoration: 'none' }}>Browse</Link>
@@ -165,11 +165,11 @@ export default async function DealDetailPage({ params }: Props) {
           </div>
 
           {/* Gallery + Apply card */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: 20, marginBottom: 32, alignItems: 'start' }}>
+          <div className="lz-deal-layout">
             <DealGallery images={deal.images} make={deal.make} model={deal.model} year={deal.year} />
 
             {/* Sticky dark apply card */}
-            <aside style={{ position: 'sticky', top: 80, alignSelf: 'flex-start' }}>
+            <aside className="lz-deal-apply-aside">
               <div style={{
                 borderRadius: 24, padding: 24,
                 background: 'rgba(18,18,18,0.94)',
@@ -239,11 +239,11 @@ export default async function DealDetailPage({ params }: Props) {
           </div>
 
           {/* About + Specs */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 20, marginBottom: 24 }}>
+          <div className="lz-deal-info-grid">
             {/* About */}
             <div className="lz-glass" style={{ borderRadius: 22, padding: 28 }}>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', color: MUTED, textTransform: 'uppercase' }}>Deal overview</div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 20, paddingBottom: 20, borderBottom: '1px solid rgba(10,10,10,0.06)' }}>
+              <div className="lz-deal-highlights" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 20, paddingBottom: 20, borderBottom: '1px solid rgba(10,10,10,0.06)' }}>
                 <div>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', color: MUTED, textTransform: 'uppercase' }}>Monthly</div>
                   <div style={{ fontFamily: SERIF, fontSize: 28, letterSpacing: '-0.02em', marginTop: 4, color: A }}>${deal.monthly.toLocaleString()}</div>
@@ -289,7 +289,7 @@ export default async function DealDetailPage({ params }: Props) {
                 </div>
                 <Link href="/browse" style={{ fontSize: 13, color: A, textDecoration: 'none' }}>Browse all →</Link>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${Math.min(similar.length, 4)}, 1fr)`, gap: 16 }}>
+              <div className="lz-deal-similar-grid">
                 {similar.map(s => <SimilarCard key={s.id} deal={s} />)}
               </div>
             </div>

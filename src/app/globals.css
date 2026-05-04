@@ -370,6 +370,34 @@ button { cursor: pointer; font-family: var(--font-cond); }
 
 /* ─── Admin layout ──────────────────────────────────────────────────── */
 
+/* Outer flex wrapper — column on mobile so nav bar sits above content */
+.lz-admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Page content padding — reduced on mobile */
+.lz-admin-page {
+  padding: 32px 40px 80px;
+}
+
+/* Ticket rows in admin dashboard */
+.lz-admin-ticket-head {
+  display: grid;
+  grid-template-columns: 90px 1fr 220px 80px 90px;
+  gap: 16px;
+  padding: 6px 0 10px;
+  border-bottom: 1px solid rgba(10,10,10,0.06);
+}
+.lz-admin-ticket-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 220px 80px 90px;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(10,10,10,0.06);
+  align-items: center;
+}
+
 .lz-admin-stats-grid {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -400,6 +428,24 @@ button { cursor: pointer; font-family: var(--font-cond); }
 }
 
 @media (max-width: 768px) {
+  /* Layout: stack nav on top of content */
+  .lz-admin-layout { flex-direction: column; }
+
+  /* Page padding */
+  .lz-admin-page { padding: 16px 16px 60px; }
+
+  /* Ticket table → card list */
+  .lz-admin-ticket-head { display: none; }
+  .lz-admin-ticket-row {
+    display: flex; flex-wrap: wrap; gap: 4px 8px;
+    padding: 12px 0;
+  }
+  .lz-admin-tc-id { display: none; }
+  .lz-admin-tc-subject { width: 100%; white-space: normal; }
+  .lz-admin-tc-user { font-size: 11px; color: rgba(10,10,10,0.4); flex: 1; white-space: normal; overflow: visible; }
+  .lz-admin-tc-age { font-size: 11px; color: rgba(10,10,10,0.4); }
+
+  /* Other grids */
   .lz-admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
   .lz-browse-deals-grid { grid-template-columns: 1fr; }
   .lz-admin-actions-grid { grid-template-columns: 1fr 1fr; }

@@ -48,7 +48,7 @@ export default async function AdminTickets() {
   const open = (tickets ?? []).filter((t: TicketRow) => t.status === 'open').length;
 
   return (
-    <div style={{ padding: '32px 40px 80px', maxWidth: 1100, fontFamily: SF, color: INK }}>
+    <div className="lz-admin-page" style={{ maxWidth: 1100, fontFamily: SF, color: INK }}>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>

@@ -46,7 +46,7 @@ export default async function AdminDealsPage() {
   const rejectedCount = rejectedResult.count ?? 0;
 
   return (
-    <div style={{ padding: '32px 40px 80px', maxWidth: 1100 }}>
+    <div className="lz-admin-page" style={{ maxWidth: 1100 }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
         <div>

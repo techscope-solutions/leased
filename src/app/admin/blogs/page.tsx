@@ -27,7 +27,7 @@ export default async function AdminBlogs() {
     .order('created_at', { ascending: false });
 
   return (
-    <div style={{ padding: '32px 40px 80px', maxWidth: 1100, fontFamily: SF, color: INK }}>
+    <div className="lz-admin-page" style={{ maxWidth: 1100, fontFamily: SF, color: INK }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
         <div>

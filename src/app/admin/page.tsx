@@ -102,7 +102,7 @@ export default async function AdminDashboard() {
   ];
 
   return (
-    <div style={{ padding: '32px 40px 60px', position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+    <div className="lz-admin-page" style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
       {/* Ambient blobs */}
       <div style={{ position: 'absolute', top: -200, right: -100, width: 600, height: 600, background: `radial-gradient(circle, ${A} 0%, transparent 65%)`, opacity: 0.10, filter: 'blur(40px)', pointerEvents: 'none', zIndex: 0 }} />
       <div style={{ position: 'absolute', bottom: -100, left: 200, width: 700, height: 700, background: `radial-gradient(circle, oklch(0.55 0.18 250) 0%, transparent 65%)`, opacity: 0.08, filter: 'blur(40px)', pointerEvents: 'none', zIndex: 0 }} />
@@ -209,7 +209,7 @@ export default async function AdminDashboard() {
             <div style={{ fontFamily: SF, fontSize: 13, color: 'rgba(10,10,10,0.3)', padding: '12px 0' }}>All caught up — no open tickets</div>
           ) : (
             <div>
-              <div style={{ display: 'grid', gridTemplateColumns: '90px 1fr 220px 80px 90px', gap: 16, padding: '6px 0 10px', borderBottom: '1px solid rgba(10,10,10,0.06)' }}>
+              <div className="lz-admin-ticket-head">
                 {['ID', 'Subject', 'User', 'Age', ''].map(h => (
                   <span key={h} style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(10,10,10,0.35)' }}>{h}</span>
                 ))}
@@ -218,11 +218,11 @@ export default async function AdminDashboard() {
                 const ageMs = t.created_at ? Date.now() - new Date(t.created_at).getTime() : 0;
                 const ageStr = ageMs < 3600000 ? `${Math.round(ageMs / 60000)}m` : ageMs < 86400000 ? `${Math.round(ageMs / 3600000)}h` : `${Math.round(ageMs / 86400000)}d`;
                 return (
-                  <div key={t.id} style={{ display: 'grid', gridTemplateColumns: '90px 1fr 220px 80px 90px', gap: 16, padding: '13px 0', borderBottom: '1px solid rgba(10,10,10,0.06)', alignItems: 'center' }}>
-                    <span style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(10,10,10,0.5)' }}>#{t.id?.slice(-4) ?? '—'}</span>
-                    <span style={{ fontFamily: SF, fontSize: 14, color: '#0a0a0a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject ?? 'No subject'}</span>
-                    <span style={{ fontFamily: SF, fontSize: 12, color: 'rgba(10,10,10,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.user_email ?? '—'}</span>
-                    <span style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(10,10,10,0.4)' }}>{ageStr}</span>
+                  <div key={t.id} className="lz-admin-ticket-row">
+                    <span className="lz-admin-tc-id" style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(10,10,10,0.5)' }}>#{t.id?.slice(-4) ?? '—'}</span>
+                    <span className="lz-admin-tc-subject" style={{ fontFamily: SF, fontSize: 14, color: '#0a0a0a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject ?? 'No subject'}</span>
+                    <span className="lz-admin-tc-user" style={{ fontFamily: SF, fontSize: 12, color: 'rgba(10,10,10,0.45)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.user_email ?? '—'}</span>
+                    <span className="lz-admin-tc-age" style={{ fontFamily: MONO, fontSize: 12, color: 'rgba(10,10,10,0.4)' }}>{ageStr}</span>
                     <Link href="/admin/tickets" style={{ fontFamily: SF, fontSize: 12, color: A, textDecoration: 'none', textAlign: 'right' }}>Open →</Link>
                   </div>
                 );

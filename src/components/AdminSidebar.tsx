@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 const A = 'oklch(0.55 0.22 18)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
@@ -37,6 +38,13 @@ function AlertIcon() {
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function signOut() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/');
+  }
 
   return (
     <>
@@ -108,7 +116,7 @@ export default function AdminSidebar() {
         </nav>
 
         {/* Bottom */}
-        <div style={{ padding: '16px 12px 24px', borderTop: '1px solid rgba(10,10,10,0.06)' }}>
+        <div style={{ padding: '16px 12px 24px', borderTop: '1px solid rgba(10,10,10,0.06)', display: 'flex', flexDirection: 'column', gap: 4 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px' }}>
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#0a0a0a', color: 'white', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 600, fontFamily: SF, flexShrink: 0 }}>A</div>
             <div style={{ minWidth: 0 }}>
@@ -116,6 +124,13 @@ export default function AdminSidebar() {
               <Link href="/" style={{ fontFamily: SF, fontSize: 11, color: 'rgba(10,10,10,0.4)', textDecoration: 'none' }}>← Back to site</Link>
             </div>
           </div>
+          <button
+            onClick={signOut}
+            style={{ width: '100%', padding: '9px 12px', borderRadius: 10, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, fontFamily: SF, fontSize: 13, color: 'rgba(10,10,10,0.45)', textAlign: 'left' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign out
+          </button>
         </div>
       </aside>
 
@@ -132,7 +147,7 @@ export default function AdminSidebar() {
           overflowX: 'auto',
         }}
       >
-        <div style={{ display: 'flex', padding: '0 12px', gap: 4, minWidth: 'max-content' }}>
+        <div style={{ display: 'flex', padding: '0 12px', gap: 4, minWidth: 'max-content', alignItems: 'center' }}>
           {NAV.map(({ href, label }) => {
             const isActive = pathname === href;
             return (
@@ -152,6 +167,13 @@ export default function AdminSidebar() {
               </Link>
             );
           })}
+          <button
+            onClick={signOut}
+            style={{ padding: '8px 14px', border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: SF, fontSize: 13, color: 'rgba(10,10,10,0.4)', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign out
+          </button>
         </div>
       </div>
     </>

@@ -2,7 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { getAllDeals, getPendingDeals, DealWithSeller } from '@/lib/deals';
-import { approveDeal, rejectDeal, deleteDeal } from './actions';
+import { approveDeal, rejectDeal } from './actions';
+import { DeleteDealButton, DeleteDealButtonSmall } from './DeleteDealButton';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const A = 'oklch(0.55 0.22 18)';
@@ -112,10 +113,7 @@ export default async function AdminDealsPage() {
                       <Link href={`/admin/deals/${deal.id}/edit`} style={{ textDecoration: 'none' }}>
                         <button style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(10,10,10,0.06)', border: '1px solid rgba(10,10,10,0.1)', color: MUTED, fontFamily: SF, fontWeight: 500, fontSize: 12, cursor: 'pointer' }}>Edit</button>
                       </Link>
-                      <form action={deleteDeal} onSubmit={(e) => { if (!confirm('Delete this deal?')) e.preventDefault(); }}>
-                        <input type="hidden" name="dealId" value={deal.id} />
-                        <button type="submit" style={{ padding: '5px 12px', borderRadius: 8, background: 'rgba(180,30,20,0.07)', border: `1px solid ${A}30`, color: A, fontFamily: SF, fontWeight: 500, fontSize: 12, cursor: 'pointer' }}>Delete</button>
-                      </form>
+                      <DeleteDealButtonSmall dealId={deal.id} />
                     </div>
                   </div>
                   {/* Info + actions */}
@@ -195,10 +193,7 @@ export default async function AdminDealsPage() {
                   <Link href={`/admin/deals/${deal.id}/edit`} style={{ textDecoration: 'none' }}>
                     <button style={{ padding: '6px 14px', borderRadius: 8, background: 'rgba(10,10,10,0.06)', border: '1px solid rgba(10,10,10,0.10)', color: 'rgba(10,10,10,0.6)', fontFamily: SF, fontWeight: 500, fontSize: 12, cursor: 'pointer' }}>Edit</button>
                   </Link>
-                  <form action={deleteDeal} onSubmit={(e) => { if (!confirm(`Delete ${deal.make} ${deal.model}?`)) e.preventDefault(); }}>
-                    <input type="hidden" name="dealId" value={deal.id} />
-                    <button type="submit" style={{ padding: '6px 12px', borderRadius: 8, background: 'rgba(180,30,20,0.07)', border: `1px solid ${A}30`, color: A, fontFamily: SF, fontWeight: 500, fontSize: 12, cursor: 'pointer' }}>✕</button>
-                  </form>
+                  <DeleteDealButton dealId={deal.id} label={`${deal.make} ${deal.model}`} />
                 </div>
               </div>
             ))}

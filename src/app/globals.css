@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@400;700;800;900&family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -298,6 +298,107 @@ button { cursor: pointer; font-family: var(--font-cond); }
   .lz-deals-grid { grid-template-columns: repeat(2, 1fr); }
   .lz-hiw-grid { grid-template-columns: repeat(2, 1fr); }
   .lz-footer-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+/* ─── Cream / Glass utility classes ─────────────────────────────────── */
+
+/* CSS variables for cream theme */
+.lz-theme {
+  --ink: #0a0a0a;
+  --ink-2: rgba(10,10,10,0.7);
+  --muted: rgba(10,10,10,0.4);
+  --muted-2: rgba(10,10,10,0.25);
+  --cream: #f7f5f2;
+}
+
+/* Glass surface */
+.lz-glass {
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.8) inset, 0 4px 24px rgba(10,10,10,0.04);
+}
+
+/* Typography helpers */
+.lz-serif { font-family: 'Instrument Serif', Georgia, serif; }
+.lz-mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* Pill & button primitives */
+.lz-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+.lz-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+}
+
+/* Input placeholder for cream theme */
+.lz-input::placeholder { color: rgba(10,10,10,0.3); }
+.lz-input:focus { outline: none; }
+
+/* ─── Marketplace / Browse layout ──────────────────────────────────── */
+
+.lz-browse-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+}
+.lz-browse-sidebar { position: sticky; top: 72px; height: fit-content; }
+.lz-browse-deals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ─── Admin layout ──────────────────────────────────────────────────── */
+
+.lz-admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+.lz-admin-two-col {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+}
+.lz-admin-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 1280px) {
+  .lz-admin-stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .lz-browse-deals-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  .lz-browse-layout { grid-template-columns: 1fr; }
+  .lz-browse-sidebar { position: static; }
+  .lz-admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .lz-admin-two-col { grid-template-columns: 1fr; }
+  .lz-admin-actions-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .lz-admin-stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .lz-browse-deals-grid { grid-template-columns: 1fr; }
+  .lz-admin-actions-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 768px) {

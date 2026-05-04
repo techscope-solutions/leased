@@ -2,8 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { guessCarSpecs, POPULAR_MAKES } from '@/lib/carHeuristics';
+
+const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+const SERIF = '"Instrument Serif", Georgia, serif';
+const MONO = '"JetBrains Mono", ui-monospace, monospace';
+const INK = '#0a0a0a';
+const MUTED = 'rgba(10,10,10,0.45)';
+const MUTED2 = 'rgba(10,10,10,0.25)';
+const A = 'oklch(0.55 0.22 18)';
 
 const ACCENT: Record<string, string> = {
   Daily: '#111827', Luxury: '#0a0f1e', Supercar: '#161616',
@@ -27,7 +36,7 @@ export default function DealForm({ userId }: { userId: string }) {
   const [mpy, setMpy] = useState('10000');
   const [msrp, setMsrp] = useState('');
   const [zeroDeal, setZeroDeal] = useState(false);
-  const [state, setState] = useState('');
+  const [stateCode, setStateCode] = useState('');
   const [city, setCity] = useState('');
   const [slots, setSlots] = useState('');
   const [expiresDays, setExpiresDays] = useState('7');
@@ -75,8 +84,8 @@ export default function DealForm({ userId }: { userId: string }) {
 
   const handleSubmit = async () => {
     setError('');
-    if (!make || !model || !monthly || !msrp || !state || !city) {
-      setError('Please fill in all required fields.');
+    if (!make || !model || !monthly || !msrp || !stateCode || !city) {
+      setError('Please fill in all required fields: make, model, monthly payment, MSRP, city, and state.');
       return;
     }
     setSubmitting(true);
@@ -102,7 +111,7 @@ export default function DealForm({ userId }: { userId: string }) {
       color: color || null, deal_type: dealType,
       monthly: parseInt(monthly), due_at_signing: parseInt(das),
       term: parseInt(term), miles_per_year: parseInt(mpy), msrp: parseInt(msrp),
-      zero_deal: zeroDeal, state: state.trim().toUpperCase(), city: city.trim(),
+      zero_deal: zeroDeal, state: stateCode.trim().toUpperCase(), city: city.trim(),
       slots_left: slots ? parseInt(slots) : null, expires_at: expiresAt,
       images: imageUrls, accent,
       stripe: `linear-gradient(135deg, ${accent} 0%, ${accent}ee 100%)`,
@@ -113,225 +122,380 @@ export default function DealForm({ userId }: { userId: string }) {
   };
 
   return (
-    <div style={{ padding: '48px 24px 100px', maxWidth: 720, margin: '0 auto' }}>
-      <div style={{ marginBottom: 48 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.35)' }}>SELLER PORTAL</span>
-        </div>
-        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(28px, 5vw, 48px)', letterSpacing: '-0.025em', lineHeight: 0.92, marginBottom: 10 }}>
-          <span style={{ color: '#fff' }}>POST A </span>
-          <span style={{ background: 'linear-gradient(135deg, #FF2800 20%, #cc1f00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>DROP.</span>
-        </div>
-        <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
-          Your deal will be reviewed by a moderator before going live.
-        </p>
+    <div style={{ background: '#f7f5f2', minHeight: '100vh', fontFamily: SF, WebkitFontSmoothing: 'antialiased', color: INK }}>
+      {/* Top nav bar */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(247,245,242,0.9)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(10,10,10,0.07)', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Link href="/seller/dashboard" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, color: MUTED, fontSize: 13 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7" /></svg>
+          Dashboard
+        </Link>
+        <span style={{ fontFamily: SERIF, fontStyle: 'italic', fontSize: 18, letterSpacing: '-0.02em' }}>Leased</span>
+        <div style={{ width: 80 }} />
       </div>
 
-      <Section label="VEHICLE">
-        {/* Lookup row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 1fr auto', gap: 10, alignItems: 'flex-end' }}>
-          <Field label="YEAR">
-            <Select value={year} onChange={setYear}>
-              {[2027,2026,2025,2024,2023,2022,2021,2020].map(y => <option key={y} value={y}>{y}</option>)}
-            </Select>
-          </Field>
-          <Field label="MAKE *">
-            <Input value={make} onChange={setMake} placeholder="BMW" list="makes-list" />
-            <datalist id="makes-list">
-              {POPULAR_MAKES.map(m => <option key={m} value={m} />)}
-            </datalist>
-          </Field>
-          <Field label="MODEL *">
-            <Input value={model} onChange={setModel} placeholder="M3 Competition" list="models-list" />
-            <datalist id="models-list">
-              {models.map(m => <option key={m} value={m} />)}
-            </datalist>
-          </Field>
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '32px 16px 120px' }}>
+
+        {/* Page header */}
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', color: MUTED2, textTransform: 'uppercase', marginBottom: 8 }}>Seller portal</div>
+          <h1 style={{ fontFamily: SERIF, fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 400, margin: '0 0 8px', letterSpacing: '-0.03em', lineHeight: 1 }}>
+            Post a <em style={{ color: A }}>deal.</em>
+          </h1>
+          <p style={{ fontSize: 14, color: MUTED, margin: 0, lineHeight: 1.5 }}>
+            Your listing will be reviewed by a moderator before going live — usually within a few hours.
+          </p>
+        </div>
+
+        {/* VEHICLE */}
+        <Card label="01 — Vehicle" icon="🚗">
+          {/* Year + Make */}
+          <div className="lz-form-row-2">
+            <Field label="Year">
+              <StyledSelect value={year} onChange={setYear}>
+                {[2027,2026,2025,2024,2023,2022,2021,2020].map(y => <option key={y} value={y}>{y}</option>)}
+              </StyledSelect>
+            </Field>
+            <Field label="Make" required>
+              <StyledInput value={make} onChange={setMake} placeholder="BMW" list="makes-list" />
+              <datalist id="makes-list">{POPULAR_MAKES.map(m => <option key={m} value={m} />)}</datalist>
+            </Field>
+          </div>
+
+          {/* Model + Auto-fill */}
+          <div>
+            <Field label="Model" required>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+                <div style={{ flex: 1 }}>
+                  <StyledInput value={model} onChange={setModel} placeholder="M3 Competition" list="models-list" />
+                  <datalist id="models-list">{models.map(m => <option key={m} value={m} />)}</datalist>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAutoFill}
+                  disabled={!make || !model}
+                  style={{
+                    flexShrink: 0,
+                    padding: '0 14px', borderRadius: 10,
+                    background: specsFilled ? 'rgba(34,197,94,0.1)' : (!make || !model) ? 'rgba(10,10,10,0.04)' : 'rgba(10,10,10,0.06)',
+                    border: `1px solid ${specsFilled ? 'rgba(34,197,94,0.4)' : 'rgba(10,10,10,0.1)'}`,
+                    color: specsFilled ? 'oklch(0.55 0.16 145)' : (!make || !model) ? MUTED2 : INK,
+                    fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em',
+                    cursor: (!make || !model) ? 'not-allowed' : 'pointer',
+                    whiteSpace: 'nowrap', transition: 'all 0.2s',
+                  }}
+                >
+                  {specsFilled ? '✓ Done' : '⚡ Auto-fill'}
+                </button>
+              </div>
+            </Field>
+            {specsFilled && (
+              <div style={{ marginTop: 6, fontSize: 12, color: 'oklch(0.55 0.16 145)', fontFamily: MONO }}>Drivetrain, type, and category filled automatically</div>
+            )}
+          </div>
+
+          {/* Trim + Color */}
+          <div className="lz-form-row-2">
+            <Field label="Trim" optional>
+              <StyledInput value={trim} onChange={setTrim} placeholder="xDrive40i" />
+            </Field>
+            <Field label="Color" optional>
+              <StyledInput value={color} onChange={setColor} placeholder="Midnight Black" />
+            </Field>
+          </div>
+
+          {/* Drivetrain + Type + Category */}
+          <div className="lz-form-row-3">
+            <Field label="Drivetrain">
+              <StyledSelect value={drive} onChange={setDrive}>
+                {['AWD','RWD','FWD','4WD'].map(d => <option key={d}>{d}</option>)}
+              </StyledSelect>
+            </Field>
+            <Field label="Body type">
+              <StyledSelect value={carType} onChange={setCarType}>
+                {['Sedan','SUV','Coupe','Truck','EV'].map(t => <option key={t}>{t}</option>)}
+              </StyledSelect>
+            </Field>
+            <Field label="Category">
+              <StyledSelect value={category} onChange={setCategory}>
+                {['Daily','Luxury','Supercar'].map(c => <option key={c}>{c}</option>)}
+              </StyledSelect>
+            </Field>
+          </div>
+        </Card>
+
+        {/* DEAL TERMS */}
+        <Card label="02 — Deal terms" icon="💰">
+          {/* Deal type */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['LEASE', 'FINANCE'].map(t => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setDealType(t)}
+                style={{
+                  flex: 1, padding: '10px 0', borderRadius: 10, border: 'none', cursor: 'pointer',
+                  background: dealType === t ? INK : 'rgba(10,10,10,0.05)',
+                  color: dealType === t ? 'white' : MUTED,
+                  fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em',
+                  transition: 'all 0.15s',
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <div className="lz-form-row-2">
+            <Field label="Monthly payment ($)" required>
+              <StyledInput type="number" value={monthly} onChange={setMonthly} placeholder="899" />
+            </Field>
+            <Field label="Due at signing ($)">
+              <StyledInput type="number" value={das} onChange={setDas} placeholder="0" />
+            </Field>
+          </div>
+
+          <div className="lz-form-row-3">
+            <Field label="Term">
+              <StyledSelect value={term} onChange={setTerm}>
+                {['24','36','39','48'].map(t => <option key={t} value={t}>{t} mo</option>)}
+              </StyledSelect>
+            </Field>
+            <Field label="Miles / year">
+              <StyledSelect value={mpy} onChange={setMpy}>
+                {[['7500','7,500 mi'],['10000','10,000 mi'],['12000','12,000 mi'],['15000','15,000 mi']].map(([v,l]) => <option key={v} value={v}>{l}</option>)}
+              </StyledSelect>
+            </Field>
+            <Field label="MSRP ($)" required>
+              <StyledInput type="number" value={msrp} onChange={setMsrp} placeholder="92800" />
+            </Field>
+          </div>
+
+          {/* Zero down toggle */}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', padding: '12px 14px', borderRadius: 10, background: zeroDeal ? 'rgba(10,10,10,0.05)' : 'transparent', border: `1px solid ${zeroDeal ? 'rgba(10,10,10,0.12)' : 'transparent'}`, transition: 'all 0.15s' }}>
+            <div style={{
+              width: 36, height: 20, borderRadius: 999, background: zeroDeal ? INK : 'rgba(10,10,10,0.12)',
+              position: 'relative', flexShrink: 0, transition: 'background 0.2s',
+            }}>
+              <div style={{
+                position: 'absolute', top: 2, left: zeroDeal ? 18 : 2, width: 16, height: 16,
+                borderRadius: '50%', background: 'white', transition: 'left 0.2s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }} />
+            </div>
+            <input type="checkbox" checked={zeroDeal} onChange={e => setZeroDeal(e.target.checked)} style={{ display: 'none' }} />
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 500 }}>Zero down deal</div>
+              <div style={{ fontSize: 12, color: MUTED, marginTop: 1 }}>No money required at signing</div>
+            </div>
+          </label>
+        </Card>
+
+        {/* LOCATION & AVAILABILITY */}
+        <Card label="03 — Location & availability" icon="📍">
+          <div className="lz-form-row-2">
+            <Field label="City" required>
+              <StyledInput value={city} onChange={setCity} placeholder="Los Angeles" />
+            </Field>
+            <Field label="State" required hint="2-letter code">
+              <StyledInput value={stateCode} onChange={setStateCode} placeholder="CA" maxLength={2} />
+            </Field>
+          </div>
+          <div className="lz-form-row-2">
+            <Field label="Slots available" optional hint="leave blank for unlimited">
+              <StyledInput type="number" value={slots} onChange={setSlots} placeholder="∞" />
+            </Field>
+            <Field label="Deal expires in">
+              <StyledSelect value={expiresDays} onChange={setExpiresDays}>
+                <option value="1">1 day</option>
+                <option value="3">3 days</option>
+                <option value="7">7 days</option>
+                <option value="14">14 days</option>
+                <option value="30">30 days</option>
+              </StyledSelect>
+            </Field>
+          </div>
+        </Card>
+
+        {/* PHOTOS */}
+        <Card label="04 — Photos" icon="📷">
+          {previews.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 8 }}>
+              {previews.map((src, i) => (
+                <div key={i} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(10,10,10,0.1)' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(i)}
+                    style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', border: 'none', color: '#fff', borderRadius: '50%', width: 24, height: 24, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: SF }}
+                  >×</button>
+                </div>
+              ))}
+            </div>
+          )}
+          <label style={{
+            border: '1.5px dashed rgba(10,10,10,0.15)', borderRadius: 14,
+            padding: previews.length === 0 ? '40px 20px' : '20px',
+            background: 'rgba(10,10,10,0.02)', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+            transition: 'border-color 0.15s, background 0.15s',
+          }}>
+            <input type="file" accept="image/*" multiple onChange={handleImages} style={{ display: 'none' }} />
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: 'rgba(10,10,10,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MUTED} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <span style={{ fontFamily: SF, fontSize: 14, fontWeight: 500, color: INK }}>
+              {previews.length === 0 ? 'Upload photos' : 'Add more photos'}
+            </span>
+            <span style={{ fontFamily: MONO, fontSize: 11, color: MUTED2, letterSpacing: '0.05em' }}>
+              Up to 8 images · JPG PNG WEBP
+            </span>
+          </label>
+        </Card>
+
+        {/* Error */}
+        {error && (
+          <div style={{ padding: '14px 16px', background: `${A}12`, border: `1px solid ${A}30`, borderRadius: 12, marginBottom: 20, fontSize: 13, color: A, lineHeight: 1.4, fontFamily: SF }}>
+            {error}
+          </div>
+        )}
+
+        {/* Submit row */}
+        <div style={{ display: 'flex', gap: 10, flexDirection: 'column' }}>
           <button
-            type="button"
-            onClick={handleAutoFill}
-            disabled={!make || !model}
+            onClick={handleSubmit}
+            disabled={submitting}
             style={{
-              padding: '9px 14px', borderRadius: 8, marginBottom: 1,
-              background: specsFilled ? 'rgba(34,197,94,0.2)' : (!make || !model) ? 'rgba(255,255,255,0.04)' : 'rgba(255,40,0,0.15)',
-              border: `1px solid ${specsFilled ? 'rgba(34,197,94,0.4)' : (!make || !model) ? 'rgba(255,255,255,0.08)' : 'rgba(255,40,0,0.35)'}`,
-              color: specsFilled ? '#22c55e' : (!make || !model) ? 'rgba(255,255,255,0.25)' : '#FF2800',
-              fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 10,
-              letterSpacing: '0.1em', cursor: (!make || !model) ? 'not-allowed' : 'pointer',
-              whiteSpace: 'nowrap', transition: 'all 0.2s',
+              width: '100%', padding: '16px', borderRadius: 14,
+              background: submitting ? 'rgba(10,10,10,0.3)' : INK,
+              border: 'none',
+              color: 'white', fontFamily: SF, fontWeight: 600,
+              fontSize: 15, cursor: submitting ? 'not-allowed' : 'pointer',
+              transition: 'background 0.15s',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             }}
           >
-            {specsFilled ? '✓ FILLED' : '⚡ AUTO-FILL'}
+            {submitting ? (
+              <>
+                <span style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite', display: 'inline-block' }} />
+                Submitting…
+              </>
+            ) : 'Submit for review →'}
+          </button>
+          <button
+            onClick={() => router.back()}
+            disabled={submitting}
+            style={{
+              width: '100%', padding: '14px', borderRadius: 14,
+              background: 'transparent', border: '1px solid rgba(10,10,10,0.12)',
+              color: MUTED, fontFamily: SF, fontSize: 14, cursor: 'pointer',
+            }}
+          >
+            Cancel
           </button>
         </div>
 
-        <Row>
-          <Field label="TRIM" note="optional">
-            <Input value={trim} onChange={setTrim} placeholder="xDrive" />
-          </Field>
-          <Field label="COLOR" note="optional">
-            <Input value={color} onChange={setColor} placeholder="Midnight Black" />
-          </Field>
-        </Row>
-        <Row>
-          <Field label="DRIVETRAIN *">
-            <Select value={drive} onChange={setDrive}>{['AWD','RWD','FWD','4WD'].map(d => <option key={d}>{d}</option>)}</Select>
-          </Field>
-          <Field label="CAR TYPE *">
-            <Select value={carType} onChange={setCarType}>{['Sedan','SUV','Coupe','Truck','EV'].map(t => <option key={t}>{t}</option>)}</Select>
-          </Field>
-          <Field label="CATEGORY *">
-            <Select value={category} onChange={setCategory}>{['Daily','Luxury','Supercar'].map(c => <option key={c}>{c}</option>)}</Select>
-          </Field>
-        </Row>
-      </Section>
-
-      <Section label="DEAL TERMS">
-        <Row>
-          <Field label="DEAL TYPE *">
-            <Select value={dealType} onChange={setDealType}><option value="LEASE">LEASE</option><option value="FINANCE">FINANCE</option></Select>
-          </Field>
-          <Field label="MONTHLY ($) *">
-            <Input type="number" value={monthly} onChange={setMonthly} placeholder="899" />
-          </Field>
-          <Field label="DUE AT SIGNING ($) *">
-            <Input type="number" value={das} onChange={setDas} placeholder="0" />
-          </Field>
-        </Row>
-        <Row>
-          <Field label="TERM (MONTHS) *">
-            <Select value={term} onChange={setTerm}>{['24','36','39','48'].map(t => <option key={t}>{t}</option>)}</Select>
-          </Field>
-          <Field label="MILES / YEAR *">
-            <Select value={mpy} onChange={setMpy}>{['7500','10000','12000','15000'].map(m => <option key={m}>{m}</option>)}</Select>
-          </Field>
-          <Field label="MSRP ($) *">
-            <Input type="number" value={msrp} onChange={setMsrp} placeholder="92800" />
-          </Field>
-        </Row>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', paddingTop: 4 }}>
-          <input type="checkbox" checked={zeroDeal} onChange={e => setZeroDeal(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#FF2800' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)' }}>ZERO DOWN DEAL</span>
-        </label>
-      </Section>
-
-      <Section label="LOCATION & INVENTORY">
-        <Row>
-          <Field label="STATE *" note="2-letter code">
-            <Input value={state} onChange={setState} placeholder="CA" maxLength={2} />
-          </Field>
-          <Field label="CITY *">
-            <Input value={city} onChange={setCity} placeholder="Los Angeles" />
-          </Field>
-          <Field label="SLOTS AVAILABLE" note="blank = unlimited">
-            <Input type="number" value={slots} onChange={setSlots} placeholder="∞" />
-          </Field>
-        </Row>
-      </Section>
-
-      <Section label="EXPIRATION">
-        <Row>
-          <Field label="DEAL EXPIRES IN *">
-            <Select value={expiresDays} onChange={setExpiresDays}>
-              <option value="1">1 day</option>
-              <option value="3">3 days</option>
-              <option value="7">7 days</option>
-              <option value="14">14 days</option>
-              <option value="30">30 days</option>
-            </Select>
-          </Field>
-        </Row>
-      </Section>
-
-      <Section label="PHOTOS">
-        {previews.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(110px, 1fr))', gap: 8, marginBottom: 4 }}>
-            {previews.map((src, i) => (
-              <div key={i} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,40,0,0.25)' }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                <button
-                  type="button"
-                  onClick={() => removeImage(i)}
-                  style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.75)', border: 'none', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer', fontSize: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >×</button>
-              </div>
-            ))}
-          </div>
-        )}
-        <label style={{ border: '1px dashed rgba(255,255,255,0.15)', borderRadius: 12, padding: '20px', background: 'rgba(255,255,255,0.02)', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-          <input type="file" accept="image/*" multiple onChange={handleImages} style={{ display: 'none' }} />
-          <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.4)' }}>
-            {previews.length === 0 ? 'CLICK OR DROP PHOTOS HERE' : '+ ADD MORE PHOTOS'}
-          </span>
-          <span style={{ fontFamily: 'var(--font-barlow)', fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>
-            Up to 8 images · JPG, PNG, WEBP
-          </span>
-        </label>
-      </Section>
-
-      {error && (
-        <div style={{ padding: '12px 16px', background: 'rgba(255,40,0,0.1)', border: '1px solid rgba(255,40,0,0.3)', borderRadius: 10, marginBottom: 20, fontFamily: 'var(--font-barlow)', fontSize: 12, color: '#ff6b6b' }}>
-          {error}
-        </div>
-      )}
-
-      <div style={{ display: 'flex', gap: 12 }}>
-        <button
-          onClick={handleSubmit}
-          disabled={submitting}
-          style={{
-            flex: 1, padding: '16px', borderRadius: 14,
-            background: submitting ? 'rgba(255,40,0,0.4)' : 'rgba(255,40,0,0.9)',
-            border: '1px solid rgba(255,80,40,0.4)',
-            boxShadow: submitting ? 'none' : '0 4px 28px rgba(255,40,0,0.3)',
-            color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 800,
-            fontSize: 14, letterSpacing: '0.1em', cursor: submitting ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {submitting ? 'SUBMITTING…' : 'SUBMIT FOR REVIEW →'}
-        </button>
-        <button
-          onClick={() => router.back()}
-          disabled={submitting}
-          style={{ padding: '16px 24px', borderRadius: 14, background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 13, letterSpacing: '0.08em', cursor: 'pointer' }}
-        >
-          CANCEL
-        </button>
+        <p style={{ marginTop: 16, fontSize: 12, color: MUTED2, textAlign: 'center', fontFamily: MONO, letterSpacing: '0.04em' }}>
+          A moderator reviews every submission before it goes live.
+        </p>
       </div>
-      <p style={{ marginTop: 16, fontFamily: 'var(--font-barlow)', fontSize: 11, color: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>
-        A moderator will review your submission before it goes live.
-      </p>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .lz-form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .lz-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+        @media (max-width: 480px) {
+          .lz-form-row-2 { grid-template-columns: 1fr; }
+          .lz-form-row-3 { grid-template-columns: 1fr 1fr; }
+        }
+      `}</style>
     </div>
   );
 }
 
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
+function Card({ label, icon, children }: { label: string; icon?: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 36 }}>
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.16em', color: 'rgba(255,255,255,0.3)', marginBottom: 16 }}>{label}</div>
-      <div style={{ padding: '24px', background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>{children}</div>
+    <div style={{ marginBottom: 20, background: 'white', border: '1px solid rgba(10,10,10,0.08)', borderRadius: 18, overflow: 'hidden', boxShadow: '0 1px 4px rgba(10,10,10,0.04)' }}>
+      <div style={{ padding: '14px 20px', borderBottom: '1px solid rgba(10,10,10,0.06)', display: 'flex', alignItems: 'center', gap: 8 }}>
+        {icon && <span style={{ fontSize: 14 }}>{icon}</span>}
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', color: MUTED, textTransform: 'uppercase' }}>{label}</span>
+      </div>
+      <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {children}
+      </div>
     </div>
   );
 }
-function Row({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 14 }}>{children}</div>;
-}
-function Field({ label, note, children }: { label: string; note?: string; children: React.ReactNode }) {
+
+function Field({ label, required, optional, hint, children }: { label: string; required?: boolean; optional?: boolean; hint?: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-        <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.4)' }}>{label}</span>
-        {note && <span style={{ fontFamily: 'var(--font-barlow)', fontSize: 10, color: 'rgba(255,255,255,0.2)' }}>{note}</span>}
+        <span style={{ fontFamily: SF, fontSize: 13, fontWeight: 500, color: INK }}>{label}</span>
+        {required && <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', color: A, textTransform: 'uppercase' }}>Required</span>}
+        {optional && <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.1em', color: MUTED2, textTransform: 'uppercase' }}>Optional</span>}
+        {hint && <span style={{ fontSize: 11, color: MUTED2 }}>{hint}</span>}
       </div>
       {children}
     </div>
   );
 }
-function Input({ value, onChange, placeholder, type = 'text', maxLength, list }: { value: string; onChange: (v: string) => void; placeholder?: string; type?: string; maxLength?: number; list?: string }) {
-  return <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} maxLength={maxLength} list={list} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '9px 12px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', boxSizing: 'border-box' }} />;
+
+function StyledInput({ value, onChange, placeholder, type = 'text', maxLength, list }: {
+  value: string; onChange: (v: string) => void; placeholder?: string;
+  type?: string; maxLength?: number; list?: string;
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      maxLength={maxLength}
+      list={list}
+      style={{
+        background: '#f9f8f6',
+        border: '1px solid rgba(10,10,10,0.12)',
+        borderRadius: 10,
+        padding: '11px 14px',
+        color: INK,
+        fontFamily: SF,
+        fontSize: 15,
+        outline: 'none',
+        width: '100%',
+        boxSizing: 'border-box',
+        transition: 'border-color 0.15s, box-shadow 0.15s',
+      }}
+      onFocus={e => { e.target.style.borderColor = 'rgba(10,10,10,0.35)'; e.target.style.boxShadow = '0 0 0 3px rgba(10,10,10,0.06)'; }}
+      onBlur={e => { e.target.style.borderColor = 'rgba(10,10,10,0.12)'; e.target.style.boxShadow = 'none'; }}
+    />
+  );
 }
-function Select({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
-  return <select value={value} onChange={e => onChange(e.target.value)} style={{ background: 'rgba(20,20,20,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, padding: '9px 12px', color: '#fff', fontFamily: 'var(--font-barlow)', fontSize: 13, outline: 'none', width: '100%', cursor: 'pointer' }}>{children}</select>;
+
+function StyledSelect({ value, onChange, children }: { value: string; onChange: (v: string) => void; children: React.ReactNode }) {
+  return (
+    <select
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      style={{
+        background: '#f9f8f6',
+        border: '1px solid rgba(10,10,10,0.12)',
+        borderRadius: 10,
+        padding: '11px 14px',
+        color: INK,
+        fontFamily: SF,
+        fontSize: 15,
+        outline: 'none',
+        width: '100%',
+        cursor: 'pointer',
+        appearance: 'none',
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23999' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'right 14px center',
+        paddingRight: 36,
+      }}
+    >
+      {children}
+    </select>
+  );
 }

@@ -19,9 +19,5 @@ export default async function NewDealPage() {
     redirect('/seller/dashboard');
   }
 
-  return (
-    <div style={{ minHeight: '100vh', position: 'relative', zIndex: 2 }}>
-      <DealForm userId={user.id} />
-    </div>
-  );
+  return <DealForm userId={user.id} />;
 }

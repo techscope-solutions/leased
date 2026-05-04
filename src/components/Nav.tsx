@@ -106,7 +106,7 @@ const BOTTOM_TABS = [
   },
 ];
 
-export default function Nav() {
+export default function Nav({ light = false }: { light?: boolean }) {
   const path = usePathname();
   const router = useRouter();
   const liveCount = useLiveCount();
@@ -150,12 +150,19 @@ export default function Nav() {
     router.push('/');
   };
 
+  const ink = light ? '#0a0a0a' : '#ffffff';
+  const inkMuted = light ? 'rgba(10,10,10,0.56)' : 'rgba(255,255,255,0.45)';
+  const navBg = light ? 'rgba(247,245,242,0.88)' : 'rgba(8,8,8,0.9)';
+  const borderColor = light ? 'rgba(10,10,10,0.08)' : 'rgba(255,255,255,0.07)';
+  const accent = light ? 'oklch(0.55 0.22 18)' : '#FF2800';
+  const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
+
   const linkStyle = (href: string) => ({
-    fontFamily: 'var(--font-barlow-cond)',
-    fontWeight: 600,
-    fontSize: 13,
-    letterSpacing: '0.08em',
-    color: path === href ? '#fff' : 'rgba(255,255,255,0.45)',
+    fontFamily: light ? SF : 'var(--font-barlow-cond)',
+    fontWeight: light ? 500 : 600,
+    fontSize: 14,
+    letterSpacing: light ? '-0.01em' : '0.08em',
+    color: path === href ? ink : inkMuted,
     textDecoration: 'none',
     transition: 'color 0.2s',
   });
@@ -163,62 +170,97 @@ export default function Nav() {
   return (
     <>
       <nav style={{
-        position: 'sticky', top: 0, zIndex: 100, height: 52,
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
-        background: 'rgba(8,8,8,0.9)',
+        position: 'sticky', top: 0, zIndex: 100, height: light ? 'auto' : 52,
+        borderBottom: `1px solid ${borderColor}`,
+        background: navBg,
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '0 24px',
+        padding: light ? '14px 24px' : '0 24px',
       }}>
 
         {/* Left: logo + desktop links */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
-          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 1 }}>
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#fff' }}>LEASE</span>
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#FF2800' }}>D</span>
+          <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
+            {light ? (
+              /* Light theme: circle-lines logo + italic wordmark */
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: ink, fontWeight: 600, fontSize: 22, letterSpacing: '-0.03em', fontFamily: SF }}>
+                <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="13" stroke={ink} strokeWidth="1.5"/>
+                  <path d="M9 9h10M9 14h10M9 19h6" stroke={ink} strokeWidth="1.8" strokeLinecap="round"/>
+                </svg>
+                <span style={{ fontStyle: 'italic', fontSize: 24, letterSpacing: '-0.02em' }}>Leased</span>
+              </span>
+            ) : (
+              <>
+                <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#fff' }}>LEASE</span>
+                <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 900, fontSize: 20, letterSpacing: '-0.01em', color: '#FF2800' }}>D</span>
+              </>
+            )}
           </Link>
 
           <div className="r-nav-links">
-            {NAV_LINKS.map(({ label, href }) => (
-              <Link key={label} href={href} style={linkStyle(href)}>{label}</Link>
-            ))}
+            {light ? (
+              <>
+                <Link href="/browse" style={linkStyle('/browse')}>Browse deals</Link>
+                <Link href="/seller/deals/new" style={linkStyle('/seller/deals/new')}>For dealers</Link>
+                <a href="#how-it-works" style={linkStyle('')}>How it works</a>
+                <a href="#about" style={linkStyle('')}>About</a>
+              </>
+            ) : (
+              NAV_LINKS.map(({ label, href }) => (
+                <Link key={label} href={href} style={linkStyle(href)}>{label}</Link>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Right: live count + log in */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.7)', fontVariantNumeric: 'tabular-nums', minWidth: 28, display: 'inline-block' }}>
-              {liveCount ?? BASE} PEOPLE LIVE
-            </span>
-          </div>
-
-          <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+        {/* Right */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: light ? 8 : 16 }}>
+          {!light && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
+                <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', color: 'rgba(255,255,255,0.7)', fontVariantNumeric: 'tabular-nums', minWidth: 28, display: 'inline-block' }}>
+                  {liveCount ?? BASE} PEOPLE LIVE
+                </span>
+              </div>
+              <div style={{ width: 1, height: 16, background: 'rgba(255,255,255,0.1)' }} />
+            </>
+          )}
 
           {user ? (
             <div className="r-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               {dashHref && (
                 <Link href={dashHref} style={{ textDecoration: 'none' }}>
-                  <button style={{ padding: '6px 16px', border: '1px solid rgba(255,40,0,0.4)', borderRadius: 8, background: 'rgba(255,40,0,0.1)', color: '#FF2800', fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}>
+                  <button style={{ padding: '8px 16px', border: `1px solid ${light ? 'rgba(10,10,10,0.15)' : 'rgba(255,40,0,0.4)'}`, borderRadius: 999, background: light ? 'rgba(10,10,10,0.06)' : 'rgba(255,40,0,0.1)', color: light ? ink : '#FF2800', fontFamily: light ? SF : 'var(--font-barlow-cond)', fontWeight: 600, fontSize: 13, letterSpacing: light ? '-0.01em' : '0.1em', cursor: 'pointer' }}>
                     {dashLabel} →
                   </button>
                 </Link>
               )}
               <button
                 onClick={signOut}
-                style={{ padding: '6px 14px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, background: 'transparent', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-barlow-cond)', fontWeight: 600, fontSize: 11, letterSpacing: '0.1em', cursor: 'pointer' }}
+                style={{ padding: '8px 14px', border: `1px solid ${light ? 'rgba(10,10,10,0.12)' : 'rgba(255,255,255,0.1)'}`, borderRadius: 999, background: 'transparent', color: inkMuted, fontFamily: light ? SF : 'var(--font-barlow-cond)', fontWeight: 500, fontSize: 13, letterSpacing: light ? '-0.01em' : '0.1em', cursor: 'pointer' }}
               >
-                SIGN OUT
+                Sign out
               </button>
             </div>
           ) : (
-            <Link href="/login" className="r-nav-links" style={{ textDecoration: 'none' }}>
-              <button style={{ padding: '6px 18px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 8, background: 'transparent', color: '#fff', fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 12, letterSpacing: '0.1em', cursor: 'pointer' }}>
-                LOG IN
-              </button>
-            </Link>
+            <div className="r-nav-links" style={{ display: 'flex', gap: 8 }}>
+              <Link href="/login" style={{ textDecoration: 'none' }}>
+                <button style={{ padding: '10px 16px', border: 'none', borderRadius: 999, background: 'transparent', color: inkMuted, fontFamily: light ? SF : 'var(--font-barlow-cond)', fontWeight: 500, fontSize: 14, letterSpacing: light ? '-0.01em' : '0.1em', cursor: 'pointer' }}>
+                  {light ? 'Sign in' : 'LOG IN'}
+                </button>
+              </Link>
+              {light && (
+                <Link href="/seller/deals/new" style={{ textDecoration: 'none' }}>
+                  <button style={{ padding: '10px 18px', border: 'none', borderRadius: 999, background: ink, color: '#f7f5f2', fontFamily: SF, fontWeight: 500, fontSize: 14, letterSpacing: '-0.01em', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    Post a deal
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+                  </button>
+                </Link>
+              )}
+            </div>
           )}
         </div>
       </nav>

@@ -1,90 +1,91 @@
 import Nav from '@/components/Nav';
-import HeroCTA from '@/components/HeroCTA';
-import HeroDelivery from '@/components/HeroDelivery';
-import HowItWorks from '@/components/HowItWorks';
+import HeroSpotlight from '@/components/HeroSpotlight';
+import BrandMarquee from '@/components/BrandMarquee';
 import HomepageDeals from '@/components/HomepageDeals';
+import HowItWorks from '@/components/HowItWorks';
+import SplitSection from '@/components/SplitSection';
 import Testimonials from '@/components/Testimonials';
+import CTASection from '@/components/CTASection';
 import { getLiveDealsByCategory } from '@/lib/deals';
+import Link from 'next/link';
+
+const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif';
 
 export default async function Home() {
   const dealsByCategory = await getLiveDealsByCategory();
 
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', zIndex: 2 }}>
-      <Nav />
+    <div style={{
+      background: '#f7f5f2',
+      minHeight: '100vh',
+      color: '#0a0a0a',
+      fontFamily: SF,
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+      <Nav light />
 
-      {/* ── Hero ── */}
-      <section className="r-hero-section" style={{ position: 'relative' }}>
-        {/* Bottom gradient */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: 160,
-          background: 'linear-gradient(to top, #070707, transparent)',
-          zIndex: 10, pointerEvents: 'none',
-        }} />
+      <HeroSpotlight />
+      <BrandMarquee />
+      <HomepageDeals dealsByCategory={dealsByCategory} />
+      <HowItWorks />
+      <SplitSection />
+      <Testimonials />
+      <CTASection />
 
-        {/* Inner layout */}
-        <div className="r-hero-inner" style={{ maxWidth: 1320, width: '100%', margin: '0 auto', position: 'relative', zIndex: 5 }}>
-
-          {/* Left */}
-          <div className="r-hero-left" style={{ position: 'relative', zIndex: 6 }}>
-            {/* 2-line headline */}
-            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-0.025em', marginBottom: 24 }}>
-              <div style={{ fontSize: 'clamp(44px, 7.5vw, 108px)', color: '#fff' }}>
-                GET YOUR
+      {/* Footer */}
+      <footer style={{ padding: '48px 24px 32px', borderTop: '1px solid rgba(10,10,10,0.08)' }}>
+        <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+          <div className="lz-footer-grid">
+            <div>
+              {/* Logo */}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: '#0a0a0a', fontWeight: 600, fontSize: 22, letterSpacing: '-0.03em', fontFamily: SF }}>
+                <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="13" stroke="#0a0a0a" strokeWidth="1.5" />
+                  <path d="M9 9h10M9 14h10M9 19h6" stroke="#0a0a0a" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+                <span style={{ fontStyle: 'italic', fontSize: 24, letterSpacing: '-0.02em' }}>Leased</span>
+              </span>
+              <p style={{ fontSize: 13, color: 'rgba(10,10,10,0.55)', marginTop: 12, maxWidth: 280, lineHeight: 1.5, fontFamily: SF }}>
+                The lease marketplace where dealers post real deals and shoppers apply directly. No phone tag.
+              </p>
+            </div>
+            {[
+              { h: 'Shop', i: ['Browse deals', 'Get pre-qualified', 'Apply'] },
+              { h: 'Dealers', i: ['Post a deal', 'Pricing', 'Dealer login'] },
+              { h: 'Company', i: ['About', 'Careers', 'Contact'] },
+              { h: 'Legal', i: ['Privacy', 'Terms', 'Cookies'] },
+            ].map(col => (
+              <div key={col.h}>
+                <div style={{
+                  fontFamily: 'JetBrains Mono, ui-monospace, monospace',
+                  fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+                  color: 'rgba(10,10,10,0.45)', marginBottom: 14,
+                }}>
+                  {col.h}
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {col.i.map(item => (
+                    <li key={item} style={{ fontSize: 13, color: 'rgba(10,10,10,0.7)', fontFamily: SF }}>{item}</li>
+                  ))}
+                </ul>
               </div>
-              <div style={{
-                fontSize: 'clamp(44px, 7.5vw, 108px)',
-                background: 'linear-gradient(135deg, #FF2800 20%, #cc1f00 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-              }}>
-                DREAM LEASE.
-              </div>
-            </h1>
-
-            {/* Tagline */}
-            <p style={{
-              fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 15,
-              lineHeight: 1.7, color: 'rgba(255,255,255,0.5)',
-              maxWidth: 380, marginBottom: 36, letterSpacing: '0.01em',
-            }}>
-              Vetted brokers. Live countdowns.<br/>Strike before the timer hits zero.
-            </p>
-
-            <HeroCTA />
+            ))}
           </div>
 
-          {/* Right — deal preview (desktop only) */}
-          <div className="r-hero-slideshow">
-            <HeroDelivery />
+          <div style={{
+            marginTop: 32, paddingTop: 20,
+            borderTop: '1px solid rgba(10,10,10,0.08)',
+            display: 'flex', justifyContent: 'space-between',
+            fontSize: 12, color: 'rgba(10,10,10,0.4)',
+            fontFamily: SF,
+            flexWrap: 'wrap', gap: 8,
+          }}>
+            <span>© 2026 Leased, Inc.</span>
+            <span style={{ fontFamily: 'JetBrains Mono, ui-monospace, monospace', fontSize: 11 }}>
+              Made for shoppers, not for spam.
+            </span>
           </div>
-
         </div>
-      </section>
-
-      {/* ── Deals of the Day ── */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <HomepageDeals dealsByCategory={dealsByCategory} />
-      </div>
-
-      {/* ── How It Works ── */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <HowItWorks />
-      </div>
-
-      {/* ── Testimonials ── */}
-      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <Testimonials />
-      </div>
-
-      {/* ── Footer ── */}
-      <footer className="r-footer" style={{
-        textAlign: 'center',
-        borderTop: '1px solid rgba(255,255,255,0.05)',
-        fontFamily: 'var(--font-barlow)', fontWeight: 300,
-        fontSize: 11, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.18)',
-      }}>
-        LEASED · Prices reflect estimated monthly payments. Terms vary by dealer. ©2025
       </footer>
     </div>
   );

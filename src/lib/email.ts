@@ -30,7 +30,7 @@ export async function sendInquiryNotification({
   const dashboardUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.leased.today'}/seller/dashboard`;
 
   await resend.emails.send({
-    from: 'Leased <notifications@leased.today>',
+    from: 'Leased <notifications@notification.leased.today>',
     to: sellerEmail,
     subject: `New inquiry on your ${dealTitle} listing`,
     html: `

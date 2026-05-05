@@ -156,7 +156,7 @@ export default function LoginPage() {
         </div>
 
         {/* Role preview */}
-        <div style={{ marginTop: 24, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+        <div className="lz-login-roles" style={{ marginTop: 24, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
           {[
             { label: 'USERS', desc: 'Browse & apply for drops', icon: '◎' },
             { label: 'SELLERS', desc: 'Post & manage listings', icon: '◈' },

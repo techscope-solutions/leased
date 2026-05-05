@@ -567,6 +567,9 @@ button { cursor: pointer; font-family: var(--font-cond); }
 }
 
 @media (max-width: 768px) {
+  /* Hide role preview cards on login page */
+  .lz-login-roles { display: none !important; }
+
   /* Hide quick filter chips — they live in the sidebar filters panel */
   .lz-browse-quickchip { display: none !important; }
   /* Hide sort select and view toggle — sort is in sidebar, view toggle not needed */

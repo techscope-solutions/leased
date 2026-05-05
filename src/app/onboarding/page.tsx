@@ -1,8 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+
+const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
+const INK = '#0a0a0a';
+const A = 'oklch(0.55 0.22 18)';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -12,97 +17,105 @@ export default function OnboardingPage() {
   const confirm = async () => {
     if (!selected || saving) return;
     setSaving(true);
-
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push('/login'); return; }
-
-    await supabase
-      .from('profiles')
-      .update({ role: selected, onboarded: true })
-      .eq('id', user.id);
-
+    await supabase.from('profiles').update({ role: selected, onboarded: true }).eq('id', user.id);
     router.push(selected === 'seller' ? '/seller/dashboard' : '/browse');
   };
 
   return (
     <div style={{
-      minHeight: '100vh', display: 'flex', flexDirection: 'column',
-      alignItems: 'center', justifyContent: 'center',
-      padding: '24px 20px', position: 'relative', zIndex: 2,
+      minHeight: '100vh',
+      background: '#f7f5f2',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px 20px 48px',
+      position: 'relative',
+      zIndex: 2,
+      fontFamily: SF,
+      color: INK,
     }}>
+
+      {/* Logo */}
+      <Link href="/" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 40 }}>
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" stroke={INK} strokeWidth="1.5"/>
+          <path d="M9 9h10M9 14h10M9 19h6" stroke={INK} strokeWidth="1.8" strokeLinecap="round"/>
+        </svg>
+        <span style={{ fontStyle: 'italic', fontSize: 24, letterSpacing: '-0.02em', color: INK, fontWeight: 500, fontFamily: 'Georgia, serif' }}>Leased</span>
+      </Link>
+
       <div style={{ width: '100%', maxWidth: 560 }}>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20, background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 99, padding: '6px 16px' }}>
-            <span className="pulse-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF2800', display: 'inline-block' }} />
-            <span style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 11, letterSpacing: '0.14em', color: 'rgba(255,255,255,0.55)' }}>ONE LAST STEP</span>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 7, marginBottom: 16, background: `${A}12`, border: `1px solid ${A}30`, borderRadius: 99, padding: '5px 14px' }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: A, display: 'inline-block' }} />
+            <span style={{ fontFamily: SF, fontWeight: 600, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', color: A }}>One last step</span>
           </div>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(32px, 7vw, 52px)', letterSpacing: '-0.025em', lineHeight: 0.9, marginBottom: 14 }}>
-            <span style={{ color: '#fff' }}>WHO ARE </span>
-            <span style={{ background: 'linear-gradient(135deg, #FF2800 20%, #cc1f00 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>YOU?</span>
-          </div>
-          <p style={{ fontFamily: 'var(--font-barlow)', fontWeight: 300, fontSize: 14, color: 'rgba(255,255,255,0.45)', lineHeight: 1.7 }}>
-            Choose how you want to use LEASED. You can only pick one.
+          <h1 style={{ fontSize: 'clamp(28px, 6vw, 44px)', fontWeight: 700, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 12px', color: INK, fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+            How will you use Leased?
+          </h1>
+          <p style={{ fontSize: 14, color: 'rgba(10,10,10,0.45)', margin: 0, lineHeight: 1.6 }}>
+            Choose your role. You can only pick one.
           </p>
         </div>
 
         {/* Role cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 20 }}>
           <RoleCard
             active={selected === 'user'}
             onClick={() => setSelected('user')}
             icon={
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <circle cx="14" cy="10" r="5" fill="currentColor" opacity="0.9"/>
+              <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                <circle cx="14" cy="10" r="5" fill="currentColor"/>
                 <path d="M4 26C4 20 8.5 15.5 14 15.5C19.5 15.5 24 20 24 26" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
               </svg>
             }
-            label="USER"
-            headline="I'm Looking to Lease"
-            perks={['Browse live drops', 'Apply directly to brokers', 'Saved searches & alerts', 'Deal history']}
-            accentColor="#4a7fd4"
+            label="Buyer"
+            headline="I'm looking to lease"
+            perks={['Browse live drops', 'Apply to brokers directly', 'Track deal history']}
+            accent="#4a7fd4"
           />
           <RoleCard
             active={selected === 'seller'}
             onClick={() => setSelected('seller')}
             icon={
-              <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-                <rect x="3" y="8" width="22" height="16" rx="2" fill="currentColor" opacity="0.7"/>
+              <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+                <rect x="3" y="8" width="22" height="16" rx="2" fill="currentColor" opacity="0.8"/>
                 <rect x="1" y="6" width="26" height="5" rx="1.5" fill="currentColor"/>
-                <rect x="10" y="17" width="4" height="7" fill="#080808"/>
-                <rect x="14" y="17" width="4" height="7" fill="#080808"/>
+                <rect x="10" y="17" width="4" height="7" fill="white"/>
+                <rect x="14" y="17" width="4" height="7" fill="white"/>
               </svg>
             }
-            label="SELLER"
-            headline="I'm a Broker or Dealer"
-            perks={['Post lease drops', 'Set your own pricing', 'Timer-driven urgency', 'Verified badge']}
-            accentColor="#FF2800"
+            label="Broker / Dealer"
+            headline="I'm posting deals"
+            perks={['Post lease drops', 'Set your own pricing', 'Get verified badge']}
+            accent={A}
           />
         </div>
 
-        {/* Confirm */}
+        {/* Confirm button */}
         <button
           onClick={confirm}
           disabled={!selected || saving}
           style={{
-            width: '100%', padding: '16px',
-            borderRadius: 14,
-            background: selected ? 'rgba(255,40,0,0.9)' : 'rgba(255,255,255,0.06)',
-            border: `1px solid ${selected ? 'rgba(255,80,40,0.4)' : 'rgba(255,255,255,0.1)'}`,
-            boxShadow: selected ? '0 4px 28px rgba(255,40,0,0.3)' : 'none',
-            color: selected ? '#fff' : 'rgba(255,255,255,0.25)',
-            fontFamily: 'var(--font-barlow-cond)', fontWeight: 800,
-            fontSize: 14, letterSpacing: '0.1em',
+            width: '100%', padding: '15px',
+            borderRadius: 14, border: 'none',
+            background: selected ? INK : 'rgba(10,10,10,0.08)',
+            color: selected ? 'white' : 'rgba(10,10,10,0.25)',
+            fontFamily: SF, fontWeight: 600, fontSize: 15,
             cursor: selected && !saving ? 'pointer' : 'not-allowed',
-            transition: 'all 0.3s cubic-bezier(0.23,1,0.32,1)',
+            transition: 'all 0.2s',
           }}
         >
-          {saving ? 'SETTING UP YOUR ACCOUNT…' : selected ? `ENTER AS ${selected.toUpperCase()} →` : 'SELECT A ROLE ABOVE'}
+          {saving ? 'Setting up your account…' : selected ? `Continue as ${selected === 'user' ? 'Buyer' : 'Broker / Dealer'} →` : 'Select a role above'}
         </button>
 
-        <p style={{ textAlign: 'center', marginTop: 16, fontFamily: 'var(--font-barlow)', fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>
+        <p style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(10,10,10,0.25)', lineHeight: 1.7 }}>
           Moderators are invited directly — contact the team.
         </p>
       </div>
@@ -111,7 +124,7 @@ export default function OnboardingPage() {
 }
 
 function RoleCard({
-  active, onClick, icon, label, headline, perks, accentColor,
+  active, onClick, icon, label, headline, perks, accent,
 }: {
   active: boolean;
   onClick: () => void;
@@ -119,54 +132,59 @@ function RoleCard({
   label: string;
   headline: string;
   perks: string[];
-  accentColor: string;
+  accent: string;
 }) {
   return (
     <button
       onClick={onClick}
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
-        padding: '24px 20px', borderRadius: 20, textAlign: 'left',
-        background: active ? `${accentColor}12` : 'rgba(255,255,255,0.03)',
-        border: `1px solid ${active ? accentColor + '50' : 'rgba(255,255,255,0.09)'}`,
-        boxShadow: active ? `0 0 40px ${accentColor}18, inset 0 1px 0 ${accentColor}20` : 'none',
+        padding: '22px 18px', borderRadius: 20, textAlign: 'left', width: '100%',
+        background: active ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.55)',
+        backdropFilter: 'blur(20px) saturate(140%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(140%)',
+        border: `1.5px solid ${active ? accent + '60' : 'rgba(255,255,255,0.8)'}`,
+        boxShadow: active
+          ? `0 8px 32px ${accent}18, inset 0 1px 0 rgba(255,255,255,0.9)`
+          : '0 2px 12px rgba(10,10,10,0.04), inset 0 1px 0 rgba(255,255,255,0.8)',
         cursor: 'pointer',
-        transition: 'all 0.25s cubic-bezier(0.23,1,0.32,1)',
+        transition: 'all 0.2s cubic-bezier(0.23,1,0.32,1)',
         position: 'relative', overflow: 'hidden',
+        fontFamily: SF,
       }}
     >
       {active && (
         <div style={{
-          position: 'absolute', top: 14, right: 14,
-          width: 18, height: 18, borderRadius: '50%',
-          background: accentColor,
+          position: 'absolute', top: 12, right: 12,
+          width: 20, height: 20, borderRadius: '50%',
+          background: accent,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-            <path d="M2 5L4 7L8 3" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 5L4 7L8 3" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
       )}
 
-      <div style={{ color: active ? accentColor : 'rgba(255,255,255,0.35)', marginBottom: 14, transition: 'color 0.2s' }}>
+      <div style={{ color: active ? accent : 'rgba(10,10,10,0.25)', marginBottom: 14, transition: 'color 0.2s' }}>
         {icon}
       </div>
 
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 700, fontSize: 10, letterSpacing: '0.14em', color: active ? accentColor : 'rgba(255,255,255,0.3)', marginBottom: 6, transition: 'color 0.2s' }}>
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: active ? accent : 'rgba(10,10,10,0.35)', marginBottom: 5, transition: 'color 0.2s' }}>
         {label}
       </div>
-      <div style={{ fontFamily: 'var(--font-barlow-cond)', fontWeight: 800, fontSize: 16, color: active ? '#fff' : 'rgba(255,255,255,0.65)', lineHeight: 1.2, marginBottom: 16, transition: 'color 0.2s' }}>
+      <div style={{ fontSize: 15, fontWeight: 600, color: active ? INK : 'rgba(10,10,10,0.55)', lineHeight: 1.2, marginBottom: 16, letterSpacing: '-0.01em', transition: 'color 0.2s' }}>
         {headline}
       </div>
 
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 7 }}>
         {perks.map(perk => (
-          <li key={perk} style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <circle cx="5" cy="5" r="4" fill={active ? accentColor : 'rgba(255,255,255,0.12)'} style={{ transition: 'fill 0.2s' }}/>
-              <path d="M3 5L4.5 6.5L7 3.5" stroke={active ? '#fff' : 'rgba(255,255,255,0.4)'} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'stroke 0.2s' }}/>
+          <li key={perk} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" fill={active ? accent : 'rgba(10,10,10,0.08)'}/>
+              <path d="M4.5 7L6 8.5L9.5 5" stroke={active ? 'white' : 'rgba(10,10,10,0.3)'} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <span style={{ fontFamily: 'var(--font-barlow)', fontSize: 11, color: active ? 'rgba(255,255,255,0.75)' : 'rgba(255,255,255,0.35)', transition: 'color 0.2s' }}>{perk}</span>
+            <span style={{ fontSize: 12, color: active ? 'rgba(10,10,10,0.65)' : 'rgba(10,10,10,0.35)', transition: 'color 0.2s' }}>{perk}</span>
           </li>
         ))}
       </ul>

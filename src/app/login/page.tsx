@@ -169,36 +169,46 @@ export default function LoginPage() {
               </div>
 
               {/* Email form */}
-              <form onSubmit={handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                  style={{
-                    width: '100%', padding: '13px 16px',
-                    background: 'white',
-                    border: '1px solid rgba(10,10,10,0.12)',
-                    borderRadius: 12, color: INK, fontFamily: SF, fontSize: 14,
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  style={{
-                    width: '100%', padding: '13px 16px',
-                    background: 'white',
-                    border: '1px solid rgba(10,10,10,0.12)',
-                    borderRadius: 12, color: INK, fontFamily: SF, fontSize: 14,
-                    outline: 'none', boxSizing: 'border-box',
-                  }}
-                />
+              <form onSubmit={handleEmail} style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', color: 'rgba(10,10,10,0.5)', textTransform: 'uppercase' }}>
+                    Email address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                    style={{
+                      width: '100%', padding: '13px 16px',
+                      background: 'white',
+                      border: '1px solid rgba(10,10,10,0.12)',
+                      borderRadius: 12, color: INK, fontFamily: SF, fontSize: 14,
+                      outline: 'none', boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', color: 'rgba(10,10,10,0.5)', textTransform: 'uppercase' }}>
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    style={{
+                      width: '100%', padding: '13px 16px',
+                      background: 'white',
+                      border: '1px solid rgba(10,10,10,0.12)',
+                      borderRadius: 12, color: INK, fontFamily: SF, fontSize: 14,
+                      outline: 'none', boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
                 {error && (
                   <div style={{
                     padding: '10px 14px',

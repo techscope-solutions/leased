@@ -617,6 +617,7 @@ button { cursor: pointer; font-family: var(--font-cond); }
 /* Desktop: show table columns, hide mobile inline summary */
 .lz-seller-desktop-col   { display: block; }
 .lz-seller-mobile-inline { display: none !important; }
+.lz-seller-deal-row:hover { background: rgba(10,10,10,0.02); }
 
 @media (max-width: 900px) {
   /* Hide sidebar, show mobile chrome */

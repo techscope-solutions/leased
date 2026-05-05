@@ -20,7 +20,14 @@ export default function OnboardingPage() {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push('/login'); return; }
-    await supabase.from('profiles').update({ role: selected, onboarded: true }).eq('id', user.id);
+    // Upsert so email/password users who skipped the OAuth callback still get a profile row
+    await supabase.from('profiles').upsert({
+      id: user.id,
+      email: user.email ?? null,
+      full_name: (user.user_metadata?.full_name as string | undefined) ?? (user.user_metadata?.name as string | undefined) ?? null,
+      role: selected,
+      onboarded: true,
+    }, { onConflict: 'id' });
     router.push(selected === 'seller' ? '/seller/dashboard' : '/browse');
   };
 

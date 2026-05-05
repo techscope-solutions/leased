@@ -413,7 +413,8 @@ function ListingsTab({ deals, inquiryCounts, newInquiryCounts }: { deals: DbDeal
             </div>
 
             {filtered.map((deal, i) => (
-              <div key={deal.id} className="lz-seller-table-row" style={{ padding: '12px 16px', borderTop: i === 0 ? 'none' : '1px solid rgba(10,10,10,0.05)' }}>
+              <Link key={deal.id} href={`/seller/deals/${deal.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+              <div className="lz-seller-table-row lz-seller-deal-row" style={{ padding: '12px 16px', borderTop: i === 0 ? 'none' : '1px solid rgba(10,10,10,0.05)', cursor: 'pointer' }}>
                 {/* Vehicle (always shown) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                   <Thumb deal={deal} />
@@ -460,6 +461,7 @@ function ListingsTab({ deals, inquiryCounts, newInquiryCounts }: { deals: DbDeal
                   {new Date(deal.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </span>
               </div>
+              </Link>
             ))}
           </div>
         )}

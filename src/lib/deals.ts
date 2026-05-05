@@ -187,6 +187,19 @@ export async function getAllDeals(): Promise<DealWithSeller[]> {
   }
 }
 
+export async function getFeaturedDeal(): Promise<DbDeal | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('deals')
+    .select('*')
+    .eq('status', 'live')
+    .eq('featured', true)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data ?? null) as DbDeal | null;
+}
+
 export async function getDealById(id: string): Promise<DbDeal | null> {
   const supabase = await createClient();
   const { data } = await supabase

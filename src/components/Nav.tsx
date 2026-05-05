@@ -60,8 +60,6 @@ function useLiveCount() {
 
 const NAV_LINKS = [
   { label: 'MARKETPLACE', href: '/browse' },
-  { label: 'BROKERS',     href: '/brokers' },
-  { label: 'DEALERSHIPS', href: '/dealerships' },
 ];
 
 const BOTTOM_TABS = [
@@ -81,26 +79,6 @@ const BOTTOM_TABS = [
         <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor"/>
         <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
         <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'BROKERS', href: '/brokers',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <circle cx="10" cy="6" r="3.5" fill="currentColor"/>
-        <path d="M3 18C3 14.5 6.1 11.5 10 11.5C13.9 11.5 17 14.5 17 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'DEALERS', href: '/dealerships',
-    icon: (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <rect x="2" y="7" width="16" height="11" rx="1" fill="currentColor" opacity="0.7"/>
-        <rect x="1" y="5" width="18" height="4" rx="1" fill="currentColor"/>
-        <rect x="7" y="12" width="3" height="6" fill="#080808"/>
-        <rect x="10" y="12" width="3" height="6" fill="#080808"/>
       </svg>
     ),
   },

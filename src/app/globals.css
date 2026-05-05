@@ -566,6 +566,14 @@ button { cursor: pointer; font-family: var(--font-cond); }
   .lz-browse-sidebar-hidden { display: none !important; }
 }
 
+@media (max-width: 768px) {
+  /* Hide quick filter chips — they live in the sidebar filters panel */
+  .lz-browse-quickchip { display: none !important; }
+  /* Hide sort select and view toggle — sort is in sidebar, view toggle not needed */
+  .lz-browse-sort-select { display: none !important; }
+  .lz-browse-view-toggle { display: none !important; }
+}
+
 /* CTA section grid */
 .lz-cta-grid {
   display: grid;

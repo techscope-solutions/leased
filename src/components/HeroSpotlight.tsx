@@ -1,11 +1,26 @@
-'use client';
-
 import Link from 'next/link';
+import { getFeaturedDeal } from '@/lib/deals';
 
 const A = 'oklch(0.55 0.22 18)';
 const SF = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif';
 
-export default function HeroSpotlight() {
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const h = Math.floor(diff / 3600000);
+  if (h < 1) return 'just now';
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+export default async function HeroSpotlight() {
+  const deal = await getFeaturedDeal();
+  if (!deal) return null;
+
+  const title = `${deal.year} ${deal.make} ${deal.model}`;
+  const image = deal.images?.[0] ?? '/hero-tesla.png';
+  const milesLabel = deal.miles_per_year >= 1000 ? `${deal.miles_per_year / 1000}k` : String(deal.miles_per_year);
+
   return (
     <section style={{ padding: '24px', maxWidth: 1280, margin: '0 auto' }}>
       <div
@@ -49,8 +64,8 @@ export default function HeroSpotlight() {
               fontFamily: SF,
               maxWidth: 520,
             }}>
-              Lease this Model 3<br />
-              for <span style={{ color: A }}>$429</span>/month.
+              Lease this {deal.model}<br />
+              for <span style={{ color: A }}>${deal.monthly}</span>/month.
             </h1>
 
             <p style={{
@@ -62,7 +77,7 @@ export default function HeroSpotlight() {
               fontFamily: SF,
               fontWeight: 400,
             }}>
-              2026 Long Range AWD · Pearl White · posted by Coastline EV in San Diego. Updated 2 hours ago.
+              {deal.year} {deal.trim}{deal.color ? ` · ${deal.color}` : ''} · {deal.city}, {deal.state}. Updated {timeAgo(deal.updated_at)}.
             </p>
           </div>
 
@@ -77,9 +92,9 @@ export default function HeroSpotlight() {
               fontFamily: SF,
             }}>
               {[
-                { val: '36 mo', label: 'term' },
-                { val: '$2,999', label: 'due at signing' },
-                { val: '10k', label: 'miles/yr' },
+                { val: `${deal.term} mo`, label: 'term' },
+                { val: `$${deal.due_at_signing.toLocaleString()}`, label: 'due at signing' },
+                { val: milesLabel, label: 'miles/yr' },
               ].map(({ val, label }) => (
                 <div key={label}>
                   <div style={{ fontSize: 28, color: 'white', lineHeight: 1, fontWeight: 600, letterSpacing: '-0.02em', fontFamily: SF }}>
@@ -91,17 +106,13 @@ export default function HeroSpotlight() {
             </div>
 
             <div style={{ display: 'flex', gap: 10, flexWrap: 'nowrap' }}>
-              <Link href="/browse" style={{ textDecoration: 'none', flexShrink: 0 }}>
+              <Link href={`/browse/${deal.id}`} style={{ textDecoration: 'none', flexShrink: 0 }}>
                 <button className="lz-hero-btn" style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '14px 22px', borderRadius: 999,
                   fontWeight: 500, fontSize: 15, border: 'none', cursor: 'pointer',
                   background: 'white', color: '#0a0a0a', fontFamily: SF,
-                  transition: 'transform 0.15s ease',
-                }}
-                  onMouseEnter={e => { (e.target as HTMLElement).style.transform = 'translateY(-1px)'; }}
-                  onMouseLeave={e => { (e.target as HTMLElement).style.transform = ''; }}
-                >
+                }}>
                   Apply now
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 5l7 7-7 7" /></svg>
                 </button>
@@ -123,15 +134,15 @@ export default function HeroSpotlight() {
           </div>
         </div>
 
-        {/* Right: Tesla image card */}
+        {/* Right: car image card */}
         <div
           className="lz-spotlight-image"
           style={{ position: 'relative', borderRadius: 18, overflow: 'hidden' }}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/hero-tesla.png"
-            alt="2026 Tesla Model 3"
+            src={image}
+            alt={title}
             style={{
               position: 'absolute', inset: 0,
               width: '100%', height: '100%',
@@ -147,7 +158,7 @@ export default function HeroSpotlight() {
               padding: '6px 12px', borderRadius: 999,
               background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(10px)',
               color: 'white', fontSize: 12, fontWeight: 500, fontFamily: SF,
-            }}>⚡ EV</span>
+            }}>{deal.car_type}</span>
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: 6,
               padding: '6px 12px', borderRadius: 999,
@@ -155,7 +166,7 @@ export default function HeroSpotlight() {
               color: 'white', fontSize: 12, fontWeight: 500, fontFamily: SF,
             }}>
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: A, display: 'inline-block' }} />
-              Posted 2h ago
+              {timeAgo(deal.updated_at)}
             </span>
           </div>
         </div>

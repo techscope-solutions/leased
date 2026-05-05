@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { CarDeal } from '@/lib/types';
 import { trackDealClick } from '@/lib/analytics';
 
@@ -18,22 +18,18 @@ const SORTS = [
 
 function GlassDealCard({ deal, compact = false }: { deal: CarDeal; compact?: boolean }) {
   const [hovered, setHovered] = useState(false);
-  const router = useRouter();
-
-  const handleClick = () => {
-    trackDealClick(deal.dropId);
-    router.push(`/browse/${deal.id}`);
-  };
 
   if (compact) {
     return (
-      <div
+      <Link
+        href={`/browse/${deal.id}`}
+        onClick={() => trackDealClick(deal.dropId)}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
-        onClick={handleClick}
         style={{
           display: 'flex',
           gap: 0,
+          textDecoration: 'none',
           background: 'rgba(255,255,255,0.55)',
           backdropFilter: 'blur(20px) saturate(140%)',
           WebkitBackdropFilter: 'blur(20px) saturate(140%)',
@@ -74,26 +70,29 @@ function GlassDealCard({ deal, compact = false }: { deal: CarDeal; compact?: boo
           <div style={{ fontFamily: SF, fontSize: 22, fontWeight: 700, color: A, letterSpacing: '-0.025em', flexShrink: 0 }}>
             ${deal.monthly}<span style={{ fontSize: 12, fontWeight: 400, color: 'rgba(10,10,10,0.35)' }}>/mo</span>
           </div>
-          <button
+          <span
             style={{
               padding: '8px 16px', borderRadius: 999,
-              background: '#0a0a0a', color: 'white', border: 'none', cursor: 'pointer',
+              background: '#0a0a0a', color: 'white',
               fontFamily: SF, fontSize: 13, fontWeight: 500, flexShrink: 0,
             }}
           >
             Apply
-          </button>
+          </span>
         </div>
-      </div>
+      </Link>
     );
   }
 
   return (
-    <div
+    <Link
+      href={`/browse/${deal.id}`}
+      onClick={() => trackDealClick(deal.dropId)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={handleClick}
       style={{
+        display: 'block',
+        textDecoration: 'none',
         background: 'rgba(255,255,255,0.55)',
         backdropFilter: 'blur(20px) saturate(140%)',
         WebkitBackdropFilter: 'blur(20px) saturate(140%)',
@@ -156,27 +155,24 @@ function GlassDealCard({ deal, compact = false }: { deal: CarDeal; compact?: boo
             {deal.trim} · {deal.city}, {deal.state}
           </div>
         </div>
-        <button
-          title="View deal"
+        <span
           style={{
             flexShrink: 0,
             width: 32, height: 32, borderRadius: 999,
-            background: 'rgba(10,10,10,0.06)', border: 'none', cursor: 'pointer',
+            background: hovered ? '#0a0a0a' : 'rgba(10,10,10,0.06)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'rgba(10,10,10,0.5)',
+            color: hovered ? 'white' : 'rgba(10,10,10,0.5)',
             transition: 'background 0.15s, color 0.15s',
           }}
-          onMouseEnter={e => { const el = e.currentTarget; el.style.background = '#0a0a0a'; el.style.color = 'white'; }}
-          onMouseLeave={e => { const el = e.currentTarget; el.style.background = 'rgba(10,10,10,0.06)'; el.style.color = 'rgba(10,10,10,0.5)'; }}
         >
           <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 2H2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9" />
             <path d="M8 1h5v5" />
             <path d="M13 1L6 8" />
           </svg>
-        </button>
+        </span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -261,6 +257,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
 
             {/* Sort */}
             <select
+              className="lz-browse-sort-select"
               value={sortIdx}
               onChange={e => setSortIdx(Number(e.target.value))}
               style={{
@@ -276,7 +273,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
             </select>
 
             {/* View toggle */}
-            <div style={{
+            <div className="lz-browse-view-toggle" style={{
               display: 'flex',
               background: 'rgba(255,255,255,0.7)',
               border: '1px solid rgba(255,255,255,0.8)',
@@ -333,6 +330,7 @@ export default function BrowseGrid({ deals }: { deals: CarDeal[] }) {
           {quickChips.filter(c => c.label !== 'All').map(chip => (
             <button
               key={chip.label}
+              className="lz-browse-quickchip"
               onClick={chip.onClick}
               style={{
                 padding: '7px 14px', borderRadius: 999,

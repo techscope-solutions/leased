@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { sendInquiryNotification } from '@/lib/email';
 
 export type InquiryPayload = {
@@ -51,9 +52,11 @@ export async function submitInquiry(payload: InquiryPayload): Promise<InquiryRes
 
   // Fire email notification to seller (non-blocking — don't fail the inquiry if email errors)
   try {
+    // Use admin client so RLS on profiles doesn't prevent reading the seller's row
+    const admin = createAdminClient();
     const [{ data: sellerProfile }, { data: deal }] = await Promise.all([
-      supabase.from('profiles').select('email, full_name').eq('id', payload.sellerId).single(),
-      supabase.from('deals').select('year, make, model').eq('id', payload.dealId).single(),
+      admin.from('profiles').select('email, full_name').eq('id', payload.sellerId).single(),
+      admin.from('deals').select('year, make, model').eq('id', payload.dealId).single(),
     ]);
 
     if (sellerProfile?.email && deal) {
@@ -69,9 +72,25 @@ export async function submitInquiry(payload: InquiryPayload): Promise<InquiryRes
         estimatedCredit: payload.estimatedCredit,
         message:         payload.message,
       });
+    } else {
+      // Log so admins can see why no email was sent
+      await supabase.from('errors').insert({
+        user_id:  user.id,
+        message:  `Inquiry email skipped: sellerProfile.email=${sellerProfile?.email ?? 'null'}, deal=${deal ? 'found' : 'null'}`,
+        page:     `/browse/${payload.dealId}`,
+        metadata: { action: 'sendInquiryNotification', sellerId: payload.sellerId },
+      });
     }
-  } catch {
-    // Email failure never blocks the inquiry submission
+  } catch (emailErr) {
+    // Log email failures to admin errors panel without surfacing to user
+    try {
+      await supabase.from('errors').insert({
+        user_id:  user.id,
+        message:  emailErr instanceof Error ? emailErr.message : 'Unknown email error',
+        page:     `/browse/${payload.dealId}`,
+        metadata: { action: 'sendInquiryNotification', sellerId: payload.sellerId },
+      });
+    } catch { /* ignore secondary error */ }
   }
 
   return { ok: true };

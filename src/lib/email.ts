@@ -68,7 +68,7 @@ export async function sendInquiryNotification({
       </div>
 
       ${message ? `
-      <div style="border-left:3px solid oklch(0.55 0.22 18);padding:12px 16px;margin-bottom:20px;background:rgba(10,10,10,0.02);border-radius:0 8px 8px 0;">
+      <div style="border-left:3px solid #c0392b;padding:12px 16px;margin-bottom:20px;background:#fafafa;border-radius:0 8px 8px 0;">
         <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(10,10,10,0.35);margin-bottom:6px;">Message</div>
         <p style="font-size:14px;color:#0a0a0a;margin:0;line-height:1.6;">${message}</p>
       </div>` : ''}
